@@ -2,6 +2,7 @@ module.exports = [
   {
     code: '001',
     name: 'สาขาทดสอบระบบ 001',
+    driver: 'mysql',
     databases: {
       pos: {
         host: 'findigrealtime.dyndns.biz',
@@ -29,6 +30,7 @@ module.exports = [
   {
     code: '002',
     name: 'สาขาทดสอบระบบ 002',
+    driver: 'mysql2',
     databases: {
       pos: {
         host: 'localhost',

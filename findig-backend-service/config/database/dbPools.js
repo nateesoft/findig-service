@@ -1,4 +1,5 @@
 const mysql = require('mysql');
+const mysql2 = require('mysql2/promise');
 const util = require('util');
 
 const branchConfig = require('./branch_config.js');
@@ -9,25 +10,27 @@ for (const branch of branchConfig) {
   pools[branch.code] = {};
 
   for (const [dbKey, dbConf] of Object.entries(branch.databases)) {
-    const pool = mysql.createPool({
-        host: dbConf.host,
-        user: dbConf.user,
-        password: dbConf.password,
-        database: dbConf.database,
-        port: dbConf.port,
-        waitForConnections: true,
+    if (branch.driver === 'mysql') {
+      const pool = mysql.createPool({
         connectionLimit: 10,
-        queueLimit: 0,
-        connectTimeout: 10000,
-        maxIdle: 3,
-        idleTimeout: 60000,
-        enableKeepAlive: true,
-        keepAliveInitialDelay: 0
-    });
-
-    // wrap query
-    pool.query = util.promisify(pool.query);
-    pools[branch.code][dbKey] = pool;
+        ...dbConf
+      });
+      // promisify ให้เหมือน mysql2
+      pool.query = util.promisify(pool.query);
+      pools[branch.code][dbKey] = {
+        driver: 'mysql',
+        pool
+      };
+    } else if (branch.driver === 'mysql2') {
+      const pool = mysql2.createPool({
+        connectionLimit: 10,
+        ...dbConf
+      });
+      pools[branch.code][dbKey] = {
+        driver: 'mysql2',
+        pool
+      };
+    }
   }
 }
 

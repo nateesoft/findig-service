@@ -6,7 +6,6 @@ import { themes, getThemeClasses } from '../../utils/themes';
 
 const LoginPage = ({ 
   currentTheme, 
-  setCurrentTheme, 
   setUser, 
   setCurrentPage 
 }) => {
@@ -20,30 +19,20 @@ const LoginPage = ({
     apiClient.post('/api/posuser/login', { 
       username: loginData.username,
       password: loginData.password,
-      barnchCode: loginData.branchCode
+      branchCode: loginData.branchCode
     })
     .then(response => {
-      
-    })
-    .catch(err => {
-
-    })
-    
-    // Simulate API call
-    setTimeout(() => {
-      if (loginData.username === 'admin' && loginData.password === 'password') {
-        setUser({
+      setUser({
           id: 1,
-          username: 'admin',
+          username: loginData.username,
           fullName: 'ผู้ดูแลระบบ',
           role: 'admin'
         });
         setCurrentPage('dashboard');
-      } else {
-        alert('ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง');
-      }
-      setLoading(false);
-    }, 1000);
+    })
+    .catch(err => {
+      alert('ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง');
+    })
   };
 
   const loginThemeClasses = currentTheme === 'sunset' ? 'bg-gradient-to-br from-orange-100 via-pink-100 to-red-100' :
