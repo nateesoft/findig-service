@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
+
 import { getThemeClasses } from './utils/themes';
 import { SESSION_TIMEOUT, WARNING_TIME } from './utils/constants';
 
@@ -9,6 +11,7 @@ import Header from './components/Layout/Header';
 import SessionWarningModal from './components/Modals/SessionWarningModal';
 import LogoutConfirmModal from './components/Modals/LogoutConfirmModal';
 import SessionIndicator from './components/Common/SessionIndicator';
+import ProtectedRoute from './components/Auth/ProtectedRoute';
 
 // Import Pages
 import Dashboard from './pages/Dashboard';
@@ -21,10 +24,54 @@ import InventoryReport from './pages/InventoryReport';
 import SystemSettings from './pages/SystemSettings';
 import BranchInfo from './pages/BranchInfo';
 
-const App = () => {
+// Layout Component สำหรับหน้าที่ล็อกอินแล้ว
+const AppLayout = ({ children, user, currentTheme, setCurrentTheme, setSidebarOpen, setShowLogoutConfirm, expandedMenus, setExpandedMenus, sidebarOpen }) => {
+  return (
+    <div className={`flex h-screen ${getThemeClasses('mainBg', currentTheme)}`}>
+      {/* Sidebar */}
+      <Sidebar 
+        user={user}
+        currentTheme={currentTheme}
+        setShowLogoutConfirm={setShowLogoutConfirm}
+        expandedMenus={expandedMenus}
+        setExpandedMenus={setExpandedMenus}
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+      />
+      
+      {/* Overlay for mobile */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+      
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Header */}
+        <Header 
+          currentTheme={currentTheme}
+          setCurrentTheme={setCurrentTheme}
+          setSidebarOpen={setSidebarOpen}
+          getThemeClasses={getThemeClasses}
+        />
+        
+        {/* Main Content Area */}
+        <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 lg:p-6">
+          {children}
+        </main>
+      </div>
+    </div>
+  );
+};
+
+// Main App Component
+const AppContent = () => {
   // User and Authentication States
   const [user, setUser] = useState(null);
-  const [currentPage, setCurrentPage] = useState('login');
+  const location = useLocation();
+  const navigate = useNavigate();
   
   // UI States
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -101,7 +148,7 @@ const App = () => {
       if (countdownInterval) clearInterval(countdownInterval);
       
       setUser(null);
-      setCurrentPage('login');
+      navigate('/login');
       setShowSessionWarning(false);
       setShowLogoutConfirm(false);
       // Reset states
@@ -160,7 +207,7 @@ const App = () => {
         document.removeEventListener(type, throttledHandleActivity);
       });
     };
-  }, [user, showLogoutConfirm, showSessionWarning]);
+  }, [user, showLogoutConfirm, showSessionWarning, navigate]);
 
   // Handle session extension
   const extendSession = () => {
@@ -169,124 +216,248 @@ const App = () => {
     setLastActivity(Date.now());
   };
 
-  // Render different pages based on currentPage
-  const renderPage = () => {
-    switch (currentPage) {
-      case 'dashboard':
-        return <Dashboard currentTheme={currentTheme} />;
-      case 'sales':
-        return (
-          <Sales 
-            currentTheme={currentTheme}
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            selectedCustomer={selectedCustomer}
-            setSelectedCustomer={setSelectedCustomer}
-            cart={cart}
-            setCart={setCart}
-          />
-        );
-      case 'user-groups':
-        return <UserGroups currentTheme={currentTheme} />;
-      case 'products':
-        return (
-          <Products 
-            currentTheme={currentTheme}
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-          />
-        );
-      case 'customers':
-        return (
-          <Customers 
-            currentTheme={currentTheme}
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-          />
-        );
-      case 'reports':
-        return <Reports currentTheme={currentTheme} />;
-      case 'inventory-report':
-        return <InventoryReport currentTheme={currentTheme} />;
-      case 'system-settings':
-        return (
-          <SystemSettings 
-            currentTheme={currentTheme}
-            setCurrentTheme={setCurrentTheme}
-          />
-        );
-      case 'branch-info':
-        return <BranchInfo currentTheme={currentTheme} />;
-      default:
-        return <Dashboard currentTheme={currentTheme} />;
-    }
+  // Handle logout
+  const handleLogout = () => {
+    setUser(null);
+    navigate('/login');
+    setShowLogoutConfirm(false);
+    setCart([]);
+    setSelectedCustomer(null);
+    setSidebarOpen(false);
   };
 
-  // If user is not logged in, show login page
-  if (!user) {
-    return (
-      <LoginPage 
-        currentTheme={currentTheme}
-        setCurrentTheme={setCurrentTheme}
-        setUser={setUser}
-        setCurrentPage={setCurrentPage}
-      />
-    );
-  }
-
-  // Main App Layout
   return (
-    <div className={`flex h-screen ${getThemeClasses('mainBg', currentTheme)}`}>
-      {/* Sidebar */}
-      <Sidebar 
-        user={user}
-        currentTheme={currentTheme}
-        currentPage={currentPage}
-        setCurrentPage={setCurrentPage}
-        setSidebarOpen={setSidebarOpen}
-        setShowLogoutConfirm={setShowLogoutConfirm}
-        expandedMenus={expandedMenus}
-        setExpandedMenus={setExpandedMenus}
-        sidebarOpen={sidebarOpen}
-      />
-      
-      {/* Overlay for mobile */}
-      {sidebarOpen && (
-        <div 
-          className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-      
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
-        <Header 
-          currentTheme={currentTheme}
-          setCurrentTheme={setCurrentTheme}
-          setSidebarOpen={setSidebarOpen}
-          getThemeClasses={getThemeClasses}
+    <>
+      <Routes>
+        {/* Login Route */}
+        <Route 
+          path="/login" 
+          element={
+            user ? 
+            <Navigate to="/dashboard" replace /> : 
+            <LoginPage 
+              currentTheme={currentTheme}
+              setCurrentTheme={setCurrentTheme}
+              setUser={setUser}
+              onLogin={() => navigate('/dashboard')}
+            />
+          } 
         />
         
-        {/* Main Content Area */}
-        <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 lg:p-6">
-          {renderPage()}
-        </main>
-      </div>
+        {/* Protected Routes */}
+        <Route 
+          path="/dashboard" 
+          element={
+            <ProtectedRoute user={user}>
+              <AppLayout 
+                user={user}
+                currentTheme={currentTheme}
+                setCurrentTheme={setCurrentTheme}
+                setSidebarOpen={setSidebarOpen}
+                setShowLogoutConfirm={setShowLogoutConfirm}
+                expandedMenus={expandedMenus}
+                setExpandedMenus={setExpandedMenus}
+                sidebarOpen={sidebarOpen}
+              >
+                <Dashboard currentTheme={currentTheme} />
+              </AppLayout>
+            </ProtectedRoute>
+          } 
+        />
+        
+        <Route 
+          path="/sales" 
+          element={
+            <ProtectedRoute user={user}>
+              <AppLayout 
+                user={user}
+                currentTheme={currentTheme}
+                setCurrentTheme={setCurrentTheme}
+                setSidebarOpen={setSidebarOpen}
+                setShowLogoutConfirm={setShowLogoutConfirm}
+                expandedMenus={expandedMenus}
+                setExpandedMenus={setExpandedMenus}
+                sidebarOpen={sidebarOpen}
+              >
+                <Sales 
+                  currentTheme={currentTheme}
+                  searchTerm={searchTerm}
+                  setSearchTerm={setSearchTerm}
+                  selectedCustomer={selectedCustomer}
+                  setSelectedCustomer={setSelectedCustomer}
+                  cart={cart}
+                  setCart={setCart}
+                />
+              </AppLayout>
+            </ProtectedRoute>
+          } 
+        />
+        
+        <Route 
+          path="/user-groups" 
+          element={
+            <ProtectedRoute user={user}>
+              <AppLayout 
+                user={user}
+                currentTheme={currentTheme}
+                setCurrentTheme={setCurrentTheme}
+                setSidebarOpen={setSidebarOpen}
+                setShowLogoutConfirm={setShowLogoutConfirm}
+                expandedMenus={expandedMenus}
+                setExpandedMenus={setExpandedMenus}
+                sidebarOpen={sidebarOpen}
+              >
+                <UserGroups currentTheme={currentTheme} />
+              </AppLayout>
+            </ProtectedRoute>
+          } 
+        />
+        
+        <Route 
+          path="/products" 
+          element={
+            <ProtectedRoute user={user}>
+              <AppLayout 
+                user={user}
+                currentTheme={currentTheme}
+                setCurrentTheme={setCurrentTheme}
+                setSidebarOpen={setSidebarOpen}
+                setShowLogoutConfirm={setShowLogoutConfirm}
+                expandedMenus={expandedMenus}
+                setExpandedMenus={setExpandedMenus}
+                sidebarOpen={sidebarOpen}
+              >
+                <Products 
+                  currentTheme={currentTheme}
+                  searchTerm={searchTerm}
+                  setSearchTerm={setSearchTerm}
+                />
+              </AppLayout>
+            </ProtectedRoute>
+          } 
+        />
+        
+        <Route 
+          path="/customers" 
+          element={
+            <ProtectedRoute user={user}>
+              <AppLayout 
+                user={user}
+                currentTheme={currentTheme}
+                setCurrentTheme={setCurrentTheme}
+                setSidebarOpen={setSidebarOpen}
+                setShowLogoutConfirm={setShowLogoutConfirm}
+                expandedMenus={expandedMenus}
+                setExpandedMenus={setExpandedMenus}
+                sidebarOpen={sidebarOpen}
+              >
+                <Customers 
+                  currentTheme={currentTheme}
+                  searchTerm={searchTerm}
+                  setSearchTerm={setSearchTerm}
+                />
+              </AppLayout>
+            </ProtectedRoute>
+          } 
+        />
+        
+        <Route 
+          path="/reports" 
+          element={
+            <ProtectedRoute user={user}>
+              <AppLayout 
+                user={user}
+                currentTheme={currentTheme}
+                setCurrentTheme={setCurrentTheme}
+                setSidebarOpen={setSidebarOpen}
+                setShowLogoutConfirm={setShowLogoutConfirm}
+                expandedMenus={expandedMenus}
+                setExpandedMenus={setExpandedMenus}
+                sidebarOpen={sidebarOpen}
+              >
+                <Reports currentTheme={currentTheme} />
+              </AppLayout>
+            </ProtectedRoute>
+          } 
+        />
+        
+        <Route 
+          path="/inventory-report" 
+          element={
+            <ProtectedRoute user={user}>
+              <AppLayout 
+                user={user}
+                currentTheme={currentTheme}
+                setCurrentTheme={setCurrentTheme}
+                setSidebarOpen={setSidebarOpen}
+                setShowLogoutConfirm={setShowLogoutConfirm}
+                expandedMenus={expandedMenus}
+                setExpandedMenus={setExpandedMenus}
+                sidebarOpen={sidebarOpen}
+              >
+                <InventoryReport currentTheme={currentTheme} />
+              </AppLayout>
+            </ProtectedRoute>
+          } 
+        />
+        
+        <Route 
+          path="/system-settings" 
+          element={
+            <ProtectedRoute user={user}>
+              <AppLayout 
+                user={user}
+                currentTheme={currentTheme}
+                setCurrentTheme={setCurrentTheme}
+                setSidebarOpen={setSidebarOpen}
+                setShowLogoutConfirm={setShowLogoutConfirm}
+                expandedMenus={expandedMenus}
+                setExpandedMenus={setExpandedMenus}
+                sidebarOpen={sidebarOpen}
+              >
+                <SystemSettings 
+                  currentTheme={currentTheme}
+                  setCurrentTheme={setCurrentTheme}
+                />
+              </AppLayout>
+            </ProtectedRoute>
+          } 
+        />
+        
+        <Route 
+          path="/branch-info" 
+          element={
+            <ProtectedRoute user={user}>
+              <AppLayout 
+                user={user}
+                currentTheme={currentTheme}
+                setCurrentTheme={setCurrentTheme}
+                setSidebarOpen={setSidebarOpen}
+                setShowLogoutConfirm={setShowLogoutConfirm}
+                expandedMenus={expandedMenus}
+                setExpandedMenus={setExpandedMenus}
+                sidebarOpen={sidebarOpen}
+              >
+                <BranchInfo currentTheme={currentTheme} />
+              </AppLayout>
+            </ProtectedRoute>
+          } 
+        />
+        
+        {/* Default redirect */}
+        <Route path="/" element={<Navigate to={user ? "/dashboard" : "/login"} replace />} />
+        <Route path="*" element={<Navigate to={user ? "/dashboard" : "/login"} replace />} />
+      </Routes>
       
-      {/* Quick Theme Selector */}
-      {/* <QuickThemeSelector 
-        currentTheme={currentTheme}
-        setCurrentTheme={setCurrentTheme}
-      /> */}
-      
-      {/* Session Indicator */}
-      <SessionIndicator 
-        user={user}
-        lastActivity={lastActivity}
-        showSessionWarning={showSessionWarning}
-        currentTheme={currentTheme}
-      />
+      {/* Session Indicator - แสดงเฉพาะเมื่อล็อกอินแล้ว */}
+      {user && (
+        <SessionIndicator 
+          user={user}
+          lastActivity={lastActivity}
+          showSessionWarning={showSessionWarning}
+          currentTheme={currentTheme}
+        />
+      )}
       
       {/* Session Warning Modal */}
       <SessionWarningModal 
@@ -295,8 +466,7 @@ const App = () => {
         user={user}
         currentTheme={currentTheme}
         extendSession={extendSession}
-        setUser={setUser}
-        setCurrentPage={setCurrentPage}
+        onLogout={handleLogout}
         setShowSessionWarning={setShowSessionWarning}
         setCart={setCart}
         setSelectedCustomer={setSelectedCustomer}
@@ -307,15 +477,23 @@ const App = () => {
       <LogoutConfirmModal 
         showLogoutConfirm={showLogoutConfirm}
         setShowLogoutConfirm={setShowLogoutConfirm}
-        setUser={setUser}
-        setCurrentPage={setCurrentPage}
+        onLogout={handleLogout}
         setCart={setCart}
         setSelectedCustomer={setSelectedCustomer}
         setSidebarOpen={setSidebarOpen}
         user={user}
         currentTheme={currentTheme}
       />
-    </div>
+    </>
+  );
+};
+
+// Root App Component
+const App = () => {
+  return (
+    <Router basename='findig-sale-online'>
+      <AppContent />
+    </Router>
   );
 };
 

@@ -1,5 +1,5 @@
-// src/components/Layout/Sidebar.jsx
 import React from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Users, 
   ShoppingCart, 
@@ -17,14 +17,15 @@ import { MENU_GROUPS } from '../../utils/constants';
 const Sidebar = ({ 
   user,
   currentTheme,
-  currentPage,
-  setCurrentPage,
   setSidebarOpen,
   setShowLogoutConfirm,
   expandedMenus,
   setExpandedMenus,
   sidebarOpen
 }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  
   const iconMap = {
     dashboard: Home,
     sales: ShoppingCart,
@@ -39,6 +40,26 @@ const Sidebar = ({
     icon: iconMap[group.id]
   }));
 
+  // Convert page names to paths
+  const pageToPath = {
+    'dashboard': '/dashboard',
+    'sales': '/sales',
+    'products': '/products',
+    'customers': '/customers',
+    'reports': '/reports',
+    'inventory-report': '/inventory-report',
+    'user-groups': '/user-groups',
+    'system-settings': '/system-settings',
+    'branch-info': '/branch-info'
+  };
+
+  // Convert path to page for checking active state
+  const pathToPage = Object.fromEntries(
+    Object.entries(pageToPath).map(([page, path]) => [path, page])
+  );
+
+  const currentPage = pathToPage[location.pathname];
+
   const toggleMenu = (menuId) => {
     console.log('Toggle menu clicked:', menuId);
     setExpandedMenus(prev => ({
@@ -50,7 +71,7 @@ const Sidebar = ({
   const handleMenuClick = (item) => {
     console.log('Menu clicked:', item);
     if (item.page) {
-      setCurrentPage(item.page);
+      navigate(pageToPath[item.page]);
       setSidebarOpen(false);
     } else if (item.items) {
       toggleMenu(item.id);
@@ -59,7 +80,7 @@ const Sidebar = ({
 
   const handleSubmenuClick = (page) => {
     console.log('Submenu clicked:', page);
-    setCurrentPage(page);
+    navigate(pageToPath[page]);
     setSidebarOpen(false);
   };
 

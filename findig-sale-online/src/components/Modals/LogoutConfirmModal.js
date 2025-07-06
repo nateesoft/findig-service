@@ -6,8 +6,7 @@ import { getThemeClasses, themes } from '../../utils/themes';
 const LogoutConfirmModal = ({ 
   showLogoutConfirm, 
   setShowLogoutConfirm, 
-  setUser, 
-  setCurrentPage, 
+  onLogout, 
   setCart, 
   setSelectedCustomer, 
   setSidebarOpen, 
@@ -17,8 +16,7 @@ const LogoutConfirmModal = ({
   if (!showLogoutConfirm) return null;
 
   const handleLogout = () => {
-    setUser(null);
-    setCurrentPage('login');
+    onLogout();
     setShowLogoutConfirm(false);
     // Reset states when logging out
     setCart([]);

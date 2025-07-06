@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ShoppingCart } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 import apiClient from "../../httpRequest"
 import { themes, getThemeClasses } from '../../utils/themes';
@@ -11,6 +12,8 @@ const LoginPage = ({
 }) => {
   const [loginData, setLoginData] = useState({ username: '', password: '', branchCode: '' });
   const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     if(!loginData.branchCode){
@@ -34,7 +37,7 @@ const LoginPage = ({
             fullName: 'ผู้ดูแลระบบ',
             role: 'admin'
           });
-          setCurrentPage('dashboard');
+          navigate('dashboard');
       }else{
         setLoading(false);
         alert('ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง');
