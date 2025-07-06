@@ -1,4 +1,3 @@
-// src/components/Common/SessionIndicator.jsx
 import React, { useState, useEffect } from 'react';
 import { getThemeClasses } from '../../utils/themes';
 import { SESSION_TIMEOUT } from '../../utils/constants';

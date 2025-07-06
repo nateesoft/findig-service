@@ -2,9 +2,8 @@
   "name": "findig-sale-online",
   "version": "0.1.0",
   "private": true,
-  "homepage": "findig-pos-backoffice",
+  "homepage": "findig-sale-online",
   "dependencies": {
-    "@tailwindcss/cli": "^4.1.10",
     "axios": "^1.10.0",
     "dotenv": "^17.0.1",
     "http-proxy-middleware": "^3.0.5",
@@ -45,9 +44,6 @@
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.1.0",
-    "@testing-library/user-event": "^13.2.1",
-    "autoprefixer": "^10.4.21",
-    "postcss": "^8.5.6",
-    "tailwindcss": "^4.1.10"
+    "@testing-library/user-event": "^13.2.1"
   }
 }

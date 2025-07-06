@@ -13,8 +13,13 @@ const LoginPage = ({
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e) => {
+    if(!loginData.branchCode){
+      return;
+    }
     e.preventDefault();
     setLoading(true);
+
+    console.log(loginData)
 
     apiClient.post('/api/posuser/login', { 
       username: loginData.username,
@@ -22,15 +27,21 @@ const LoginPage = ({
       branchCode: loginData.branchCode
     })
     .then(response => {
-      setUser({
-          id: 1,
-          username: loginData.username,
-          fullName: 'ผู้ดูแลระบบ',
-          role: 'admin'
-        });
-        setCurrentPage('dashboard');
+      if(response.data.data != null){
+        setUser({
+            id: 1,
+            username: loginData.username,
+            fullName: 'ผู้ดูแลระบบ',
+            role: 'admin'
+          });
+          setCurrentPage('dashboard');
+      }else{
+        setLoading(false);
+        alert('ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง');
+      }
     })
     .catch(err => {
+      setLoading(false);
       alert('ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง');
     })
   };
@@ -67,8 +78,9 @@ const LoginPage = ({
               onChange={(e) => setLoginData({...loginData, branchCode: e.target.value})}
               className={`w-full px-4 py-3 border rounded-lg text-center text-sm ${getThemeClasses('input', currentTheme)}`}
             >
-              <option value="001">สาขาทดสอบระบบ 001</option>
-              <option value="002">สาขาทดสอบระบบ 002</option>
+              <option value="">เลือกสาขา</option>
+              <option value="001">findigrealtime.dyndns.biz/</option>
+              <option value="002">localhost</option>
             </select>
           </div>
           <div>

@@ -1,4 +1,3 @@
-// src/pages/BranchInfo.jsx
 import React, { useState } from 'react';
 import { getThemeClasses } from '../utils/themes';
 import { mockBranchInfo } from '../data/mockData';

@@ -1,5 +1,3 @@
-// src/data/mockData.js
-
 // Mock Sales Data
 export const mockSalesData = [
   { month: 'ม.ค.', revenue: 45000, orders: 120 },

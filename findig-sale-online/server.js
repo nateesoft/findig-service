@@ -3,7 +3,7 @@ const path = require('path');
 
 const app = express();
 
-const BASENAME = "/findig-pos-backoffice";
+const BASENAME = "/findig-sale-online";
 const PORT = process.env.PORT || 3000;
 
 // Serve static files from the React app

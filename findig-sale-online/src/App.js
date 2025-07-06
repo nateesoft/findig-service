@@ -1,5 +1,4 @@
-// src/App.jsx
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { getThemeClasses } from './utils/themes';
 import { SESSION_TIMEOUT, WARNING_TIME } from './utils/constants';
 
@@ -7,7 +6,6 @@ import { SESSION_TIMEOUT, WARNING_TIME } from './utils/constants';
 import LoginPage from './components/Auth/LoginPage';
 import Sidebar from './components/Layout/Sidebar';
 import Header from './components/Layout/Header';
-import QuickThemeSelector from './components/Layout/QuickThemeSelector';
 import SessionWarningModal from './components/Modals/SessionWarningModal';
 import LogoutConfirmModal from './components/Modals/LogoutConfirmModal';
 import SessionIndicator from './components/Common/SessionIndicator';

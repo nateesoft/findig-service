@@ -1,4 +1,3 @@
-// src/pages/InventoryReport.jsx
 import React from 'react';
 import { Download, FileText, Package, DollarSign, TrendingUp, BarChart3 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';

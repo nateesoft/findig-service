@@ -1,4 +1,3 @@
-// src/pages/UserGroups.jsx
 import React, { useState } from 'react';
 import { Plus, Edit, Trash2, X, Check } from 'lucide-react';
 import { getThemeClasses } from '../utils/themes';

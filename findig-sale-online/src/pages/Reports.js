@@ -1,4 +1,3 @@
-// src/pages/Reports.jsx
 import React, { useState } from 'react';
 import { Download, FileText } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';

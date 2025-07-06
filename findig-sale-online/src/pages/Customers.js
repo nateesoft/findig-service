@@ -1,4 +1,3 @@
-// src/pages/Customers.jsx
 import React from 'react';
 import { Plus, Search, Users, TrendingUp, Download, Eye, Edit, Trash2 } from 'lucide-react';
 import { getThemeClasses } from '../utils/themes';

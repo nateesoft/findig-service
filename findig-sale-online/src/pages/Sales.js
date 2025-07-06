@@ -1,4 +1,3 @@
-// src/pages/Sales.jsx
 import { useState, useEffect } from 'react';
 import { 
   Plus, 

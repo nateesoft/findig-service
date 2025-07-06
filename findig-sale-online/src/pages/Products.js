@@ -1,4 +1,3 @@
-// src/pages/Products.jsx
 import React, { useState } from 'react';
 import { Plus, Search, Edit, Trash2, X } from 'lucide-react';
 import { getThemeClasses } from '../utils/themes';

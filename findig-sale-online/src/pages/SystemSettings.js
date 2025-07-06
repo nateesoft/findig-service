@@ -1,4 +1,3 @@
-// src/pages/SystemSettings.jsx
 import React, { useState } from 'react';
 import { getThemeClasses, themes } from '../utils/themes';
 import { DEFAULT_SETTINGS } from '../utils/constants';
