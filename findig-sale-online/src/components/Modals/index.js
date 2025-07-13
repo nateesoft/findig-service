@@ -79,7 +79,6 @@ const Modal = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop with blur effect */}
       <div 
         className={`fixed inset-0 bg-black/60 backdrop-blur-sm transition-all duration-300 ${
           isOpen ? 'opacity-100' : 'opacity-0'
@@ -87,19 +86,15 @@ const Modal = ({
         onClick={onClose}
       />
       
-      {/* Modal */}
       <div className={`relative w-full max-w-md bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl ${config.glowColor} border border-white/20 transform transition-all duration-300 ${
         isOpen ? 'scale-100 opacity-100 translate-y-0' : 'scale-95 opacity-0 translate-y-4'
       }`}>
         
-        {/* Accent border */}
         <div className={`h-1 ${config.borderAccent} rounded-t-2xl`} />
         
-        {/* Header */}
         <div className={`px-6 py-5 ${config.headerBg} rounded-t-2xl border-b border-gray-100/50`}>
           <div className="flex items-start justify-between">
             <div className="flex items-center space-x-4">
-              {/* Icon with modern styling */}
               <div className={`w-12 h-12 ${config.iconBg} rounded-xl flex items-center justify-center shadow-lg transform transition-transform hover:scale-105`}>
                 <IconComponent className={`w-6 h-6 ${config.iconColor}`} />
               </div>
@@ -150,7 +145,6 @@ const Modal = ({
   );
 };
 
-// Enhanced Demo Component with modern styling
 const ModalDemo = () => {
   const [activeModal, setActiveModal] = useState(null);
 
@@ -186,14 +180,12 @@ const ModalDemo = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-      {/* Background decoration */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-transparent to-indigo-50/50" />
       <div className="absolute top-0 left-0 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse" />
       <div className="absolute bottom-0 right-0 w-72 h-72 bg-indigo-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse" />
       
       <div className="relative p-8">
         <div className="max-w-6xl mx-auto">
-          {/* Header */}
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent mb-4">
               Modern Modal Components
@@ -203,7 +195,6 @@ const ModalDemo = () => {
             </p>
           </div>
           
-          {/* Modal Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
             {modals.map((modal, index) => (
               <div
@@ -212,7 +203,6 @@ const ModalDemo = () => {
                 className="group cursor-pointer"
               >
                 <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden border border-white/50 hover:scale-[1.02] hover:-translate-y-1">
-                  {/* Card header with gradient */}
                   <div className={`h-2 bg-gradient-to-r ${cardColors[modal.type]}`} />
                   
                   <div className="p-6">
@@ -240,7 +230,6 @@ const ModalDemo = () => {
             ))}
           </div>
 
-          {/* Special Examples */}
           <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-white/50">
             <h2 className="text-2xl font-bold text-slate-800 mb-6 flex items-center">
               <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg mr-3" />
@@ -276,7 +265,6 @@ const ModalDemo = () => {
             </div>
           </div>
 
-          {/* Modal Component */}
           {activeModal && (
             <Modal
               isOpen={!!activeModal}

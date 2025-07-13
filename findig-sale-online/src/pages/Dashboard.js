@@ -19,6 +19,7 @@ import {
   Pie, 
   Cell 
 } from 'recharts';
+
 import { getThemeClasses, themes } from '../utils/themes';
 import { mockSalesData, mockProducts, mockSales, categoryData } from '../data/mockData';
 

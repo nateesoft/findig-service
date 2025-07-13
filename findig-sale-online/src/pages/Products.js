@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Plus, Search, Edit, Trash2, X } from 'lucide-react';
+
 import { getThemeClasses } from '../utils/themes';
 import { mockProducts } from '../data/mockData';
 
@@ -49,7 +50,6 @@ const Products = ({ currentTheme, searchTerm, setSearchTerm }) => {
         </button>
       </div>
 
-      {/* Filters */}
       <div className={`${getThemeClasses('cardBg', currentTheme)} rounded-lg shadow-sm border ${getThemeClasses('cardBorder', currentTheme)} p-6`}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="relative">
@@ -75,7 +75,6 @@ const Products = ({ currentTheme, searchTerm, setSearchTerm }) => {
         </div>
       </div>
 
-      {/* Products Table */}
       <div className={`${getThemeClasses('cardBg', currentTheme)} rounded-lg shadow-sm border ${getThemeClasses('cardBorder', currentTheme)}`}>
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -150,7 +149,6 @@ const Products = ({ currentTheme, searchTerm, setSearchTerm }) => {
         </div>
       </div>
 
-      {/* Add Product Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className={`${getThemeClasses('cardBg', currentTheme)} rounded-lg shadow-xl w-full max-w-md`}>

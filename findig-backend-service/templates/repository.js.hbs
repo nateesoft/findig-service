@@ -1,0 +1,9 @@
+const listAll = async ({ payload, db }) => {
+  const sql = `SELECT * FROM branch`
+  const results = await db.pos.query(sql)
+  return results
+};
+
+module.exports = {
+  listAll
+}

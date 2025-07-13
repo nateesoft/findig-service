@@ -1,6 +1,6 @@
-// src/components/Layout/QuickThemeSelector.jsx
 import React, { useState } from 'react';
 import { X, Settings } from 'lucide-react';
+
 import { getThemeClasses, themes } from '../../utils/themes';
 
 const QuickThemeSelector = ({ currentTheme, setCurrentTheme }) => {
@@ -35,7 +35,6 @@ const QuickThemeSelector = ({ currentTheme, setCurrentTheme }) => {
             </button>
           </div>
           
-          {/* Current Theme Display */}
           <div className={`text-xs ${getThemeClasses('textSecondary', currentTheme)} mb-3 flex items-center`}>
             <span>ปัจจุบัน: </span>
             <span className={`ml-1 px-2 py-1 rounded-full text-xs ${getThemeClasses('info', currentTheme)}`}>
@@ -43,7 +42,6 @@ const QuickThemeSelector = ({ currentTheme, setCurrentTheme }) => {
             </span>
           </div>
           
-          {/* Quick Color Dots */}
           <div className={`grid grid-cols-4 gap-2 ${isOpen ? 'mb-4' : ''}`}>
             {Object.entries(themes).slice(0, 8).map(([themeKey, theme]) => (
               <button
@@ -67,7 +65,6 @@ const QuickThemeSelector = ({ currentTheme, setCurrentTheme }) => {
             ))}
           </div>
           
-          {/* Extended Theme Options */}
           {isOpen && (
             <div className={`border-t ${getThemeClasses('cardBorder', currentTheme)} pt-4 space-y-3`}>
               <div className={`text-xs font-medium ${getThemeClasses('textSecondary', currentTheme)} mb-2`}>
@@ -99,7 +96,6 @@ const QuickThemeSelector = ({ currentTheme, setCurrentTheme }) => {
                 ))}
               </div>
               
-              {/* Theme Actions */}
               <div className={`border-t ${getThemeClasses('cardBorder', currentTheme)} pt-3 space-y-2`}>
                 <button
                   onClick={() => {

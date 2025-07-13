@@ -1,8 +1,5 @@
-// src/utils/constants.js
-
-// Session management constants
-export const SESSION_TIMEOUT = 5 * 60 * 1000; // 5 minutes in milliseconds
-export const WARNING_TIME = 60 * 1000; // 1 minute warning before logout
+export const SESSION_TIMEOUT = 5 * 60 * 1000;
+export const WARNING_TIME = 60 * 1000;
 
 // Menu configuration
 export const MENU_GROUPS = [

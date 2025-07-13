@@ -1,0 +1,9 @@
+const { {{name}}Service } = require('../services/{{name}}Service.js')
+
+describe('{{name}}Service', () => {
+  it('should work', async () => {
+    const payload = { id: 1 };
+    const result = await {{name}}Service(payload);
+    expect(result).toBeDefined();
+  });
+});

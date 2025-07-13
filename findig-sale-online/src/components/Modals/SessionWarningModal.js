@@ -1,4 +1,3 @@
-// src/components/Modals/SessionWarningModal.jsx
 import React from 'react';
 import { LogOut } from 'lucide-react';
 import { getThemeClasses, themes } from '../../utils/themes';
@@ -10,7 +9,6 @@ const SessionWarningModal = ({
   currentTheme, 
   extendSession, 
   setUser, 
-  setCurrentPage, 
   setShowSessionWarning, 
   setCart, 
   setSelectedCustomer, 
@@ -45,7 +43,6 @@ const SessionWarningModal = ({
         
         <div className="p-6">
           <div className="space-y-6">
-            {/* Countdown Display */}
             <div className="text-center">
               <div className={`inline-flex items-center justify-center w-24 h-24 rounded-full ${currentTheme === 'dark' ? 'bg-orange-900 bg-opacity-30' : 'bg-orange-100'} mb-4`}>
                 <div className="text-center">
@@ -63,7 +60,6 @@ const SessionWarningModal = ({
               </p>
             </div>
 
-            {/* Warning Message */}
             <div className={`p-4 rounded-lg ${currentTheme === 'dark' ? 'bg-red-900 bg-opacity-30 border-red-700' : 'bg-red-50 border-red-200'} border`}>
               <div className="flex items-start space-x-3">
                 <div className="flex-shrink-0">
@@ -80,7 +76,6 @@ const SessionWarningModal = ({
               </div>
             </div>
 
-            {/* User Info */}
             <div className={`p-4 rounded-lg ${getThemeClasses('cardBg', currentTheme)} border ${getThemeClasses('cardBorder', currentTheme)}`}>
               <div className="flex items-center space-x-3">
                 <div className={`w-10 h-10 bg-${themes[currentTheme].accent} rounded-full flex items-center justify-center shadow-sm`}>
@@ -100,7 +95,6 @@ const SessionWarningModal = ({
               </div>
             </div>
 
-            {/* Activity Status */}
             <div className={`text-center p-3 rounded-lg ${currentTheme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'}`}>
               <div className="flex items-center justify-center space-x-2 text-xs">
                 <span className={`${getThemeClasses('textMuted', currentTheme)}`}>💡 เคล็ดลับ:</span>
@@ -120,7 +114,6 @@ const SessionWarningModal = ({
             <button
               onClick={() => {
                 setUser(null);
-                setCurrentPage('login');
                 setShowSessionWarning(false);
                 setCart([]);
                 setSelectedCustomer(null);
@@ -142,7 +135,6 @@ const SessionWarningModal = ({
         </div>
       </div>
 
-      {/* Progress Bar */}
       <div className="fixed bottom-0 left-0 right-0 h-1 bg-gray-200">
         <div 
           className="h-full bg-orange-500 transition-all duration-1000 ease-linear"

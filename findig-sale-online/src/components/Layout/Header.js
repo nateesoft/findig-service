@@ -1,13 +1,15 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { Menu } from 'lucide-react';
+
 import { getThemeClasses, themes } from '../../utils/themes';
+import { AppContext } from '../../contexts';
 
 const Header = ({ 
   currentTheme, 
-  setCurrentTheme, 
   setSidebarOpen, 
   getThemeClasses: getClasses 
 }) => {
+  const { appData, setAppData } = useContext(AppContext)
   const [showMobileThemes, setShowMobileThemes] = useState(false);
   
   const handleMobileMenuClick = (e) => {
@@ -18,8 +20,7 @@ const Header = ({
   };
 
   const handleMobileThemeSelect = (themeKey) => {
-    console.log('Mobile theme selected:', themeKey);
-    setCurrentTheme(themeKey);
+    setAppData({ ...appData, currentTheme: themeKey })
     setShowMobileThemes(false);
   };
   
@@ -43,17 +44,13 @@ const Header = ({
           ระบบบันทึกการขาย
         </h1>
         
-        {/* Mobile Theme Selector */}
         <div className="relative">
-
-          {/* Mobile Theme Dropdown */}
           {showMobileThemes && (
             <div className={`absolute top-full right-0 mt-2 ${getThemeClasses('cardBg', currentTheme)} rounded-lg shadow-xl border ${getThemeClasses('cardBorder', currentTheme)} z-50 w-64 max-h-96 overflow-y-auto`}>
               <div className="p-4">
                 <div className={`text-sm font-semibold ${getThemeClasses('textPrimary', currentTheme)} mb-3`}>🎨 เลือกธีม</div>
                 
                 <div className="space-y-3">
-                  {/* Quick Colors */}
                   <div>
                     <div className={`text-xs ${getThemeClasses('textMuted', currentTheme)} mb-2`}>เลือกด่วน</div>
                     <div className="grid grid-cols-6 gap-2">
@@ -85,7 +82,6 @@ const Header = ({
                     </div>
                   </div>
                   
-                  {/* Special Themes */}
                   <div>
                     <div className={`text-xs ${getThemeClasses('textMuted', currentTheme)} mb-2`}>ธีมพิเศษ</div>
                     <div className="space-y-2">
@@ -134,7 +130,6 @@ const Header = ({
         </div>
       </div>
       
-      {/* Overlay to close dropdown */}
       {showMobileThemes && (
         <div 
           className="fixed inset-0 z-40" 

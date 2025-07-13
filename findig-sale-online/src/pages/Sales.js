@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Plus, 
   Eye, 
@@ -6,70 +6,120 @@ import {
   X,
   Calendar,
   Upload,
-  FileText} from 'lucide-react';
+  FileText,
+  Trash2,
+  ShoppingCart} from 'lucide-react';
+
 import { getThemeClasses } from '../utils/themes';
-import { mockSales, mockCustomers } from '../data/mockData';
+import { mockSales } from '../data/mockData';
 
 const Sales = ({ currentTheme}) => {
   const [showSaleModal, setShowSaleModal] = useState(false);
   
-  // New Sale Modal Data
-  const [newSaleData, setNewSaleData] = useState({
+  const [saleHeader, setSaleHeader] = useState({
     saleNumber: '',
     date: new Date().toISOString().split('T')[0],
-    barcode: '',
-    productName: '',
-    stock: 'A1',
-    qty: 0,
     branch: '001'
   });
 
-  // Reset new sale form
+  const [currentItem, setCurrentItem] = useState({
+    barcode: '',
+    productName: '',
+    stock: 'A1',
+    qty: 0
+  });
+
+  const [saleItems, setSaleItems] = useState([]);
+
   const resetNewSaleForm = () => {
-    setNewSaleData({
+    setSaleHeader({
       saleNumber: '',
       date: new Date().toISOString().split('T')[0],
+      branch: '001'
+    });
+    setCurrentItem({
       barcode: '',
       productName: '',
-      stock: '',
-      qty: 0,
-      branch: ''
+      stock: 'A1',
+      qty: 0
+    });
+    setSaleItems([]);
+  };
+
+  const resetCurrentItem = () => {
+    setCurrentItem({
+      barcode: '',
+      productName: '',
+      stock: 'A1',
+      qty: 0
     });
   };
 
-  // Handle new sale form submission
+  const addItemToSale = () => {
+    if (!currentItem.barcode || !currentItem.productName || currentItem.qty <= 0) {
+      alert('กรุณากรอกข้อมูลสินค้าให้ครบถ้วน');
+      return;
+    }
+
+    const newItem = {
+      id: Date.now(), // simple ID generation
+      ...currentItem,
+      total: currentItem.qty // คำนวณยอดรวมได้ตามต้องการ
+    };
+
+    setSaleItems(prev => [...prev, newItem]);
+    resetCurrentItem();
+  };
+
+  const removeItemFromSale = (itemId) => {
+    setSaleItems(prev => prev.filter(item => item.id !== itemId));
+  };
+
+  const editSaleItem = (itemId) => {
+    const itemToEdit = saleItems.find(item => item.id === itemId);
+    if (itemToEdit) {
+      setCurrentItem({
+        barcode: itemToEdit.barcode,
+        productName: itemToEdit.productName,
+        stock: itemToEdit.stock,
+        qty: itemToEdit.qty
+      });
+      removeItemFromSale(itemId);
+    }
+  };
+
   const handleNewSaleSubmit = () => {
-    if (!newSaleData.saleNumber) {
+    if (!saleHeader.saleNumber) {
       alert('กรุณาระบุข้อมูลเลขที่ใบเสร็จ');
       return;
     }
 
-    console.log(newSaleData)
+    if (saleItems.length === 0) {
+      alert('กรุณาเพิ่มรายการสินค้าอย่างน้อย 1 รายการ');
+      return;
+    }
+
+    const totalQty = saleItems.reduce((sum, item) => sum + item.qty, 0);
     
-    // Simulate saving to database
     alert(`บันทึกใบขายใหม่เรียบร้อย!\n` +
-          `เลขที่: ${newSaleData.saleNumber}\n` +
-          `วันที่: ${newSaleData.date}\n` +
-          `รหัสบาร์โค้ด: ${newSaleData?.barcode}\n` +
-          `ชื่อสินค้า: ${newSaleData?.productName}\n` +
-          `คลังสินค้า: ${newSaleData?.stock}\n` +
-          `จำนวน: ${newSaleData?.qty}\n` +
-          `สาขาทำรายการ: ${newSaleData?.branch}\n`);
+          `เลขที่: ${saleHeader.saleNumber}\n` +
+          `วันที่: ${saleHeader.date}\n` +
+          `สาขาทำรายการ: ${saleHeader.branch}\n` +
+          `จำนวนรายการ: ${saleItems.length} รายการ\n` +
+          `จำนวนสินค้ารวม: ${totalQty} ชิ้น`);
     
-    // Close modal and reset form
     setShowSaleModal(false);
     resetNewSaleForm();
   };
 
-  // Keyboard shortcuts for modal
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (showSaleModal) {
         if (e.key === 'Escape') {
           setShowSaleModal(false);
         } else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-          if (newSaleData.customerId) {
-            handleNewSaleSubmit();
+          if (currentItem.barcode && currentItem.productName && currentItem.qty > 0) {
+            addItemToSale();
           }
         }
       }
@@ -77,16 +127,7 @@ const Sales = ({ currentTheme}) => {
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [showSaleModal, newSaleData.customerId]);
-
-  // Auto-generate sale number when modal opens
-  useEffect(() => {
-    if (showSaleModal && !newSaleData.saleNumber) {
-      setNewSaleData(prev => ({
-        ...prev
-      }));
-    }
-  }, [showSaleModal]);
+  }, [showSaleModal, currentItem]);
 
   return (
     <div className="space-y-6">
@@ -109,7 +150,6 @@ const Sales = ({ currentTheme}) => {
         </div>
       </div>
 
-      {/* Sales History */}
       <div className={`${getThemeClasses('cardBg', currentTheme)} rounded-lg shadow-sm border ${getThemeClasses('cardBorder', currentTheme)}`}>
         <div className={`p-6 border-b ${getThemeClasses('cardBorder', currentTheme)}`}>
           <h3 className={`text-lg font-semibold ${getThemeClasses('textPrimary', currentTheme)}`}>ข้อมูลบันทึกข้อมูลการขาย</h3>
@@ -122,19 +162,13 @@ const Sales = ({ currentTheme}) => {
                   เลขที่ใบเสร็จ
                 </th>
                 <th className={`px-6 py-3 text-center text-xs font-medium ${getThemeClasses('textMuted', currentTheme)} uppercase tracking-wider`}>
-                  วันที่
+                  วันที่ทำรายการ
                 </th>
                 <th className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses('textMuted', currentTheme)} uppercase tracking-wider`}>
-                  จำนวน
+                  จำนวนสินค้า
                 </th>
                 <th className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses('textMuted', currentTheme)} uppercase tracking-wider`}>
-                  รหัสบาร์โค้ด
-                </th>
-                <th className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses('textMuted', currentTheme)} uppercase tracking-wider`}>
-                  ชื่อสินค้า
-                </th>
-                <th className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses('textMuted', currentTheme)} uppercase tracking-wider`}>
-                  คลังสินค้า
+                  พนักงานทำรายการ
                 </th>
                 <th className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses('textMuted', currentTheme)} uppercase tracking-wider`}>
                   สาขา
@@ -157,13 +191,7 @@ const Sales = ({ currentTheme}) => {
                     {sale.items}
                   </td>
                   <td className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses('textPrimary', currentTheme)}`}>
-                    {sale.productCode}
-                  </td>
-                  <td className={`px-6 py-4 whitespace-nowrap text-sm ${getThemeClasses('textPrimary', currentTheme)}`}>
-                    {sale.productName}
-                  </td>
-                  <td className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses('textPrimary', currentTheme)}`}>
-                    {sale.stock}
+                    {sale.empCode}
                   </td>
                   <td className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses('textPrimary', currentTheme)}`}>
                     {sale.branch}
@@ -186,11 +214,10 @@ const Sales = ({ currentTheme}) => {
         </div>
       </div>
 
-      {/* New Sale Modal */}
       {showSaleModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 animate-fade-in">
           <div 
-            className={`${getThemeClasses('cardBg', currentTheme)} rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto ${getThemeClasses('transition', currentTheme)} transform animate-scale-in`}
+            className={`${getThemeClasses('cardBg', currentTheme)} rounded-xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-y-auto ${getThemeClasses('transition', currentTheme)} transform animate-scale-in`}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
@@ -205,7 +232,7 @@ const Sales = ({ currentTheme}) => {
                       เพิ่มข้อมูลการขาย
                     </h3>
                     <p className={`text-sm ${getThemeClasses('textSecondary', currentTheme)}`}>
-                      กรอกข้อมูลการขายใหม่
+                      กรอกข้อมูลการขายใหม่ (รองรับหลายรายการ)
                     </p>
                   </div>
                 </div>
@@ -218,11 +245,12 @@ const Sales = ({ currentTheme}) => {
               </div>
             </div>
 
-            {/* Modal Body */}
             <div className="p-6 space-y-6">
-              {/* Sale Info Section */}
               <div className={`p-4 rounded-lg ${currentTheme === 'dark' ? 'bg-blue-900 bg-opacity-20' : 'bg-blue-50'} border ${currentTheme === 'dark' ? 'border-blue-700' : 'border-blue-200'}`}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <h4 className={`text-lg font-semibold mb-4 ${getThemeClasses('textPrimary', currentTheme)}`}>
+                  ข้อมูลหัวเอกสาร
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className={`block text-sm font-medium ${getThemeClasses('textSecondary', currentTheme)} mb-2`}>
                       <FileText className="w-4 h-4 inline mr-2" />
@@ -230,10 +258,10 @@ const Sales = ({ currentTheme}) => {
                     </label>
                     <input
                       type="text"
-                      value={newSaleData.saleNumber}
-                      onChange={(e) => setNewSaleData({...newSaleData, saleNumber: e.target.value})}
+                      value={saleHeader.saleNumber}
+                      onChange={(e) => setSaleHeader({...saleHeader, saleNumber: e.target.value})}
                       className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses('input', currentTheme)}`}
-                      placeholder=""
+                      placeholder="เลขที่เอกสาร"
                       autoFocus
                     />
                   </div>
@@ -244,118 +272,181 @@ const Sales = ({ currentTheme}) => {
                     </label>
                     <input
                       type="date"
-                      value={newSaleData.date}
-                      onChange={(e) => setNewSaleData({...newSaleData, date: e.target.value})}
+                      value={saleHeader.date}
+                      onChange={(e) => setSaleHeader({...saleHeader, date: e.target.value})}
                       className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses('input', currentTheme)}`}
                     />
+                  </div>
+                  <div>
+                    <label className={`block text-sm font-medium ${getThemeClasses('textSecondary', currentTheme)} mb-2`}>
+                      รหัสสาขา
+                    </label>
+                    <select
+                      value={saleHeader.branch}
+                      onChange={(e) => setSaleHeader({...saleHeader, branch: e.target.value})}
+                      className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses('input', currentTheme)}`}
+                    >
+                      <option value="">เลือกสาขา</option>
+                      <option value="001">001 - สาขาทดสอบระบบ</option>
+                    </select>
                   </div>
                 </div>
               </div>
 
-              {/* Customer Info Display */}
-              {newSaleData.customerId && (
+              <div className={`p-4 rounded-lg ${getThemeClasses('cardBg', currentTheme)} border ${getThemeClasses('cardBorder', currentTheme)}`}>
+                <h4 className={`text-lg font-semibold mb-4 ${getThemeClasses('textPrimary', currentTheme)} flex items-center`}>
+                  <ShoppingCart className="w-5 h-5 mr-2" />
+                  เพิ่มรายการสินค้า
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div>
+                    <label className={`block text-sm font-medium ${getThemeClasses('textSecondary', currentTheme)} mb-2`}>
+                      รหัสบาร์โค้ด
+                    </label>
+                    <input
+                      type="text"
+                      value={currentItem.barcode}
+                      onChange={(e) => setCurrentItem({...currentItem, barcode: e.target.value})}
+                      className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses('input', currentTheme)}`}
+                      placeholder="สแกนหรือพิมพ์บาร์โค้ด"
+                    />
+                  </div>
+                  <div>
+                    <label className={`block text-sm font-medium ${getThemeClasses('textSecondary', currentTheme)} mb-2`}>
+                      ชื่อสินค้า
+                    </label>
+                    <input
+                      type="text"
+                      value={currentItem.productName}
+                      onChange={(e) => setCurrentItem({...currentItem, productName: e.target.value})}
+                      className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses('input', currentTheme)}`}
+                      placeholder="ชื่อสินค้า"
+                    />
+                  </div>
+                  <div>
+                    <label className={`block text-sm font-medium ${getThemeClasses('textSecondary', currentTheme)} mb-2`}>
+                      คลังสินค้า
+                    </label>
+                    <select
+                      value={currentItem.stock}
+                      onChange={(e) => setCurrentItem({...currentItem, stock: e.target.value})}
+                      className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses('input', currentTheme)}`}
+                    >
+                      <option value="A1">A1</option>
+                      <option value="A2">A2</option>
+                      <option value="B1">B1</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className={`block text-sm font-medium ${getThemeClasses('textSecondary', currentTheme)} mb-2`}>
+                      จำนวน
+                    </label>
+                    <div className="flex space-x-2">
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={currentItem.qty}
+                        onChange={(e) => setCurrentItem({...currentItem, qty: parseFloat(e.target.value) || 0})}
+                        className={`flex-1 px-3 py-2 border rounded-lg ${getThemeClasses('input', currentTheme)}`}
+                        placeholder="0"
+                      />
+                      <button
+                        onClick={addItemToSale}
+                        disabled={!currentItem.barcode || !currentItem.productName || currentItem.qty <= 0}
+                        className={`px-4 py-2 text-white rounded-lg font-medium ${getThemeClasses('primaryBtn', currentTheme)} ${getThemeClasses('transition', currentTheme)} hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center`}
+                      >
+                        <Plus className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {saleItems.length > 0 && (
                 <div className={`p-4 rounded-lg ${getThemeClasses('cardBg', currentTheme)} border ${getThemeClasses('cardBorder', currentTheme)}`}>
-                  {(() => {
-                    const selectedCustomer = mockCustomers.find(c => c.id === parseInt(newSaleData.customerId));
-                    return selectedCustomer ? (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <p className={`text-sm font-medium ${getThemeClasses('textPrimary', currentTheme)}`}>
-                            {selectedCustomer.name}
-                          </p>
-                          <p className={`text-xs ${getThemeClasses('textSecondary', currentTheme)}`}>
-                            รหัส: {selectedCustomer.code}
-                          </p>
+                  <h4 className={`text-lg font-semibold mb-4 ${getThemeClasses('textPrimary', currentTheme)}`}>
+                    รายการสินค้า ({saleItems.length} รายการ)
+                  </h4>
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead className={getThemeClasses('tableHeader', currentTheme)}>
+                        <tr>
+                          <th className={`px-4 py-2 text-left text-xs font-medium ${getThemeClasses('textMuted', currentTheme)} uppercase tracking-wider`}>
+                            รหัสบาร์โค้ด
+                          </th>
+                          <th className={`px-4 py-2 text-left text-xs font-medium ${getThemeClasses('textMuted', currentTheme)} uppercase tracking-wider`}>
+                            ชื่อสินค้า
+                          </th>
+                          <th className={`px-4 py-2 text-center text-xs font-medium ${getThemeClasses('textMuted', currentTheme)} uppercase tracking-wider`}>
+                            คลัง
+                          </th>
+                          <th className={`px-4 py-2 text-right text-xs font-medium ${getThemeClasses('textMuted', currentTheme)} uppercase tracking-wider`}>
+                            จำนวน
+                          </th>
+                          <th className={`px-4 py-2 text-center text-xs font-medium ${getThemeClasses('textMuted', currentTheme)} uppercase tracking-wider`}>
+                            จัดการ
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className={`${getThemeClasses('cardBg', currentTheme)} divide-y ${getThemeClasses('tableBorder', currentTheme)}`}>
+                        {saleItems.map((item, index) => (
+                          <tr key={item.id} className={getThemeClasses('tableRow', currentTheme)}>
+                            <td className={`px-4 py-3 text-sm ${getThemeClasses('textPrimary', currentTheme)}`}>
+                              {item.barcode}
+                            </td>
+                            <td className={`px-4 py-3 text-sm ${getThemeClasses('textPrimary', currentTheme)}`}>
+                              {item.productName}
+                            </td>
+                            <td className={`px-4 py-3 text-center text-sm ${getThemeClasses('textSecondary', currentTheme)}`}>
+                              {item.stock}
+                            </td>
+                            <td className={`px-4 py-3 text-right text-sm ${getThemeClasses('textSecondary', currentTheme)}`}>
+                              {item.qty}
+                            </td>
+                            <td className={`px-4 py-3 text-center text-sm`}>
+                              <div className="flex justify-center space-x-2">
+                                <button
+                                  onClick={() => editSaleItem(item.id)}
+                                  className={`p-1 rounded ${getThemeClasses('textSecondary', currentTheme)} hover:${getThemeClasses('textPrimary', currentTheme)} ${getThemeClasses('transition', currentTheme)}`}
+                                  title="แก้ไข"
+                                >
+                                  <Edit className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() => removeItemFromSale(item.id)}
+                                  className={`p-1 rounded text-red-500 hover:text-red-700 ${getThemeClasses('transition', currentTheme)}`}
+                                  title="ลบ"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  
+                  <div className={`mt-4 p-3 rounded-lg ${currentTheme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'} border-t ${getThemeClasses('cardBorder', currentTheme)}`}>
+                    <div className="flex justify-between items-center">
+                      <span className={`text-sm font-medium ${getThemeClasses('textSecondary', currentTheme)}`}>
+                        สรุปรายการ
+                      </span>
+                      <div className="text-right">
+                        <div className={`text-lg font-bold ${getThemeClasses('textPrimary', currentTheme)}`}>
+                          รวม {saleItems.reduce((sum, item) => sum + item.qty, 0)} ชิ้น
                         </div>
-                        <div>
-                          <p className={`text-xs ${getThemeClasses('textSecondary', currentTheme)}`}>
-                            โทร: {selectedCustomer.phone}
-                          </p>
-                          <p className={`text-xs ${getThemeClasses('textSecondary', currentTheme)}`}>
-                            อีเมล: {selectedCustomer.email}
-                          </p>
+                        <div className={`text-sm ${getThemeClasses('textSecondary', currentTheme)}`}>
+                          {saleItems.length} รายการ
                         </div>
                       </div>
-                    ) : null;
-                  })()}
+                    </div>
+                  </div>
                 </div>
               )}
-
-              {/* Product Detail */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className={`block text-sm font-medium ${getThemeClasses('textSecondary', currentTheme)} mb-2`}>
-                    รหัสบาร์โค้ด
-                  </label>
-                  <input
-                    type="text"
-                    value={newSaleData.barcode}
-                    onChange={(e) => setNewSaleData({...newSaleData, barcode: e.target.value || ""})}
-                    className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses('input', currentTheme)}`}
-                    placeholder=""
-                  />
-                </div>
-                <div>
-                  <label className={`block text-sm font-medium ${getThemeClasses('textSecondary', currentTheme)} mb-2`}>
-                    ขื่อสินค้า
-                  </label>
-                  <input
-                    type="text"
-                    value={newSaleData.productName}
-                    onChange={(e) => setNewSaleData({...newSaleData, productName: e.target.value})}
-                    className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses('input', currentTheme)}`}
-                    placeholder=""
-                  />
-                </div>
-              </div>
-              {/* Payment and Discount */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Stock */}
-                <div>
-                  <label className={`block text-sm font-medium ${getThemeClasses('textSecondary', currentTheme)} mb-2`}>
-                    คลังสินค้า
-                  </label>
-                  <select
-                    value={newSaleData.stock}
-                    onChange={(e) => setNewSaleData({...newSaleData, stock: e.target.value})}
-                    className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses('input', currentTheme)}`}
-                  >
-                    <option value=""></option>
-                    <option value="A1">A1</option>
-                  </select>
-                </div>
-                <div>
-                  <label className={`block text-sm font-medium ${getThemeClasses('textSecondary', currentTheme)} mb-2`}>
-                    จำนวน
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={newSaleData.qty}
-                    onChange={(e) => setNewSaleData({...newSaleData, qty: parseFloat(e.target.value)})}
-                    className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses('input', currentTheme)}`}
-                    placeholder="0"
-                  />
-                </div>
-              </div>
-
-              {/* Branch */}
-              <div>
-                <label className={`block text-sm font-medium ${getThemeClasses('textSecondary', currentTheme)} mb-2`}>
-                  รหัสสาขา
-                </label>
-                <select
-                  value={newSaleData.branch}
-                  onChange={(e) => setNewSaleData({...newSaleData, branch: e.target.value})}
-                  className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses('input', currentTheme)}`}
-                >
-                  <option value=""></option>
-                  <option value="001">001 - สาขาทดสอบระบบ</option>
-                </select>
-              </div>
             </div>
 
-            {/* Modal Footer */}
             <div className={`sticky bottom-0 ${getThemeClasses('cardBg', currentTheme)} p-6 border-t ${getThemeClasses('cardBorder', currentTheme)} rounded-b-xl`}>
               <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3">
                 <button
@@ -376,19 +467,18 @@ const Sales = ({ currentTheme}) => {
                 </button>
                 <button
                   onClick={handleNewSaleSubmit}
-                  disabled={!newSaleData.saleNumber}
+                  disabled={!saleHeader.saleNumber || saleItems.length === 0}
                   className={`px-6 py-2 text-white rounded-lg font-medium ${getThemeClasses('primaryBtn', currentTheme)} ${getThemeClasses('transition', currentTheme)} hover:shadow-lg transform hover:scale-105 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none`}
                 >
                   <Plus className="w-4 h-4 mr-2" />
-                  ยืนยันข้อมูล
+                  ยืนยันข้อมูล ({saleItems.length} รายการ)
                 </button>
               </div>
               
-              {/* Quick Tips */}
               <div className={`mt-4 text-xs ${getThemeClasses('textMuted', currentTheme)} text-center p-2 rounded ${currentTheme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'}`}>
                 <div className="flex items-center justify-center space-x-4">
                   <span>💡 เคล็ดลับ:</span>
-                  <span>กด Ctrl+Enter เพื่อบันทึกเร็ว</span>
+                  <span>กด Ctrl+Enter เพื่อเพิ่มรายการเร็ว</span>
                   <span>•</span>
                   <span>กด Esc เพื่อยกเลิก</span>
                 </div>
@@ -396,7 +486,6 @@ const Sales = ({ currentTheme}) => {
             </div>
           </div>
 
-          {/* Click outside to close */}
           <div 
             className="absolute inset-0 -z-10"
             onClick={() => setShowSaleModal(false)}

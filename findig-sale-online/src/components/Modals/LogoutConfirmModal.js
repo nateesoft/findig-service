@@ -1,28 +1,30 @@
-// src/components/Modals/LogoutConfirmModal.jsx
-import React from 'react';
+import React, { useContext } from 'react';
 import { LogOut, X } from 'lucide-react';
+
 import { getThemeClasses, themes } from '../../utils/themes';
+import { sendToLogout } from '../../api/userLoginApi';
 
 const LogoutConfirmModal = ({ 
   showLogoutConfirm, 
   setShowLogoutConfirm, 
   onLogout, 
-  setCart, 
-  setSelectedCustomer, 
   setSidebarOpen, 
-  user, 
+  userInfo, 
   currentTheme 
 }) => {
   if (!showLogoutConfirm) return null;
 
-  const handleLogout = () => {
-    onLogout();
-    setShowLogoutConfirm(false);
-    // Reset states when logging out
-    setCart([]);
-    setSelectedCustomer(null);
-    setSidebarOpen(false);
-  };
+  const handleLogout = async () => {
+    const { data, error } = await sendToLogout(userInfo)
+    if(data) {
+      onLogout();
+      setShowLogoutConfirm(false);
+      // Reset states when logging out
+      setSidebarOpen(false);
+    } else {
+      alert("Cannot logout")
+    } 
+  }
 
   return (
     <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center p-4 z-50 animate-fade-in">
@@ -68,15 +70,15 @@ const LogoutConfirmModal = ({
               <div className="flex items-center space-x-3">
                 <div className={`w-10 h-10 bg-${themes[currentTheme].accent} rounded-full flex items-center justify-center shadow-sm`}>
                   <span className="text-white text-sm font-medium">
-                    {user?.fullName?.charAt(0)}
+                    {userInfo?.Name}
                   </span>
                 </div>
                 <div>
                   <p className={`text-sm font-medium ${getThemeClasses('textPrimary', currentTheme)}`}>
-                    {user?.fullName}
+                    {userInfo?.Name}
                   </p>
                   <p className={`text-xs ${getThemeClasses('textMuted', currentTheme)} flex items-center space-x-1`}>
-                    <span>👤 {user?.role}</span>
+                    <span>👤 {userInfo?.Name}</span>
                     <span>•</span>
                     <span>🟢 เข้าสู่ระบบแล้ว</span>
                   </p>
@@ -104,7 +106,6 @@ const LogoutConfirmModal = ({
         </div>
       </div>
 
-      {/* Click outside to close */}
       <div 
         className="absolute inset-0 -z-10"
         onClick={() => setShowLogoutConfirm(false)}

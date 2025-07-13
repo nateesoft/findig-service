@@ -1,35 +1,48 @@
-import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useContext } from "react"
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  useNavigate
+} from "react-router-dom"
 
-import { getThemeClasses } from './utils/themes';
-import { SESSION_TIMEOUT, WARNING_TIME } from './utils/constants';
+import { getThemeClasses } from "./utils/themes"
+import { SESSION_TIMEOUT, WARNING_TIME } from "./utils/constants"
 
-// Import Components
-import LoginPage from './components/Auth/LoginPage';
-import Sidebar from './components/Layout/Sidebar';
-import Header from './components/Layout/Header';
-import SessionWarningModal from './components/Modals/SessionWarningModal';
-import LogoutConfirmModal from './components/Modals/LogoutConfirmModal';
-import SessionIndicator from './components/Common/SessionIndicator';
-import ProtectedRoute from './components/Auth/ProtectedRoute';
+import LoginPage from "./components/Auth/LoginPage"
+import Sidebar from "./components/Layout/Sidebar"
+import Header from "./components/Layout/Header"
+import SessionWarningModal from "./components/Modals/SessionWarningModal"
+import LogoutConfirmModal from "./components/Modals/LogoutConfirmModal"
+import SessionIndicator from "./components/Common/SessionIndicator"
+import ProtectedRoute from "./components/Auth/ProtectedRoute"
 
-// Import Pages
-import Dashboard from './pages/Dashboard';
-import Sales from './pages/Sales';
-import UserGroups from './pages/UserGroups';
-import Products from './pages/Products';
-import Customers from './pages/Customers';
-import Reports from './pages/Reports';
-import InventoryReport from './pages/InventoryReport';
-import SystemSettings from './pages/SystemSettings';
-import BranchInfo from './pages/BranchInfo';
+import Dashboard from "./pages/Dashboard"
+import Sales from "./pages/Sales"
+import UserGroups from "./pages/UserGroups"
+import Products from "./pages/Products"
+import Customers from "./pages/Customers"
+import Reports from "./pages/Reports"
+import InventoryReport from "./pages/InventoryReport"
+import SystemSettings from "./pages/SystemSettings"
+import BranchInfo from "./pages/BranchInfo"
 
-// Layout Component สำหรับหน้าที่ล็อกอินแล้ว
-const AppLayout = ({ children, user, currentTheme, setCurrentTheme, setSidebarOpen, setShowLogoutConfirm, expandedMenus, setExpandedMenus, sidebarOpen }) => {
+import { AppContext } from './contexts'
+
+const AppLayout = ({
+  children,
+  user,
+  currentTheme,
+  setSidebarOpen,
+  setShowLogoutConfirm,
+  expandedMenus,
+  setExpandedMenus,
+  sidebarOpen
+}) => {
   return (
-    <div className={`flex h-screen ${getThemeClasses('mainBg', currentTheme)}`}>
-      {/* Sidebar */}
-      <Sidebar 
+    <div className={`flex h-screen ${getThemeClasses("mainBg", currentTheme)}`}>
+      <Sidebar
         user={user}
         currentTheme={currentTheme}
         setShowLogoutConfirm={setShowLogoutConfirm}
@@ -38,66 +51,53 @@ const AppLayout = ({ children, user, currentTheme, setCurrentTheme, setSidebarOp
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
       />
-      
-      {/* Overlay for mobile */}
+
       {sidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
-      
-      {/* Main Content */}
+
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
-        <Header 
+        <Header
           currentTheme={currentTheme}
-          setCurrentTheme={setCurrentTheme}
           setSidebarOpen={setSidebarOpen}
           getThemeClasses={getThemeClasses}
         />
-        
-        {/* Main Content Area */}
+
         <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 lg:p-6">
           {children}
         </main>
       </div>
     </div>
-  );
-};
+  )
+}
 
-// Main App Component
 const AppContent = () => {
-  // User and Authentication States
+  const { appData, setAppData } = useContext(AppContext)
+  const { userInfo, currentTheme } = appData
   const [user, setUser] = useState(null);
-  const location = useLocation();
-  const navigate = useNavigate();
-  
-  // UI States
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [currentTheme, setCurrentTheme] = useState('sunset');
-  
-  // Sales Related States
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
-  const [cart, setCart] = useState([]);
-  
-  // Modal States
-  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-  const [showSessionWarning, setShowSessionWarning] = useState(false);
-  
-  // Menu States
+  const navigate = useNavigate()
+
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+
+  const [searchTerm, setSearchTerm] = useState("")
+  const [selectedCustomer, setSelectedCustomer] = useState(null)
+  const [cart, setCart] = useState([])
+
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+  const [showSessionWarning, setShowSessionWarning] = useState(false)
+
   const [expandedMenus, setExpandedMenus] = useState({
     sales: true,
     reports: false,
     settings: false
-  });
-  
-  // Session Management States
-  const [sessionCountdown, setSessionCountdown] = useState(60);
-  const [lastActivity, setLastActivity] = useState(Date.now());
+  })
 
-  // Auto logout system
+  const [sessionCountdown, setSessionCountdown] = useState(60)
+  const [lastActivity, setLastActivity] = useState(Date.now())
+
   useEffect(() => {
     if (!user) return;
 
@@ -106,153 +106,139 @@ const AppContent = () => {
     let countdownInterval;
 
     const resetTimers = () => {
-      // Clear existing timers
-      if (warningTimer) clearTimeout(warningTimer);
-      if (logoutTimer) clearTimeout(logoutTimer);
-      if (countdownInterval) clearInterval(countdownInterval);
-      
-      // Reset warning modal
-      setShowSessionWarning(false);
-      setSessionCountdown(60);
-      
-      // Set warning timer (4 minutes from now)
+      if (warningTimer) clearTimeout(warningTimer)
+      if (logoutTimer) clearTimeout(logoutTimer)
+      if (countdownInterval) clearInterval(countdownInterval)
+
+      console.log('resetTimers')
+
+      // setShowSessionWarning(false)
+      setSessionCountdown(60)
+
       warningTimer = setTimeout(() => {
-        setShowSessionWarning(true);
-        
-        // Start countdown
-        let countdown = 60;
-        setSessionCountdown(countdown);
-        
+        setShowSessionWarning(true)
+
+        let countdown = 60
+        setSessionCountdown(countdown)
+
         countdownInterval = setInterval(() => {
-          countdown--;
-          setSessionCountdown(countdown);
-          
+          countdown--
+          setSessionCountdown(countdown)
+
           if (countdown <= 0) {
-            clearInterval(countdownInterval);
-            handleAutoLogout();
+            clearInterval(countdownInterval)
+            handleAutoLogout()
           }
-        }, 1000);
-        
-        // Auto logout timer (5 minutes from now)
+        }, 1000)
+
         logoutTimer = setTimeout(() => {
-          if (countdownInterval) clearInterval(countdownInterval);
-          handleAutoLogout();
-        }, WARNING_TIME);
-        
-      }, SESSION_TIMEOUT - WARNING_TIME);
-    };
+          if (countdownInterval) clearInterval(countdownInterval)
+          handleAutoLogout()
+        }, WARNING_TIME)
+      }, SESSION_TIMEOUT - WARNING_TIME)
+    }
 
     const handleAutoLogout = () => {
-      if (warningTimer) clearTimeout(warningTimer);
-      if (logoutTimer) clearTimeout(logoutTimer);
-      if (countdownInterval) clearInterval(countdownInterval);
-      
+      console.log('handleAutoLogout:', user)
+      if (warningTimer) clearTimeout(warningTimer)
+      if (logoutTimer) clearTimeout(logoutTimer)
+      if (countdownInterval) clearInterval(countdownInterval)
+
+      setAppData({ ...appData, userInfo: null })
+      localStorage.setItem('userInfo', null)
       setUser(null);
-      navigate('/login');
-      setShowSessionWarning(false);
-      setShowLogoutConfirm(false);
-      // Reset states
-      setCart([]);
-      setSelectedCustomer(null);
-      setSidebarOpen(false);
-      
-      // Show notification
-      alert('🕐 เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่');
-    };
+      navigate("/login")
+      setShowSessionWarning(false)
+      setShowLogoutConfirm(false)
+
+      setSelectedCustomer(null)
+      setSidebarOpen(false)
+
+      alert("🕐 เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่")
+    }
 
     const handleActivity = (e) => {
-      // Don't interfere with menu clicks or if modals are open
-      if (showLogoutConfirm || showSessionWarning) return;
-      
-      // Only reset on meaningful user activity, not synthetic events
-      if (e.isTrusted === false) return;
-      
-      console.log('Activity detected:', e.type);
-      const now = Date.now();
-      setLastActivity(now);
-      resetTimers();
-    };
+      if (showLogoutConfirm || showSessionWarning) return
+      if (e.isTrusted === false) return
 
-    // Use more specific activity events that don't interfere with clicks
+      console.log("Activity detected:", e.type)
+      const now = Date.now()
+      setLastActivity(now)
+      resetTimers()
+    }
+
     const events = [
-      { type: 'keydown', options: { passive: true } },
-      { type: 'scroll', options: { passive: true } },
-      { type: 'touchstart', options: { passive: true } },
-      { type: 'mousemove', options: { passive: true } }
-    ];
-    
-    // Add listeners with throttling to avoid too many calls
-    let lastActivityTime = 0;
+      { type: "keydown", options: { passive: true } },
+      { type: "scroll", options: { passive: true } },
+      { type: "touchstart", options: { passive: true } },
+      { type: "mousemove", options: { passive: true } }
+    ]
+
+    let lastActivityTime = 0
     const throttledHandleActivity = (e) => {
-      const now = Date.now();
-      if (now - lastActivityTime > 1000) { // Throttle to once per second
-        lastActivityTime = now;
-        handleActivity(e);
+      const now = Date.now()
+      if (now - lastActivityTime > 1000) {
+        lastActivityTime = now
+        handleActivity(e)
       }
-    };
-    
+    }
+
     events.forEach(({ type, options }) => {
-      document.addEventListener(type, throttledHandleActivity, options);
-    });
+      document.addEventListener(type, throttledHandleActivity, options)
+    })
 
-    // Initial timer setup
-    resetTimers();
+    resetTimers()
 
-    // Cleanup
     return () => {
       if (warningTimer) clearTimeout(warningTimer);
       if (logoutTimer) clearTimeout(logoutTimer);
       if (countdownInterval) clearInterval(countdownInterval);
       events.forEach(({ type }) => {
-        document.removeEventListener(type, throttledHandleActivity);
-      });
-    };
-  }, [user, showLogoutConfirm, showSessionWarning, navigate]);
+        document.removeEventListener(type, throttledHandleActivity)
+      })
+    }
+  }, [showLogoutConfirm, showSessionWarning, navigate]);
 
-  // Handle session extension
   const extendSession = () => {
-    console.log('Session extended');
-    setShowSessionWarning(false);
-    setLastActivity(Date.now());
-  };
+    setShowSessionWarning(false)
+    setLastActivity(Date.now())
+  }
 
-  // Handle logout
   const handleLogout = () => {
+    setAppData({ ...appData, userInfo: null })
+    localStorage.setItem('userInfo', null)
+
     setUser(null);
     navigate('/login');
     setShowLogoutConfirm(false);
-    setCart([]);
     setSelectedCustomer(null);
     setSidebarOpen(false);
-  };
+  }
 
   return (
     <>
       <Routes>
-        {/* Login Route */}
-        <Route 
-          path="/login" 
+        <Route
+          path="/login"
           element={
-            user ? 
-            <Navigate to="/dashboard" replace /> : 
-            <LoginPage 
-              currentTheme={currentTheme}
-              setCurrentTheme={setCurrentTheme}
-              setUser={setUser}
-              onLogin={() => navigate('/dashboard')}
-            />
-          } 
+            user ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <LoginPage 
+                currentTheme={currentTheme}
+                setUser={setUser} 
+                onLogin={() => navigate("/dashboard")} />
+            )
+          }
         />
-        
-        {/* Protected Routes */}
-        <Route 
-          path="/dashboard" 
+
+        <Route
+          path="/dashboard"
           element={
             <ProtectedRoute user={user}>
-              <AppLayout 
+              <AppLayout
                 user={user}
                 currentTheme={currentTheme}
-                setCurrentTheme={setCurrentTheme}
                 setSidebarOpen={setSidebarOpen}
                 setShowLogoutConfirm={setShowLogoutConfirm}
                 expandedMenus={expandedMenus}
@@ -262,24 +248,23 @@ const AppContent = () => {
                 <Dashboard currentTheme={currentTheme} />
               </AppLayout>
             </ProtectedRoute>
-          } 
+          }
         />
-        
-        <Route 
-          path="/sales" 
+
+        <Route
+          path="/sales"
           element={
             <ProtectedRoute user={user}>
-              <AppLayout 
+              <AppLayout
                 user={user}
                 currentTheme={currentTheme}
-                setCurrentTheme={setCurrentTheme}
                 setSidebarOpen={setSidebarOpen}
                 setShowLogoutConfirm={setShowLogoutConfirm}
                 expandedMenus={expandedMenus}
                 setExpandedMenus={setExpandedMenus}
                 sidebarOpen={sidebarOpen}
               >
-                <Sales 
+                <Sales
                   currentTheme={currentTheme}
                   searchTerm={searchTerm}
                   setSearchTerm={setSearchTerm}
@@ -290,17 +275,16 @@ const AppContent = () => {
                 />
               </AppLayout>
             </ProtectedRoute>
-          } 
+          }
         />
-        
-        <Route 
-          path="/user-groups" 
+
+        <Route
+          path="/user-groups"
           element={
             <ProtectedRoute user={user}>
-              <AppLayout 
+              <AppLayout
                 user={user}
                 currentTheme={currentTheme}
-                setCurrentTheme={setCurrentTheme}
                 setSidebarOpen={setSidebarOpen}
                 setShowLogoutConfirm={setShowLogoutConfirm}
                 expandedMenus={expandedMenus}
@@ -310,65 +294,62 @@ const AppContent = () => {
                 <UserGroups currentTheme={currentTheme} />
               </AppLayout>
             </ProtectedRoute>
-          } 
+          }
         />
-        
-        <Route 
-          path="/products" 
+
+        <Route
+          path="/products"
           element={
             <ProtectedRoute user={user}>
-              <AppLayout 
+              <AppLayout
                 user={user}
                 currentTheme={currentTheme}
-                setCurrentTheme={setCurrentTheme}
                 setSidebarOpen={setSidebarOpen}
                 setShowLogoutConfirm={setShowLogoutConfirm}
                 expandedMenus={expandedMenus}
                 setExpandedMenus={setExpandedMenus}
                 sidebarOpen={sidebarOpen}
               >
-                <Products 
+                <Products
                   currentTheme={currentTheme}
                   searchTerm={searchTerm}
                   setSearchTerm={setSearchTerm}
                 />
               </AppLayout>
             </ProtectedRoute>
-          } 
+          }
         />
-        
-        <Route 
-          path="/customers" 
+
+        <Route
+          path="/customers"
           element={
             <ProtectedRoute user={user}>
-              <AppLayout 
+              <AppLayout
                 user={user}
                 currentTheme={currentTheme}
-                setCurrentTheme={setCurrentTheme}
                 setSidebarOpen={setSidebarOpen}
                 setShowLogoutConfirm={setShowLogoutConfirm}
                 expandedMenus={expandedMenus}
                 setExpandedMenus={setExpandedMenus}
                 sidebarOpen={sidebarOpen}
               >
-                <Customers 
+                <Customers
                   currentTheme={currentTheme}
                   searchTerm={searchTerm}
                   setSearchTerm={setSearchTerm}
                 />
               </AppLayout>
             </ProtectedRoute>
-          } 
+          }
         />
-        
-        <Route 
-          path="/reports" 
+
+        <Route
+          path="/reports"
           element={
             <ProtectedRoute user={user}>
-              <AppLayout 
+              <AppLayout
                 user={user}
                 currentTheme={currentTheme}
-                setCurrentTheme={setCurrentTheme}
                 setSidebarOpen={setSidebarOpen}
                 setShowLogoutConfirm={setShowLogoutConfirm}
                 expandedMenus={expandedMenus}
@@ -378,17 +359,16 @@ const AppContent = () => {
                 <Reports currentTheme={currentTheme} />
               </AppLayout>
             </ProtectedRoute>
-          } 
+          }
         />
-        
-        <Route 
-          path="/inventory-report" 
+
+        <Route
+          path="/inventory-report"
           element={
             <ProtectedRoute user={user}>
-              <AppLayout 
+              <AppLayout
                 user={user}
                 currentTheme={currentTheme}
-                setCurrentTheme={setCurrentTheme}
                 setSidebarOpen={setSidebarOpen}
                 setShowLogoutConfirm={setShowLogoutConfirm}
                 expandedMenus={expandedMenus}
@@ -398,40 +378,37 @@ const AppContent = () => {
                 <InventoryReport currentTheme={currentTheme} />
               </AppLayout>
             </ProtectedRoute>
-          } 
+          }
         />
-        
-        <Route 
-          path="/system-settings" 
+
+        <Route
+          path="/system-settings"
           element={
             <ProtectedRoute user={user}>
-              <AppLayout 
+              <AppLayout
                 user={user}
                 currentTheme={currentTheme}
-                setCurrentTheme={setCurrentTheme}
                 setSidebarOpen={setSidebarOpen}
                 setShowLogoutConfirm={setShowLogoutConfirm}
                 expandedMenus={expandedMenus}
                 setExpandedMenus={setExpandedMenus}
                 sidebarOpen={sidebarOpen}
               >
-                <SystemSettings 
+                <SystemSettings
                   currentTheme={currentTheme}
-                  setCurrentTheme={setCurrentTheme}
                 />
               </AppLayout>
             </ProtectedRoute>
-          } 
+          }
         />
-        
-        <Route 
-          path="/branch-info" 
+
+        <Route
+          path="/branch-info"
           element={
             <ProtectedRoute user={user}>
-              <AppLayout 
+              <AppLayout
                 user={user}
                 currentTheme={currentTheme}
-                setCurrentTheme={setCurrentTheme}
                 setSidebarOpen={setSidebarOpen}
                 setShowLogoutConfirm={setShowLogoutConfirm}
                 expandedMenus={expandedMenus}
@@ -441,29 +418,33 @@ const AppContent = () => {
                 <BranchInfo currentTheme={currentTheme} />
               </AppLayout>
             </ProtectedRoute>
-          } 
+          }
         />
-        
-        {/* Default redirect */}
-        <Route path="/" element={<Navigate to={user ? "/dashboard" : "/login"} replace />} />
-        <Route path="*" element={<Navigate to={user ? "/dashboard" : "/login"} replace />} />
+
+        <Route
+          path="/"
+          element={<Navigate to={user ? "/dashboard" : "/login"} replace />}
+        />
+        <Route
+          path="*"
+          element={<Navigate to={user ? "/dashboard" : "/login"} replace />}
+        />
       </Routes>
-      
-      {/* Session Indicator - แสดงเฉพาะเมื่อล็อกอินแล้ว */}
-      {user && (
-        <SessionIndicator 
+
+      {userInfo && (
+        <SessionIndicator
           user={user}
           lastActivity={lastActivity}
           showSessionWarning={showSessionWarning}
           currentTheme={currentTheme}
         />
       )}
-      
-      {/* Session Warning Modal */}
-      <SessionWarningModal 
+
+      <SessionWarningModal
         showSessionWarning={showSessionWarning}
         sessionCountdown={sessionCountdown}
         user={user}
+        setUser={setUser}
         currentTheme={currentTheme}
         extendSession={extendSession}
         onLogout={handleLogout}
@@ -472,29 +453,37 @@ const AppContent = () => {
         setSelectedCustomer={setSelectedCustomer}
         setSidebarOpen={setSidebarOpen}
       />
-      
-      {/* Logout Confirmation Modal */}
-      <LogoutConfirmModal 
+
+      <LogoutConfirmModal
         showLogoutConfirm={showLogoutConfirm}
         setShowLogoutConfirm={setShowLogoutConfirm}
         onLogout={handleLogout}
         setCart={setCart}
         setSelectedCustomer={setSelectedCustomer}
         setSidebarOpen={setSidebarOpen}
-        user={user}
+        userInfo={userInfo}
         currentTheme={currentTheme}
       />
     </>
-  );
-};
+  )
+}
 
-// Root App Component
+const initContext = {
+  db: localStorage.getItem('db') || '',
+  userInfo: localStorage.getItem("userInfo") || null,
+  currentTheme: localStorage.getItem("currentTheme") || "sunset"
+}
+
 const App = () => {
-  return (
-    <Router basename='findig-sale-online'>
-      <AppContent />
-    </Router>
-  );
-};
+  const [appData, setAppData] = useState(initContext)
 
-export default App;
+  return (
+    <Router basename="findig-sale-online">
+      <AppContext.Provider value={{ appData, setAppData}}>
+        <AppContent />
+      </AppContext.Provider>
+    </Router>
+  )
+}
+
+export default App

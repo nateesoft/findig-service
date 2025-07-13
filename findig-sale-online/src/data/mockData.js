@@ -67,9 +67,7 @@ export const mockSales = [
     total: 45780, 
     status: 'paid', 
     items: 3,
-    productCode: "SET1001",
-    productName: "SET 1001 Premium",
-    stock: "A1",
+    empCode: "1001",
     branch: "001",
     post: "N"
   },
@@ -81,9 +79,7 @@ export const mockSales = [
     total: 8990, 
     status: 'paid', 
     items: 1,
-    productCode: "SET1001",
-    productName: "SET 1001 Premium",
-    stock: "A1",
+    empCode: "1001",
     branch: "001",
     post: "N"
   },
@@ -95,9 +91,7 @@ export const mockSales = [
     total: 2289, 
     status: 'pending', 
     items: 2,
-    productCode: "SET1001",
-    productName: "SET 1001 Premium",
-    stock: "A1",
+    empCode: "1001",
     branch: "001",
     post: "N"
   },
@@ -109,9 +103,7 @@ export const mockSales = [
     total: 35900, 
     status: 'paid', 
     items: 1,
-    productCode: "SET1001",
-    productName: "SET 1001 Premium",
-    stock: "A1",
+    empCode: "1001",
     branch: "001",
     post: "N"
   },
@@ -123,9 +115,7 @@ export const mockSales = [
     total: 19289, 
     status: 'paid', 
     items: 2,
-    productCode: "SET1001",
-    productName: "SET 1001 Premium",
-    stock: "A1",
+    empCode: "1001",
     branch: "001",
     post: "N"
   }

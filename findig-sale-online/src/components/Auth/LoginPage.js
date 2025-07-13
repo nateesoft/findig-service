@@ -1,19 +1,16 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { ShoppingCart } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 
-import apiClient from "../../httpRequest"
+import { validateLogin } from "../../api/userLoginApi"
 import { themes, getThemeClasses } from '../../utils/themes';
+import { AppContext } from '../../contexts';
 
-const LoginPage = ({ 
-  currentTheme, 
-  setUser, 
-  setCurrentPage 
-}) => {
-  const [loginData, setLoginData] = useState({ username: '', password: '', branchCode: '' });
+const LoginPage = ( { onLogin, setUser }) => {
+  const { appData, setAppData } = useContext(AppContext)
+  const { currentTheme, db } = appData
+
+  const [loginData, setLoginData] = useState({ username: '', password: '', branchCode: db || '' });
   const [loading, setLoading] = useState(false);
-
-  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     if(!loginData.branchCode){
@@ -22,31 +19,29 @@ const LoginPage = ({
     e.preventDefault();
     setLoading(true);
 
-    console.log(loginData)
-
-    apiClient.post('/api/posuser/login', { 
+    const { data: userInfo, error } = await validateLogin({
       username: loginData.username,
       password: loginData.password,
       branchCode: loginData.branchCode
     })
-    .then(response => {
-      if(response.data.data != null){
-        setUser({
-            id: 1,
-            username: loginData.username,
-            fullName: 'ผู้ดูแลระบบ',
-            role: 'admin'
-          });
-          navigate('dashboard');
-      }else{
-        setLoading(false);
-        alert('ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง');
-      }
-    })
-    .catch(err => {
+
+    if(userInfo) {
+      localStorage.setItem('userInfo', JSON.stringify(userInfo))
+      localStorage.setItem('db', loginData.branchCode)
+      setAppData({ ...appData, userInfo})
+
+      setUser({
+        id: 1,
+        username: loginData.username,
+        fullName: 'Admin',
+        role: 'admin'
+      })
+
+      onLogin()
+    } else {
       setLoading(false);
-      alert('ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง');
-    })
+      alert(error);
+    }
   };
 
   const loginThemeClasses = currentTheme === 'sunset' ? 'bg-gradient-to-br from-orange-100 via-pink-100 to-red-100' :
@@ -57,14 +52,12 @@ const LoginPage = ({
 
   return (
     <div className={`min-h-screen ${loginThemeClasses} flex items-center justify-center p-4 relative overflow-hidden`}>
-      {/* Background Animation */}
       <div className="absolute inset-0 overflow-hidden">
         <div className={`absolute top-1/4 left-1/4 w-64 h-64 ${currentTheme === 'sunset' ? 'bg-orange-300' : currentTheme === 'ocean' ? 'bg-cyan-300' : `bg-${themes[currentTheme].primary}-300`} rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse`}></div>
         <div className={`absolute top-3/4 right-1/4 w-64 h-64 ${currentTheme === 'sunset' ? 'bg-pink-300' : currentTheme === 'ocean' ? 'bg-blue-300' : `bg-${themes[currentTheme].primary}-200`} rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse delay-1000`}></div>
         <div className={`absolute bottom-1/4 left-1/3 w-64 h-64 ${currentTheme === 'sunset' ? 'bg-red-300' : currentTheme === 'ocean' ? 'bg-indigo-300' : `bg-${themes[currentTheme].primary}-400`} rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse delay-2000`}></div>
       </div>
 
-      {/* Login Form */}
       <div className={`relative ${getThemeClasses('cardBg', currentTheme)} rounded-2xl shadow-2xl w-full max-w-md p-8 backdrop-blur-sm ${currentTheme !== 'contrast' ? 'bg-opacity-90' : ''} border ${getThemeClasses('cardBorder', currentTheme)}`}>
         <div className="text-center mb-8">
           <div className={`mx-auto w-16 h-16 bg-gradient-to-r ${themes[currentTheme].gradient} rounded-full flex items-center justify-center mb-4 shadow-lg ${getThemeClasses('transition', currentTheme)}`}>
@@ -132,7 +125,6 @@ const LoginPage = ({
           </button>
         </div>
         
-
         <div className="mt-4 text-center">
           <div className={`text-xs ${getThemeClasses('textMuted', currentTheme)} p-3 rounded-lg ${currentTheme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'} border ${getThemeClasses('cardBorder', currentTheme)}`}>
             <div className="font-medium mb-2 flex items-center justify-center space-x-1">

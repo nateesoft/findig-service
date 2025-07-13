@@ -28,7 +28,6 @@ const InventoryReport = ({ currentTheme }) => {
         </div>
       </div>
 
-      {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className={`${getThemeClasses('cardBg', currentTheme)} rounded-lg shadow-sm border ${getThemeClasses('cardBorder', currentTheme)} p-6`}>
           <div className="flex items-center justify-between">
@@ -85,7 +84,6 @@ const InventoryReport = ({ currentTheme }) => {
         </div>
       </div>
 
-      {/* Inventory Chart */}
       <div className={`${getThemeClasses('cardBg', currentTheme)} rounded-lg shadow-sm border ${getThemeClasses('cardBorder', currentTheme)} p-6`}>
         <h3 className={`text-lg font-semibold ${getThemeClasses('textPrimary', currentTheme)} mb-4`}>การเคลื่อนไหวสินค้า (7 วันที่ผ่านมา)</h3>
         <ResponsiveContainer width="100%" height={300}>
@@ -99,7 +97,6 @@ const InventoryReport = ({ currentTheme }) => {
         </ResponsiveContainer>
       </div>
 
-      {/* Inventory Table */}
       <div className={`${getThemeClasses('cardBg', currentTheme)} rounded-lg shadow-sm border ${getThemeClasses('cardBorder', currentTheme)}`}>
         <div className={`p-6 border-b ${getThemeClasses('cardBorder', currentTheme)}`}>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">

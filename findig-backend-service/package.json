@@ -42,9 +42,11 @@
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
     "utf8": "^3.0.0",
-    "uuid": "^11.0.2"
+    "uuid": "^11.0.2",
+    "winston": "^3.17.0"
   },
   "devDependencies": {
+    "handlebars": "^4.7.8",
     "nodemon": "^3.1.7",
     "webpack": "^5.98.0",
     "webpack-cli": "^6.0.1"

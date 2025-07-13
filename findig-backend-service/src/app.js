@@ -9,10 +9,12 @@ const compression = require("compression");
 const helmet = require("helmet");
 const cors = require('cors')
 
+const { errorHandler } = require('./middlewares/errorHandler')
+const requestLogger = require('./middlewares/requestLogger');
+const { correlationId } = require('./middlewares/correlationId');
 const selectBranchDb = require('./config/database/selectBranchDb');
 
-// login
-const posuserRouter = require('./routes/login/posuser');
+const allRouter = require('./routes')
 
 const app = express()
 app.use(cors())
@@ -35,6 +37,9 @@ app.use((req, res, next) => {
   next()
 })
 
+app.use(correlationId)
+app.use(requestLogger);
+
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -47,10 +52,11 @@ app.get('/api/version', (req, res) => {
   })
 })
 
-
 // ใช้ middleware ก่อน protected routes
 app.use('/api', selectBranchDb);
-app.use('/api/posuser', posuserRouter);
+app.use(allRouter);
+
+app.use(errorHandler)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

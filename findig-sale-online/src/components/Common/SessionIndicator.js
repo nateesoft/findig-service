@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
+
 import { getThemeClasses } from '../../utils/themes';
 import { SESSION_TIMEOUT } from '../../utils/constants';
 
 const SessionIndicator = ({ 
-  user, 
+  user,
   lastActivity, 
   showSessionWarning, 
   currentTheme 

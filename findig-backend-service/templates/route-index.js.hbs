@@ -1,0 +1,12 @@
+const express = require('express')
+{{#each routes}}
+const { {{this.name}}Controller } = require('../controllers/{{this.name}}Controller.js')
+{{/each}}
+
+const router = express.Router();
+
+{{#each routes}}
+router.{{this.method}}('{{this.path}}', {{this.name}}Controller);
+{{/each}}
+
+module.exports = router

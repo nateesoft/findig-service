@@ -40,7 +40,6 @@ const Sidebar = ({
     icon: iconMap[group.id]
   }));
 
-  // Convert page names to paths
   const pageToPath = {
     'dashboard': '/dashboard',
     'sales': '/sales',
@@ -53,7 +52,6 @@ const Sidebar = ({
     'branch-info': '/branch-info'
   };
 
-  // Convert path to page for checking active state
   const pathToPage = Object.fromEntries(
     Object.entries(pageToPath).map(([page, path]) => [path, page])
   );
@@ -88,15 +86,12 @@ const Sidebar = ({
     <div className={`fixed inset-y-0 left-0 z-50 w-64 shadow-lg transform ${
       sidebarOpen ? 'translate-x-0' : '-translate-x-full'
     } transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${getThemeClasses('sidebarBg', currentTheme)}`}>
-      {/* Header */}
       <div className={`flex items-center justify-center h-16 px-4 ${getThemeClasses('sidebarHeader', currentTheme)}`}>
         <ShoppingCart className="w-8 h-8 text-white mr-3" />
         <h1 className="text-xl font-bold text-white">ระบบขาย</h1>
       </div>
       
-      {/* Navigation */}
       <nav className="mt-8 h-full overflow-y-auto pb-20">
-        {/* User Info */}
         <div className="px-4 mb-6">
           <div className="flex items-center">
             <div className={`w-8 h-8 bg-${themes[currentTheme].accent} rounded-full flex items-center justify-center`}>
@@ -115,7 +110,6 @@ const Sidebar = ({
           </div>
         </div>
         
-        {/* Menu Items */}
         <div className="space-y-1">
           {menuGroups.map((group) => {
             const Icon = group.icon;
@@ -203,7 +197,6 @@ const Sidebar = ({
         </div>
       </nav>
       
-      {/* Logout Button */}
       <div className={`absolute bottom-0 w-full p-4 border-t ${getThemeClasses('cardBorder', currentTheme)} ${getThemeClasses('sidebarBg', currentTheme)}`}>
         <button
           type="button"

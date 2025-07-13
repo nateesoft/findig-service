@@ -1,0 +1,20 @@
+{
+  "endpoints": [
+    {
+      "name": "Branch",
+      "path": "/api/branch",
+      "method": "GET",
+      "service": true,
+      "repository": true,
+      "unitTest": true
+    },
+    {
+      "name": "Company",
+      "path": "/api/company",
+      "method": "GET",
+      "service": true,
+      "repository": true,
+      "unitTest": true
+    }
+  ]
+}

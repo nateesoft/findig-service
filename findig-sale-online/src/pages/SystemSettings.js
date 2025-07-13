@@ -18,7 +18,6 @@ const SystemSettings = ({ currentTheme, setCurrentTheme }) => {
       <h1 className={`text-2xl font-bold ${getThemeClasses('textPrimary', currentTheme)}`}>ปรับแต่งระบบ</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* General Settings */}
         <div className={`${getThemeClasses('cardBg', currentTheme)} rounded-lg shadow-sm border ${getThemeClasses('cardBorder', currentTheme)} p-6`}>
           <h3 className={`text-lg font-semibold ${getThemeClasses('textPrimary', currentTheme)} mb-4`}>การตั้งค่าทั่วไป</h3>
           
@@ -78,7 +77,6 @@ const SystemSettings = ({ currentTheme, setCurrentTheme }) => {
           </div>
         </div>
 
-        {/* Theme Settings */}
         <div className={`${getThemeClasses('cardBg', currentTheme)} rounded-lg shadow-sm border ${getThemeClasses('cardBorder', currentTheme)} p-6`}>
           <h3 className={`text-lg font-semibold ${getThemeClasses('textPrimary', currentTheme)} mb-4 flex items-center`}>
             🎨 ธีมสีของระบบ
@@ -150,7 +148,6 @@ const SystemSettings = ({ currentTheme, setCurrentTheme }) => {
                 </div>
               </div>
 
-              {/* Special Themes */}
               <div className="mb-4">
                 <div className={`text-xs font-medium ${getThemeClasses('textMuted', currentTheme)} mb-2`}>✨ ธีมพิเศษ</div>
                 <div className="grid grid-cols-1 gap-3">
@@ -200,7 +197,6 @@ const SystemSettings = ({ currentTheme, setCurrentTheme }) => {
               </div>
             </div>
 
-            {/* Theme Preview */}
             <div className="mt-6">
               <label className={`block text-sm font-medium ${getThemeClasses('textSecondary', currentTheme)} mb-3`}>
                 🔍 ตัวอย่างธีม
@@ -238,7 +234,6 @@ const SystemSettings = ({ currentTheme, setCurrentTheme }) => {
               </div>
             </div>
 
-            {/* Theme Actions */}
             <div className="flex space-x-3">
               <button
                 onClick={() => {
@@ -263,7 +258,6 @@ const SystemSettings = ({ currentTheme, setCurrentTheme }) => {
           </div>
         </div>
 
-        {/* Notification Settings */}
         <div className={`${getThemeClasses('cardBg', currentTheme)} rounded-lg shadow-sm border ${getThemeClasses('cardBorder', currentTheme)} p-6`}>
           <h3 className={`text-lg font-semibold ${getThemeClasses('textPrimary', currentTheme)} mb-4 flex items-center`}>
             🔔 การแจ้งเตือนและความปลอดภัย
@@ -312,7 +306,6 @@ const SystemSettings = ({ currentTheme, setCurrentTheme }) => {
               </button>
             </div>
 
-            {/* Auto Logout Information */}
             <div className={`p-4 rounded-lg ${currentTheme === 'dark' ? 'bg-blue-900 bg-opacity-30 border-blue-700' : 'bg-blue-50 border-blue-200'} border`}>
               <div className="flex items-start space-x-3">
                 <div className="flex-shrink-0">
@@ -361,7 +354,6 @@ const SystemSettings = ({ currentTheme, setCurrentTheme }) => {
         </div>
       </div>
 
-      {/* Save Button */}
       <div className="flex justify-end">
         <button
           onClick={() => alert('บันทึกการตั้งค่าเรียบร้อย')}

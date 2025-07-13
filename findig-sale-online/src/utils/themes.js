@@ -1,4 +1,3 @@
-// src/utils/themes.js
 export const themes = {
   light: {
     name: 'ธีมสว่าง',

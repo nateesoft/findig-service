@@ -1,0 +1,11 @@
+const { {{name}}Repository } = require('../repository/{{name}}Repository.js')
+
+const {{name}}Service = async (payload) => {
+  // TODO: business logic
+  const data = await {{name}}Repository(payload);
+  return data;
+};
+
+module.exports = {
+  {{name}}Service
+}
