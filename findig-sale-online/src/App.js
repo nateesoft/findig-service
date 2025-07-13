@@ -78,6 +78,7 @@ const AppContent = () => {
   const { appData, setAppData } = useContext(AppContext)
   const { userInfo, currentTheme } = appData
   const [user, setUser] = useState(null);
+  const [isInitialized, setIsInitialized] = useState(false); // เพิ่ม flag สำหรับตรวจสอบว่า app initialize แล้วหรือยัง
   const navigate = useNavigate()
 
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -97,6 +98,49 @@ const AppContent = () => {
 
   const [sessionCountdown, setSessionCountdown] = useState(60)
   const [lastActivity, setLastActivity] = useState(Date.now())
+
+  // เพิ่ม useEffect สำหรับ initialize user จาก localStorage
+  useEffect(() => {
+    // ตรวจสอบ userInfo จาก localStorage
+    const storedUserInfo = localStorage.getItem('userInfo')
+    
+    if (storedUserInfo && storedUserInfo !== 'null' && storedUserInfo !== 'undefined') {
+      try {
+        const parsedUserInfo = JSON.parse(storedUserInfo)
+        if (parsedUserInfo) {
+          setUser(parsedUserInfo)
+          // อัพเดท context ด้วย
+          setAppData(prevData => ({
+            ...prevData,
+            userInfo: parsedUserInfo
+          }))
+        }
+      } catch (error) {
+        console.error('Error parsing userInfo from localStorage:', error)
+        localStorage.removeItem('userInfo') // ลบข้อมูลที่เสียหาย
+      }
+    }
+    
+    setIsInitialized(true)
+  }, [setAppData])
+
+  // ทำให้ user state sync กับ userInfo จาก context
+  useEffect(() => {
+    if (userInfo && userInfo !== 'null' && !user) {
+      if (typeof userInfo === 'string') {
+        try {
+          const parsedUserInfo = JSON.parse(userInfo)
+          setUser(parsedUserInfo)
+        } catch (error) {
+          console.error('Error parsing userInfo:', error)
+        }
+      } else {
+        setUser(userInfo)
+      }
+    } else if (!userInfo || userInfo === 'null') {
+      setUser(null)
+    }
+  }, [userInfo])
 
   useEffect(() => {
     if (!user) return;
@@ -197,7 +241,7 @@ const AppContent = () => {
         document.removeEventListener(type, throttledHandleActivity)
       })
     }
-  }, [showLogoutConfirm, showSessionWarning, navigate]);
+  }, [user, showLogoutConfirm, showSessionWarning, navigate]);
 
   const extendSession = () => {
     setShowSessionWarning(false)
@@ -213,6 +257,18 @@ const AppContent = () => {
     setShowLogoutConfirm(false);
     setSelectedCustomer(null);
     setSidebarOpen(false);
+  }
+
+  // แสดง loading จนกว่า app จะ initialize เสร็จ
+  if (!isInitialized) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
+          <div>กำลังโหลด...</div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -468,9 +524,23 @@ const AppContent = () => {
   )
 }
 
+// ปรับปรุง initContext ให้ handle การ parse userInfo จาก localStorage ได้ดีขึ้น
+const getInitialUserInfo = () => {
+  const stored = localStorage.getItem("userInfo")
+  if (!stored || stored === 'null' || stored === 'undefined') {
+    return null
+  }
+  try {
+    return JSON.parse(stored)
+  } catch (error) {
+    console.error('Error parsing userInfo from localStorage:', error)
+    return null
+  }
+}
+
 const initContext = {
   db: localStorage.getItem('db') || '',
-  userInfo: localStorage.getItem("userInfo") || null,
+  userInfo: getInitialUserInfo(),
   currentTheme: localStorage.getItem("currentTheme") || "sunset"
 }
 
