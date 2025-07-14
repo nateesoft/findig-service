@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { 
   Plus, 
   Eye, 
@@ -11,9 +11,14 @@ import {
   ShoppingCart} from 'lucide-react';
 
 import { getThemeClasses } from '../utils/themes';
-import { mockSales } from '../data/mockData';
+import { loadDraftSaleInfo } from '../api/userLoginApi';
+import { AppContext } from '../contexts';
 
-const Sales = ({ currentTheme}) => {
+const Sales = () => {
+  const { appData } = useContext(AppContext)
+    const { currentTheme, db } = appData
+
+  const [draftSale, setDraftSale] = useState([])
   const [showSaleModal, setShowSaleModal] = useState(false);
   
   const [saleHeader, setSaleHeader] = useState({
@@ -112,6 +117,23 @@ const Sales = ({ currentTheme}) => {
     resetNewSaleForm();
   };
 
+  const initLoadData = async () => {
+    const { data, error } = await loadDraftSaleInfo({
+      branchCode: db
+    })
+
+    console.log(data)
+    if(data) {
+      setDraftSale(data)
+    }else {
+      alert(error);
+    }
+  }
+
+  useEffect(() => {
+    initLoadData()
+  }, [])
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (showSaleModal) {
@@ -179,25 +201,25 @@ const Sales = ({ currentTheme}) => {
               </tr>
             </thead>
             <tbody className={`${getThemeClasses('cardBg', currentTheme)} divide-y ${getThemeClasses('tableBorder', currentTheme)}`}>
-              {mockSales.map((sale) => (
-                <tr key={sale.id} className={getThemeClasses('tableRow', currentTheme)}>
+              {draftSale.map((draft_sale) => (
+                <tr key={draft_sale.billno} className={getThemeClasses('tableRow', currentTheme)}>
                   <td className={`px-6 py-4 whitespace-nowrap text-center text-sm font-medium ${getThemeClasses('textPrimary', currentTheme)}`}>
-                    {sale.saleNumber}
+                    {draft_sale.billno}
                   </td>
                   <td className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses('textPrimary', currentTheme)}`}>
-                    {sale.date}
+                    {draft_sale.document_date}
                   </td>
                   <td className={`px-6 py-4 whitespace-nowrap text-right text-sm ${getThemeClasses('textSecondary', currentTheme)}`}>
-                    {sale.items}
+                    {draft_sale.total_item}
                   </td>
                   <td className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses('textPrimary', currentTheme)}`}>
-                    {sale.empCode}
+                    {draft_sale.emp_code}
                   </td>
                   <td className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses('textPrimary', currentTheme)}`}>
-                    {sale.branch}
+                    {draft_sale.branch_code}
                   </td>
                   <td className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses('textPrimary', currentTheme)}`}>
-                    {sale.post}
+                    {draft_sale.post_status}
                   </td>
                   <td className={`px-6 py-4 whitespace-nowrap text-right text-sm font-medium`}>
                     <button className={`${getThemeClasses('textSecondary', currentTheme)} hover:${getThemeClasses('textPrimary', currentTheme)} mr-3`}>

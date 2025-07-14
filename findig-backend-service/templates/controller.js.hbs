@@ -1,27 +1,17 @@
-const { {{name}}Service } = require('../services/{{name}}Service.js')
+const { {{name}}Service } = require('../services/{{name}}Service')
+const { {{name}}Repository } = require('../services/{{name}}Repository')
 
-const {{name}}Controller = async (req, res, next) => {
+const getData = async (req, res, next) => {
   try {
-    const result = await {{name}}Service(req.body);
+    const result = await {{name}}Service.getData({
+      repository: StcardRepository,
+      db: req.db
+    })
     res.json(result);
   } catch (err) {
     next(err);
   }
 };
-
-{{#each methods}}
-const {{name}}Controller = async (req, res, next) => {
-  try {
-    const result = await {{this.serviceName}}(req.{{this.inputType}});
-    res.json(result);
-  } catch (err) {
-    next(err);
-  }
-};
-{{/each}}
-
 module.exports = {
-{{#each methods}}
-  {{name}}Controller,
-{{/each}}
-};
+  getData
+}

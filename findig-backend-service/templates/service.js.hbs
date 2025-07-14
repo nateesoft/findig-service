@@ -1,11 +1,10 @@
-const { {{name}}Repository } = require('../repository/{{name}}Repository.js')
+const { mappingResultData } = require("../utils/ConvertThai")
 
-const {{name}}Service = async (payload) => {
-  // TODO: business logic
-  const data = await {{name}}Repository(payload);
-  return data;
+const getData = async ({ repository, db }) => {
+  const results = await repository.getData({ payload: {}, db })
+  return mappingResultData(results)
 };
 
 module.exports = {
-  {{name}}Service
+  getData
 }

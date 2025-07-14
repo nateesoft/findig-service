@@ -1,12 +1,13 @@
 const express = require('express')
-{{#each routes}}
-const { {{this.name}}Controller } = require('../controllers/{{this.name}}Controller.js')
-{{/each}}
-
 const router = express.Router();
 
 {{#each routes}}
-router.{{this.method}}('{{this.path}}', {{this.name}}Controller);
+const { {{this.name}}Controller } = require('../controllers/{{this.name}}Controller')
+{{/each}}
+
+
+{{#each routes}}
+router.{{this.method}}('{{this.path}}', {{this.name}}.getData);
 {{/each}}
 
 module.exports = router

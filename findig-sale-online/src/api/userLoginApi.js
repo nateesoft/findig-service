@@ -34,3 +34,38 @@ export const sendToLogout = async (payload) => {
         }
     }
 }
+
+export const loadStcardInfo = async (payload) => {
+    try {
+        const { branchCode } = payload
+        const response = await apiClient.get(`/api/stcard?branchCode=${branchCode}`)
+        return { data: response.data, error: null }
+    } catch (error) {
+        console.log('error=>', error)
+        if (error.response) {
+            return { data: null, error: error.response.data.message };
+        } else if (error.request) {
+            return { data: null, error: "Network error. Please try again." };
+        } else {
+            return { data: null, error: error.message };
+        }
+    }
+}
+
+export const loadDraftSaleInfo = async (payload) => {
+    try {
+        const { branchCode } = payload
+        const response = await apiClient.get(`/api/draftsale?branchCode=${branchCode}`)
+        return { data: response.data, error: null }
+    } catch (error) {
+        console.log('error=>', error)
+        if (error.response) {
+            return { data: null, error: error.response.data.message };
+        } else if (error.request) {
+            return { data: null, error: "Network error. Please try again." };
+        } else {
+            return { data: null, error: error.message };
+        }
+    }
+}
+
