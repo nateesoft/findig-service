@@ -5,7 +5,7 @@ const getAllSTCard = async (req, res, next) => {
   try {
     const { branchCode } = req.query
     const stcardInfo = await StcardService.getSTCard({
-      branchCode,
+      payload: { branch_code: branchCode },
       repository: StcardRepository,
       db: req.db
     })

@@ -1,7 +1,7 @@
 const { mappingResultData } = require("../utils/ConvertThai")
 
-const getSTCard = async ({ branchCode, repository, db }) => {
-  const results = await repository.getData({ payload: { branchCode }, db })
+const getSTCard = async ({ payload, repository, db }) => {
+  const results = await repository.getData({payload, db })
   return mappingResultData(results)
 }
 

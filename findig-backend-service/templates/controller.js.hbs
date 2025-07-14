@@ -1,10 +1,11 @@
 const { {{name}}Service } = require('../services/{{name}}Service')
 const { {{name}}Repository } = require('../services/{{name}}Repository')
 
-const getData = async (req, res, next) => {
+{{#each methods}}
+const {{this.controllerName}} = async (req, res, next) => {
   try {
-    const result = await {{name}}Service.getData({
-      repository: StcardRepository,
+    const result = await {{name}}Service.{{this.serviceName}}({
+      repository: {{name}}Repository,
       db: req.db
     })
     res.json(result);
@@ -12,6 +13,10 @@ const getData = async (req, res, next) => {
     next(err);
   }
 };
+{{/each}}
+
 module.exports = {
-  getData
+  {{#each methods}}
+    {{this.controllerName}},
+  {{/each}}
 }

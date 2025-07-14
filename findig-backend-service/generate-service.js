@@ -13,15 +13,14 @@ const renderTemplate = (templatePath, data) => {
 const spec = JSON.parse(fs.readFileSync('spec.json', 'utf-8'));
 
 // prepare all routes (for building index.js)
-const allRoutes = spec.endpoints.map(endpoint => ({
-  name: endpoint.name,
-  path: endpoint.path,
-  method: endpoint.method.toLowerCase()
+const allRoutes = spec.controllers.map(controller => ({
+  name: controller.name,
+  methods: controller.methods
 }));
 
-// generate each endpoint
-spec.endpoints.forEach(endpoint => {
-  const { name, service, repository, unitTest } = endpoint;
+// generate each controller
+spec.controller.forEach(controller => {
+  const { name, service, repository, unitTest } = controller;
 
   ensureDir('src/controllers');
   ensureDir('src/services');
@@ -62,7 +61,7 @@ ensureDir('src/routes');
 
 fs.writeFileSync(
   'src/routes/index.js',
-  renderTemplate('templates/route-index.js.hbs', { routes: allRoutes })
+  renderTemplate('templates/route-index.js.hbs', { controllers: allRoutes })
 );
 
 console.log('✅ Updated src/routes/index.js');

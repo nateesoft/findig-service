@@ -1,20 +1,25 @@
 {
-  "endpoints": [
+  "controllers": [
     {
-      "name": "Branch",
-      "path": "/api/branch",
-      "method": "GET",
-      "service": true,
-      "repository": true,
-      "unitTest": true
-    },
-    {
-      "name": "Company",
-      "path": "/api/company",
-      "method": "GET",
-      "service": true,
-      "repository": true,
-      "unitTest": true
+      "name": "User",
+      "methods": [
+        {
+          "controllerName": "getData",
+          "serviceName": "getData",
+          "repositoryName": "getData",
+          "inputType": "body",
+          "path": "/api/user/login",
+          "method": "post"
+        },
+        {
+          "controllerName": "getDataById",
+          "serviceName": "getDataById",
+          "repositoryName": "getDataById",
+          "inputType": "params",
+          "path": "/api/user/profile/:id",
+          "method": "get"
+        }
+      ]
     }
   ]
 }
