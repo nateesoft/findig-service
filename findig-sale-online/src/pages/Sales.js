@@ -763,7 +763,7 @@ const Sales = () => {
             <div className={`sticky top-0 ${getThemeClasses('cardBg', currentTheme)} p-6 border-b ${getThemeClasses('cardBorder', currentTheme)} rounded-t-xl`}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <div className={`w-12 h-12 bg-gradient-to-r ${getThemeClasses('primaryBtn', currentTheme).includes('gradient') ? getThemeClasses('primaryBtn', currentTheme).split(' ').find(c => c.includes('gradient')) : `from-${currentTheme === 'dark' ? 'blue-500' : 'blue-400'} to-${currentTheme === 'dark' ? 'blue-600' : 'blue-600'}`} rounded-lg flex items-center justify-center`}>
+                  <div className={`w-12 h-12 bg-gradient-to-r ${modalMode === 'edit' ? 'from-yellow-500 to-yellow-600' : 'from-blue-500 to-blue-600'} rounded-lg flex items-center justify-center`}>
                     {modalMode === 'edit' ? <Edit className="w-6 h-6 text-white" /> : <FileText className="w-6 h-6 text-white" />}
                   </div>
                   <div>
