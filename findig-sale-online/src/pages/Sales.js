@@ -240,6 +240,12 @@ const Sales = () => {
     setModalMode('create');
     setShowSaleModal(true);
   };
+  
+  const processStock = () => {
+    resetNewSaleForm();
+    setModalMode('create');
+    setShowSaleModal(true);
+  };
 
   // ฟังก์ชันการค้นหา
   const handleSearch = () => {
@@ -341,7 +347,9 @@ const Sales = () => {
             <Search className="w-4 h-4 mr-2" />
             {showSearchForm ? 'ซ่อนการค้นหา' : 'ค้นหา'}
           </button>
-          <button className={`text-white px-4 py-2 rounded-lg font-medium bg-green-500 hover:shadow-lg transform hover:scale-105 transition-all duration-300 ease-in-out flex items-center`}>
+          <button 
+            onClick={processStock}
+            className={`text-white px-4 py-2 rounded-lg font-medium bg-green-500 hover:shadow-lg transform hover:scale-105 transition-all duration-300 ease-in-out flex items-center`}>
             <Upload className="w-4 h-4 mr-2" />
             POST ตัดสต๊อก
           </button>

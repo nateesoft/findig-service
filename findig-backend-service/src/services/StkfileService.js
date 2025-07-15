@@ -1,6 +1,6 @@
 const { mappingResultData } = require("../utils/ConvertThai")
 
-const getSTCard = async ({ payload, repository, db }) => {
+const getSTKFile = async ({ payload, repository, db }) => {
   const results = await repository.getData({payload, db })
   return mappingResultData(results)
 }
@@ -11,6 +11,6 @@ const processStock = async ({ payload, repository, db }) => {
 }
 
 module.exports = {
-  getSTCard,
+  getSTKFile,
   processStock
 }

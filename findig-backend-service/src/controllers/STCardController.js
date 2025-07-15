@@ -15,6 +15,20 @@ const getAllSTCard = async (req, res, next) => {
   }
 }
 
+const processStock = async (req, res, next) => {
+  try {
+    const stcardInfo = await StcardService.processStock({
+      payload: req.body,
+      repository: StcardRepository,
+      db: req.db
+    })
+    res.json(stcardInfo)
+  } catch (error) {
+    next(error)
+  }
+}
+
 module.exports = {
-  getAllSTCard
+  getAllSTCard,
+  processStock
 }
