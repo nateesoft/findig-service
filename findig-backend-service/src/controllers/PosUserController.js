@@ -9,7 +9,11 @@ const validateLogin = async (req, res, next) => {
       repository: PosUserRepository,
       db: req.db
     })
-    res.json(result);
+    if(result) {
+      res.json(result);
+    } else {
+      res.status(401).json({ error: 'Invalid username or password' }); // Return 401 Unauthorized if login fails
+    }
   } catch (err) {
     next(err);
   }

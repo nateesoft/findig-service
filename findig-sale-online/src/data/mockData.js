@@ -167,9 +167,9 @@ export const mockCustomers = [
 
 // Category Data for Charts
 export const categoryData = [
-  { name: 'อิเล็กทรอนิกส์', value: 65, color: '#3B82F6' },
-  { name: 'เสื้อผ้า', value: 25, color: '#10B981' },
-  { name: 'อื่นๆ', value: 10, color: '#F59E0B' }
+  { name: 'Food', value: 65, color: '#3B82F6' },
+  { name: 'Drink', value: 25, color: '#10B981' },
+  { name: 'Other', value: 10, color: '#F59E0B' }
 ];
 
 // Mock User Groups

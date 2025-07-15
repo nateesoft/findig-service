@@ -40,7 +40,7 @@ const LoginPage = ( { onLogin, setUser }) => {
       onLogin()
     } else {
       setLoading(false);
-      alert(error);
+      alert("Username/Password ไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง");
     }
   };
 
