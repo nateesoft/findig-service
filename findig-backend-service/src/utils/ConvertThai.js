@@ -11,7 +11,7 @@ const mappingResultData = (result) => {
         });
         return newItem;
       });
-    return mappingResult[0]
+    return mappingResult??[0]
 }
 
 const mappingResultDataList = (resultList) => {

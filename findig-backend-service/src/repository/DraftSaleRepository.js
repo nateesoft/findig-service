@@ -13,10 +13,12 @@ const getDataById = async ({ payload, db }) => {
 }
 
 const saveData = async ({ payload, db }) => {
-  const { id, billno, document_date, branch_code, post_status, emp_code, update_date, total_item, emp_code_update } = payload
+  const { id, billno, document_date, branch_code, post_status, 
+    emp_code, update_date, total_item, emp_code_update } = payload
   const sql = `INSERT INTO draft_sale
-              (id, billno, document_date, branch_code, post_status, emp_code, update_date, total_item, emp_code_update)
-              VALUES(?, ?, ?, ?, ?, ?, ?, ?)`
+              (id, billno, document_date, branch_code, post_status, 
+              emp_code, update_date, total_item, emp_code_update)
+              VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)`
   const results = await db.pos.query(sql, 
     [id, billno, document_date, branch_code, post_status, emp_code, update_date, total_item, emp_code_update])
   return results

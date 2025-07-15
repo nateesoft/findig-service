@@ -16,8 +16,7 @@ const saveData = async ({ payload, repository, db }) => {
   const mappingPayload = {
     ...payload,
     id: generateUUID(),
-    document_date: getMoment().format('YYYY-MM-DD HH:mm:ss'),
-    post_status: 'N',
+    create_date: getMoment().format('YYYY-MM-DD HH:mm:ss'),
     update_date: getMoment().format('YYYY-MM-DD HH:mm:ss')
   }
   const results = await repository.saveData({ payload: mappingPayload, db })

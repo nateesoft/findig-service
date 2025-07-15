@@ -1,13 +1,13 @@
 const pools = require('./dbPools.js');
 
 const selectBranchDb = (req, res, next) => {
-  const branchCode = req.body.branchCode || req.query.branchCode || req.headers['x-branch-code'];
+  const dbConfig = req.body.dbConfig || req.query.dbConfig || req.headers['x-branch-code'];
 
-  if (!branchCode) {
-    return res.status(400).json({ error: 'Branch Code is required' });
+  if (!dbConfig) {
+    return res.status(400).json({ error: 'Database Config is required' });
   }
 
-  const branchPools = pools[branchCode];
+  const branchPools = pools[dbConfig];
   if (!branchPools) {
     return res.status(404).json({ error: 'Branch not found' });
   }

@@ -1,8 +1,10 @@
 import apiClient from "../httpRequest";
 
-export const validateLogin = async (payload) => {
+export const loadDraftSaleInfo = async (payload) => {
+    const dbConfig = localStorage.getItem('db') || ''
     try {
-        const response = await apiClient.post(`/api/posuser/login`, payload)
+        const { branchCode } = payload
+        const response = await apiClient.get(`/api/draftsale?dbConfig=${dbConfig}&branchCode=${branchCode}`)
         return { data: response.data, error: null }
     } catch (error) {
         console.log('error=>', error)
@@ -16,28 +18,10 @@ export const validateLogin = async (payload) => {
     }
 }
 
-export const sendToLogout = async (payload) => {
-    const dbConfig = localStorage.getItem('db') || ''
-    const { UserName } = payload
-    try {
-        const input = { username: UserName, dbConfig }
-        const response = await apiClient.patch(`/api/posuser/logout`, input)
-        return { data: response.data, error: null }
-    } catch (error) {
-        if (error.response) {
-            return { data: null, error: error.response.data.message };
-        } else if (error.request) {
-            return { data: null, error: "Network error. Please try again." };
-        } else {
-            return { data: null, error: error.message };
-        }
-    }
-}
-
-export const loadStcardInfo = async (payload) => {
+export const createDraftSaleInfo = async (payload) => {
     const dbConfig = localStorage.getItem('db') || ''
     try {
-        const response = await apiClient.get(`/api/stcard?dbConfig=${dbConfig}`)
+        const response = await apiClient.post(`/api/draftsale`, {...payload, dbConfig})
         return { data: response.data, error: null }
     } catch (error) {
         console.log('error=>', error)

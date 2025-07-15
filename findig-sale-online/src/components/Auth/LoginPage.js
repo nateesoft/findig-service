@@ -22,7 +22,7 @@ const LoginPage = ( { onLogin, setUser }) => {
     const { data: userInfo, error } = await validateLogin({
       username: loginData.username,
       password: loginData.password,
-      branchCode: loginData.branchCode
+      dbConfig: loginData.branchCode
     })
 
     if(userInfo) {

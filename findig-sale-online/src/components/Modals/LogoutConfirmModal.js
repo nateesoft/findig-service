@@ -10,12 +10,13 @@ const LogoutConfirmModal = ({
   onLogout, 
   setSidebarOpen, 
   userInfo, 
-  currentTheme 
+  currentTheme,
+  dbConfig
 }) => {
   if (!showLogoutConfirm) return null;
 
   const handleLogout = async () => {
-    const { data, error } = await sendToLogout(userInfo)
+    const { data, error } = await sendToLogout(userInfo, dbConfig)
     if(data) {
       onLogout();
       setShowLogoutConfirm(false);

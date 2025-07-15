@@ -5,7 +5,7 @@ const checkLogin = async ({ payload, repository, db }) => {
     const results = await repository.checkLogin({ payload, db })
     if (results.length > 0) {
         const newResult = mappingResultData(results)
-        return {...newResult, Password: ""}
+        return {...newResult[0], Password: ""}
     }
     return null
 }

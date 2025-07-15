@@ -19,7 +19,7 @@ const getData = async (req, res, next) => {
 
 const getDataById = async (req, res, next) => {
   try {
-    const { id } = req.query
+    const { id } = req.params
     const dataInfo = await DraftSaleService.getDataById({
       payload: {
         id
@@ -35,14 +35,15 @@ const getDataById = async (req, res, next) => {
 
 const saveData = async (req, res, next) => {
   try {
-    const { branchCode, billNo, empCode, totalItem } = req.body
+    const { branchCode, billNo, empCode, totalItem, saleItems } = req.body
     const dataInfo = await DraftSaleService.saveData({
       payload: {
         billno: billNo,
         branch_code: branchCode,
         emp_code: empCode,
         emp_code_update: empCode,
-        total_item: totalItem
+        total_item: totalItem,
+        sale_items: saleItems
       },
       repository: DraftSaleRepository,
       db: req.db
@@ -55,7 +56,8 @@ const saveData = async (req, res, next) => {
 
 const updateData = async (req, res, next) => {
   try {
-    const { id, branchCode, billNo, empCode, totalItem, postStatus } = req.body
+    const { id } = req.params
+    const { branchCode, billNo, empCode, totalItem, postStatus } = req.body
     const dataInfo = await DraftSaleService.updateData({
       payload: {
         billno: billNo,
@@ -76,7 +78,7 @@ const updateData = async (req, res, next) => {
 
 const deleteData = async (req, res, next) => {
   try {
-    const { id } = req.body
+    const { id } = req.params
     const dataInfo = await DraftSaleService.deleteData({
       payload: {
         id

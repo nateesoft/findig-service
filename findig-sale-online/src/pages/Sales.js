@@ -11,20 +11,21 @@ import {
   ShoppingCart} from 'lucide-react';
 
 import { getThemeClasses } from '../utils/themes';
-import { loadDraftSaleInfo } from '../api/userLoginApi';
 import { AppContext } from '../contexts';
+import { createDraftSaleInfo, loadDraftSaleInfo } from '../api/saleApi';
 
 const Sales = () => {
   const { appData } = useContext(AppContext)
-    const { currentTheme, db } = appData
+    const { currentTheme, db, userInfo } = appData
 
   const [draftSale, setDraftSale] = useState([])
   const [showSaleModal, setShowSaleModal] = useState(false);
   
   const [saleHeader, setSaleHeader] = useState({
-    saleNumber: '',
-    date: new Date().toISOString().split('T')[0],
-    branch: '001'
+    branchCode: '',
+    billNo: '',
+    empCode: userInfo.UserName,
+    createDate: new Date().toISOString().split('T')[0]
   });
 
   const [currentItem, setCurrentItem] = useState({
@@ -38,9 +39,10 @@ const Sales = () => {
 
   const resetNewSaleForm = () => {
     setSaleHeader({
-      saleNumber: '',
-      date: new Date().toISOString().split('T')[0],
-      branch: '001'
+      branchCode: '',
+      billNo: '',
+      empCode: userInfo.UserName,
+      createDate: new Date().toISOString().split('T')[0],
     });
     setCurrentItem({
       barcode: '',
@@ -73,6 +75,7 @@ const Sales = () => {
     };
 
     setSaleItems(prev => [...prev, newItem]);
+    console.log(saleItems)
     resetCurrentItem();
   };
 
@@ -93,8 +96,8 @@ const Sales = () => {
     }
   };
 
-  const handleNewSaleSubmit = () => {
-    if (!saleHeader.saleNumber) {
+  const handleNewSaleSubmit = async () => {
+    if (!saleHeader.billNo) {
       alert('กรุณาระบุข้อมูลเลขที่ใบเสร็จ');
       return;
     }
@@ -105,13 +108,26 @@ const Sales = () => {
     }
 
     const totalQty = saleItems.reduce((sum, item) => sum + item.qty, 0);
-    
-    alert(`บันทึกใบขายใหม่เรียบร้อย!\n` +
-          `เลขที่: ${saleHeader.saleNumber}\n` +
-          `วันที่: ${saleHeader.date}\n` +
-          `สาขาทำรายการ: ${saleHeader.branch}\n` +
-          `จำนวนรายการ: ${saleItems.length} รายการ\n` +
-          `จำนวนสินค้ารวม: ${totalQty} ชิ้น`);
+
+    const { data, error } = await createDraftSaleInfo({
+      branchCode: saleHeader.branchCode, 
+      billNo: saleHeader.billNo, 
+      empCode: saleHeader.empCode, 
+      totalItem: totalQty,
+      saleItems
+    })
+
+    if(data) {
+      alert(`บันทึกใบขายใหม่เรียบร้อย!\n` +
+            `เลขที่: ${saleHeader.billNo}\n` +
+            `วันที่: ${saleHeader.createDate}\n` +
+            `สาขาทำรายการ: ${saleHeader.branchCode}\n` +
+            `จำนวนรายการ: ${saleItems.length} รายการ\n` +
+            `จำนวนสินค้ารวม: ${totalQty} ชิ้น`);
+      initLoadData()
+    }else{
+      alert(error)
+    }
     
     setShowSaleModal(false);
     resetNewSaleForm();
@@ -280,8 +296,8 @@ const Sales = () => {
                     </label>
                     <input
                       type="text"
-                      value={saleHeader.saleNumber}
-                      onChange={(e) => setSaleHeader({...saleHeader, saleNumber: e.target.value})}
+                      value={saleHeader.billNo}
+                      onChange={(e) => setSaleHeader({...saleHeader, billNo: e.target.value})}
                       className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses('input', currentTheme)}`}
                       placeholder="เลขที่เอกสาร"
                       autoFocus
@@ -294,8 +310,8 @@ const Sales = () => {
                     </label>
                     <input
                       type="date"
-                      value={saleHeader.date}
-                      onChange={(e) => setSaleHeader({...saleHeader, date: e.target.value})}
+                      value={saleHeader.createDate}
+                      onChange={(e) => setSaleHeader({...saleHeader, createDate: e.target.value})}
                       className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses('input', currentTheme)}`}
                     />
                   </div>
@@ -304,12 +320,13 @@ const Sales = () => {
                       รหัสสาขา
                     </label>
                     <select
-                      value={saleHeader.branch}
-                      onChange={(e) => setSaleHeader({...saleHeader, branch: e.target.value})}
+                      value={saleHeader.branchCode}
+                      onChange={(e) => setSaleHeader({...saleHeader, branchCode: e.target.value})}
                       className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses('input', currentTheme)}`}
                     >
                       <option value="">เลือกสาขา</option>
-                      <option value="001">001 - สาขาทดสอบระบบ</option>
+                      <option value="001">001 - สำนักงานใหญ่ ICS</option>
+                      <option value="002">002 - สาขาทดสอบระบบ</option>
                     </select>
                   </div>
                 </div>
@@ -489,7 +506,7 @@ const Sales = () => {
                 </button>
                 <button
                   onClick={handleNewSaleSubmit}
-                  disabled={!saleHeader.saleNumber || saleItems.length === 0}
+                  disabled={!saleHeader.billNo || saleItems.length === 0}
                   className={`px-6 py-2 text-white rounded-lg font-medium ${getThemeClasses('primaryBtn', currentTheme)} ${getThemeClasses('transition', currentTheme)} hover:shadow-lg transform hover:scale-105 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none`}
                 >
                   <Plus className="w-4 h-4 mr-2" />
