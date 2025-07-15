@@ -21,9 +21,7 @@ const getDataById = async (req, res, next) => {
   try {
     const { id } = req.params
     const dataInfo = await DraftSaleService.getDataById({
-      payload: {
-        id
-      },
+      payload: { id },
       repository: DraftSaleRepository,
       db: req.db
     })

@@ -12,6 +12,13 @@ const getDataById = async ({ payload, db }) => {
   return results
 }
 
+const getDataByBillNo = async ({ payload, db }) => {
+  const { billno } = payload
+  const sql = `select * from draft_sale_details where billno=?`
+  const results = await db.pos.query(sql, [billno])
+  return results
+}
+
 const saveData = async ({ payload, db }) => {
   const { id, billno, create_date, barcode, product_name, stock_code, qty, 
         update_date, emp_code, emp_code_update } = payload
@@ -46,5 +53,6 @@ module.exports = {
   getDataById,
   saveData,
   updateData,
-  deleteData
+  deleteData,
+  getDataByBillNo
 }

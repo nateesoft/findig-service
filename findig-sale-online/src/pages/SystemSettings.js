@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { getThemeClasses, themes } from '../utils/themes';
 import { DEFAULT_SETTINGS } from '../utils/constants';
+import { AppContext } from '../contexts';
 
 const SystemSettings = ({ currentTheme, setCurrentTheme }) => {
+  const { appData, setAppData } = useContext(AppContext)
   const [settings, setSettings] = useState({
     ...DEFAULT_SETTINGS,
     theme: currentTheme
   });
 
   const handleThemeChange = (newTheme) => {
-    setCurrentTheme(newTheme);
+    setAppData({...appData, currentTheme: newTheme });
     setSettings({...settings, theme: newTheme});
   };
 

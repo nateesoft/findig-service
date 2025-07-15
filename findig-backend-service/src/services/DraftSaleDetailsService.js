@@ -12,6 +12,11 @@ const getDataById = async ({ payload, repository, db }) => {
   return mappingResultData(results)
 }
 
+const getSaleDetailsByBillNo = async ({ payload, repository, db }) => {
+  const results = await repository.getDataByBillNo({ payload, db })
+  return mappingResultData(results)
+}
+
 const saveData = async ({ payload, repository, db }) => {
   const mappingPayload = {
     ...payload,
@@ -42,5 +47,6 @@ module.exports = {
   getDataById,
   saveData,
   updateData,
-  deleteData
+  deleteData,
+  getSaleDetailsByBillNo
 }

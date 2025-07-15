@@ -11,8 +11,42 @@ const getData = async ({ payload, repository, db }) => {
 }
 
 const getDataById = async ({ payload, repository, db }) => {
-  const results = await repository.getData({ payload, db })
-  return mappingResultData(results)
+  const results = await repository.getDataById({ payload, db })
+  if(results.length > 0) {
+    const resultDetails = await DraftSaleDetailsService.getSaleDetailsByBillNo({ 
+      payload: { billno: results[0]?.billno },
+      repository: DraftSaleDetailsRepository,
+      db
+    })
+    const list1 = mappingResultData(results)
+    const list2 = mappingResultData(resultDetails)
+
+    const itemHeaders = list1.map(item => ({
+      billNo: item.billno,
+      empCode: item.emp_code,
+      empName: item.emp_name,
+      branchCode: item.branch_code,
+      branchName: item.branch_name,
+      totalItem: item.total_item,
+      totalAmount: item.total_amount,
+      postStatus: item.post_status,
+      documentDate: item.document_date,
+      updateDate: item.update_date
+    }))
+    const itemDetails = list2.map(item => ({
+      barcode: item.barcode,
+      productName: item.product_name,
+      stock: item.stock_code,
+      qty: item.qty
+    }))
+
+    return {
+      ...itemHeaders[0],
+      items: itemDetails
+    }
+  }
+
+  return []
 }
 
 const saveData = async ({ payload, repository, db }) => {
