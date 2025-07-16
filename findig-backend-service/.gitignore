@@ -25,3 +25,5 @@ logs
 
 /public/savePdf
 ecosystem.config.js
+
+Archive.zip

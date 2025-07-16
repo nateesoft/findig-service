@@ -19,7 +19,7 @@ import SessionIndicator from "./components/Common/SessionIndicator"
 import ProtectedRoute from "./components/Auth/ProtectedRoute"
 
 import Dashboard from "./pages/Dashboard"
-import Sales from "./pages/Sales"
+import Sales from "./pages/sale/Sales"
 import UserGroups from "./pages/UserGroups"
 import Products from "./pages/Products"
 import Customers from "./pages/Customers"

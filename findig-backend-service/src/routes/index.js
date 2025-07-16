@@ -1,6 +1,8 @@
 const express = require('express')
 const router = express.Router();
 
+const ProductController = require('../controllers/ProductController')
+
 const BranchController = require('../controllers/BranchController')
 const STCardController = require('../controllers/STCardController')
 const STKFileController = require('../controllers/STKFileController')
@@ -31,5 +33,7 @@ router.get('/api/draftsale_detail/:id', DraftSaleDetailsController.getDataById)
 router.post('/api/draftsale_detail', DraftSaleDetailsController.saveData)
 router.put('/api/draftsale_detail/:id', DraftSaleDetailsController.updateData)
 router.delete('/api/draftsale_detail/:id', DraftSaleDetailsController.deleteData)
+
+router.get('/api/product', ProductController.getProductData);
 
 module.exports = router
