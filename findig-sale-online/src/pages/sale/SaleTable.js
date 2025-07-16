@@ -1,8 +1,17 @@
 import { 
   Eye, 
   Edit,
-  FileText} from 'lucide-react';
+  FileText,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown
+} from 'lucide-react';
 import moment from 'moment';
+import { useState, useEffect } from 'react';
 
 const SaleTable = ({
     getThemeClasses,
@@ -13,6 +22,124 @@ const SaleTable = ({
     searchCriteria,
     resetSearch
 }) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [sortField, setSortField] = useState('');
+  const [sortDirection, setSortDirection] = useState('asc');
+  const itemsPerPage = 10;
+  
+  // ฟังก์ชันสำหรับการจัดเรียงข้อมูล
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  // จัดเรียงข้อมูล
+  const sortedSales = [...filteredSales].sort((a, b) => {
+    if (!sortField) return 0;
+    
+    let aValue = a[sortField];
+    let bValue = b[sortField];
+    
+    // จัดการกับข้อมูลวันที่
+    if (sortField === 'document_date') {
+      aValue = new Date(aValue);
+      bValue = new Date(bValue);
+    }
+    
+    // จัดการกับข้อมูลตัวเลข
+    if (sortField === 'total_item') {
+      aValue = Number(aValue);
+      bValue = Number(bValue);
+    }
+    
+    // จัดการกับข้อมูลข้อความ
+    if (typeof aValue === 'string') {
+      aValue = aValue.toLowerCase();
+      bValue = bValue.toLowerCase();
+    }
+    
+    if (aValue < bValue) {
+      return sortDirection === 'asc' ? -1 : 1;
+    }
+    if (aValue > bValue) {
+      return sortDirection === 'asc' ? 1 : -1;
+    }
+    return 0;
+  });
+
+  // คำนวณจำนวนหน้าทั้งหมด
+  const totalPages = Math.ceil(sortedSales.length / itemsPerPage);
+  
+  // คำนวณ index เริ่มต้นและสิ้นสุดสำหรับหน้าปัจจุบัน
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentItems = sortedSales.slice(startIndex, endIndex);
+  
+  // Reset หน้าเมื่อข้อมูลเปลี่ยน
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filteredSales]);
+
+  // ฟังก์ชันสำหรับแสดงไอคอน sort
+  const getSortIcon = (field) => {
+    if (sortField !== field) {
+      return <ArrowUpDown className="w-4 h-4 ml-1 opacity-50" />;
+    }
+    return sortDirection === 'asc' 
+      ? <ArrowUp className="w-4 h-4 ml-1" />
+      : <ArrowDown className="w-4 h-4 ml-1" />;
+  };
+  
+  // ฟังก์ชันสำหรับการเปลี่ยนหน้า
+  const goToPage = (page) => {
+    setCurrentPage(page);
+  };
+  
+  const goToFirstPage = () => setCurrentPage(1);
+  const goToLastPage = () => setCurrentPage(totalPages);
+  const goToPrevPage = () => setCurrentPage(prev => Math.max(prev - 1, 1));
+  const goToNextPage = () => setCurrentPage(prev => Math.min(prev + 1, totalPages));
+  
+  // สร้างปุ่มหน้า
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+    
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (currentPage <= 3) {
+        for (let i = 1; i <= 4; i++) {
+          pages.push(i);
+        }
+        pages.push('...');
+        pages.push(totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1);
+        pages.push('...');
+        for (let i = totalPages - 3; i <= totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        pages.push(1);
+        pages.push('...');
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+          pages.push(i);
+        }
+        pages.push('...');
+        pages.push(totalPages);
+      }
+    }
+    
+    return pages;
+  };
+
   return (
     <div
       className={`${getThemeClasses(
@@ -37,7 +164,13 @@ const SaleTable = ({
         >
           ข้อมูลบันทึกข้อมูลการขาย
         </h3>
+        {sortedSales.length > 0 && (
+          <p className={`text-sm ${getThemeClasses("textMuted", currentTheme)} mt-2`}>
+            แสดงรายการ {startIndex + 1}-{Math.min(endIndex, sortedSales.length)} จากทั้งหมด {sortedSales.length} รายการ
+          </p>
+        )}
       </div>
+      
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead className={getThemeClasses("tableHeader", currentTheme)}>
@@ -46,49 +179,91 @@ const SaleTable = ({
                 className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
                   "textMuted",
                   currentTheme
-                )} uppercase tracking-wider`}
+                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
+                  "textPrimary",
+                  currentTheme
+                )} ${getThemeClasses("transition", currentTheme)}`}
+                onClick={() => handleSort('billno')}
               >
-                เลขที่ใบเสร็จ
+                <div className="flex items-center">
+                  เลขที่ใบเสร็จ
+                  {getSortIcon('billno')}
+                </div>
               </th>
               <th
                 className={`px-6 py-3 text-center text-xs font-medium ${getThemeClasses(
                   "textMuted",
                   currentTheme
-                )} uppercase tracking-wider`}
+                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
+                  "textPrimary",
+                  currentTheme
+                )} ${getThemeClasses("transition", currentTheme)}`}
+                onClick={() => handleSort('document_date')}
               >
-                วันที่สร้างเอกสาร
+                <div className="flex items-center justify-center">
+                  วันที่สร้างเอกสาร
+                  {getSortIcon('document_date')}
+                </div>
               </th>
               <th
                 className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
                   "textMuted",
                   currentTheme
-                )} uppercase tracking-wider`}
+                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
+                  "textPrimary",
+                  currentTheme
+                )} ${getThemeClasses("transition", currentTheme)}`}
+                onClick={() => handleSort('total_item')}
               >
-                จำนวนสินค้า
+                <div className="flex items-center">
+                  จำนวนสินค้า
+                  {getSortIcon('total_item')}
+                </div>
               </th>
               <th
                 className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
                   "textMuted",
                   currentTheme
-                )} uppercase tracking-wider`}
+                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
+                  "textPrimary",
+                  currentTheme
+                )} ${getThemeClasses("transition", currentTheme)}`}
+                onClick={() => handleSort('emp_code')}
               >
-                พนักงานทำรายการ
+                <div className="flex items-center">
+                  พนักงานทำรายการ
+                  {getSortIcon('emp_code')}
+                </div>
               </th>
               <th
                 className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
                   "textMuted",
                   currentTheme
-                )} uppercase tracking-wider`}
+                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
+                  "textPrimary",
+                  currentTheme
+                )} ${getThemeClasses("transition", currentTheme)}`}
+                onClick={() => handleSort('branch_code')}
               >
-                สาขา
+                <div className="flex items-center">
+                  สาขา
+                  {getSortIcon('branch_code')}
+                </div>
               </th>
               <th
                 className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
                   "textMuted",
                   currentTheme
-                )} uppercase tracking-wider`}
+                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
+                  "textPrimary",
+                  currentTheme
+                )} ${getThemeClasses("transition", currentTheme)}`}
+                onClick={() => handleSort('post_status')}
               >
-                สถานะ POST
+                <div className="flex items-center">
+                  สถานะ POST
+                  {getSortIcon('post_status')}
+                </div>
               </th>
               <th
                 className={`px-6 py-3 text-center text-xs font-medium ${getThemeClasses(
@@ -106,8 +281,8 @@ const SaleTable = ({
               currentTheme
             )} divide-y ${getThemeClasses("tableBorder", currentTheme)}`}
           >
-            {filteredSales.length > 0 ? (
-              filteredSales.map((draft_sale) => (
+            {currentItems.length > 0 ? (
+              currentItems.map((draft_sale) => (
                 <tr
                   key={draft_sale.billno}
                   className={getThemeClasses("tableRow", currentTheme)}
@@ -241,6 +416,99 @@ const SaleTable = ({
           </tbody>
         </table>
       </div>
+      
+      {/* Pagination */}
+      {sortedSales.length > itemsPerPage && (
+        <div className={`px-6 py-4 border-t ${getThemeClasses("cardBorder", currentTheme)}`}>
+          <div className="flex items-center justify-between">
+            <div className={`text-sm ${getThemeClasses("textMuted", currentTheme)}`}>
+              หน้า {currentPage} จากทั้งหมด {totalPages} หน้า
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              {/* ปุ่มไปหน้าแรก */}
+              <button
+                onClick={goToFirstPage}
+                disabled={currentPage === 1}
+                className={`p-2 rounded-lg ${
+                  currentPage === 1 
+                    ? `${getThemeClasses("textMuted", currentTheme)} cursor-not-allowed` 
+                    : `${getThemeClasses("textSecondary", currentTheme)} hover:${getThemeClasses("textPrimary", currentTheme)} hover:bg-gray-50 dark:hover:bg-gray-800`
+                } ${getThemeClasses("transition", currentTheme)}`}
+                title="หน้าแรก"
+              >
+                <ChevronsLeft className="w-4 h-4" />
+              </button>
+              
+              {/* ปุ่มไปหน้าก่อนหน้า */}
+              <button
+                onClick={goToPrevPage}
+                disabled={currentPage === 1}
+                className={`p-2 rounded-lg ${
+                  currentPage === 1 
+                    ? `${getThemeClasses("textMuted", currentTheme)} cursor-not-allowed` 
+                    : `${getThemeClasses("textSecondary", currentTheme)} hover:${getThemeClasses("textPrimary", currentTheme)} hover:bg-gray-50 dark:hover:bg-gray-800`
+                } ${getThemeClasses("transition", currentTheme)}`}
+                title="หน้าก่อนหน้า"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              
+              {/* ปุ่มเลขหน้า */}
+              <div className="flex items-center space-x-1">
+                {getPageNumbers().map((page, index) => (
+                  <span key={index}>
+                    {page === '...' ? (
+                      <span className={`px-3 py-2 text-sm ${getThemeClasses("textMuted", currentTheme)}`}>
+                        ...
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => goToPage(page)}
+                        className={`px-3 py-2 text-sm rounded-lg ${getThemeClasses("transition", currentTheme)} ${
+                          currentPage === page
+                            ? `bg-blue-600 text-white font-medium`
+                            : `${getThemeClasses("textSecondary", currentTheme)} hover:${getThemeClasses("textPrimary", currentTheme)} hover:bg-gray-50 dark:hover:bg-gray-800`
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    )}
+                  </span>
+                ))}
+              </div>
+              
+              {/* ปุ่มไปหน้าถัดไป */}
+              <button
+                onClick={goToNextPage}
+                disabled={currentPage === totalPages}
+                className={`p-2 rounded-lg ${
+                  currentPage === totalPages 
+                    ? `${getThemeClasses("textMuted", currentTheme)} cursor-not-allowed` 
+                    : `${getThemeClasses("textSecondary", currentTheme)} hover:${getThemeClasses("textPrimary", currentTheme)} hover:bg-gray-50 dark:hover:bg-gray-800`
+                } ${getThemeClasses("transition", currentTheme)}`}
+                title="หน้าถัดไป"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+              
+              {/* ปุ่มไปหน้าสุดท้าย */}
+              <button
+                onClick={goToLastPage}
+                disabled={currentPage === totalPages}
+                className={`p-2 rounded-lg ${
+                  currentPage === totalPages 
+                    ? `${getThemeClasses("textMuted", currentTheme)} cursor-not-allowed` 
+                    : `${getThemeClasses("textSecondary", currentTheme)} hover:${getThemeClasses("textPrimary", currentTheme)} hover:bg-gray-50 dark:hover:bg-gray-800`
+                } ${getThemeClasses("transition", currentTheme)}`}
+                title="หน้าสุดท้าย"
+              >
+                <ChevronsRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
