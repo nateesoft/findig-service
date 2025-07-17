@@ -1,6 +1,6 @@
+import { useState, useEffect } from 'react';
 import { 
   Eye, 
-  Edit,
   FileText,
   ChevronLeft,
   ChevronRight,
@@ -11,14 +11,12 @@ import {
   ArrowDown
 } from 'lucide-react';
 import moment from 'moment';
-import { useState, useEffect } from 'react';
 
 const SaleTable = ({
     getThemeClasses,
     currentTheme,
     filteredSales,
     handleReviewSale,
-    handleEditSale,
     searchCriteria,
     resetSearch
 }) => {
@@ -178,7 +176,7 @@ const SaleTable = ({
                 onClick={() => handleSort('billno')}
               >
                 <div className="flex items-center">
-                  เลขที่ใบเสร็จ
+                  รหัสสาขา
                   {getSortIcon('billno')}
                 </div>
               </th>
@@ -193,7 +191,7 @@ const SaleTable = ({
                 onClick={() => handleSort('document_date')}
               >
                 <div className="flex items-center justify-center">
-                  วันที่สร้างเอกสาร
+                  รหัสสินค้า
                   {getSortIcon('document_date')}
                 </div>
               </th>
@@ -208,7 +206,7 @@ const SaleTable = ({
                 onClick={() => handleSort('total_item')}
               >
                 <div className="flex items-center">
-                  จำนวนสินค้า
+                  คลังสินค้า
                   {getSortIcon('total_item')}
                 </div>
               </th>
@@ -220,11 +218,11 @@ const SaleTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('emp_code')}
+                onClick={() => handleSort('total_item')}
               >
                 <div className="flex items-center">
-                  พนักงานทำรายการ
-                  {getSortIcon('emp_code')}
+                  M13
+                  {getSortIcon('total_item')}
                 </div>
               </th>
               <th
@@ -235,11 +233,161 @@ const SaleTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('branch_code')}
+                onClick={() => handleSort('total_item')}
               >
                 <div className="flex items-center">
-                  สาขา
-                  {getSortIcon('branch_code')}
+                  M14
+                  {getSortIcon('total_item')}
+                </div>
+              </th>
+              <th
+                className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
+                  "textMuted",
+                  currentTheme
+                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
+                  "textPrimary",
+                  currentTheme
+                )} ${getThemeClasses("transition", currentTheme)}`}
+                onClick={() => handleSort('total_item')}
+              >
+                <div className="flex items-center">
+                  M15
+                  {getSortIcon('total_item')}
+                </div>
+              </th>
+              <th
+                className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
+                  "textMuted",
+                  currentTheme
+                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
+                  "textPrimary",
+                  currentTheme
+                )} ${getThemeClasses("transition", currentTheme)}`}
+                onClick={() => handleSort('total_item')}
+              >
+                <div className="flex items-center">
+                  M16
+                  {getSortIcon('total_item')}
+                </div>
+              </th>
+              <th
+                className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
+                  "textMuted",
+                  currentTheme
+                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
+                  "textPrimary",
+                  currentTheme
+                )} ${getThemeClasses("transition", currentTheme)}`}
+                onClick={() => handleSort('total_item')}
+              >
+                <div className="flex items-center">
+                  M17
+                  {getSortIcon('total_item')}
+                </div>
+              </th>
+              <th
+                className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
+                  "textMuted",
+                  currentTheme
+                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
+                  "textPrimary",
+                  currentTheme
+                )} ${getThemeClasses("transition", currentTheme)}`}
+                onClick={() => handleSort('total_item')}
+              >
+                <div className="flex items-center">
+                  M18
+                  {getSortIcon('total_item')}
+                </div>
+              </th>
+              <th
+                className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
+                  "textMuted",
+                  currentTheme
+                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
+                  "textPrimary",
+                  currentTheme
+                )} ${getThemeClasses("transition", currentTheme)}`}
+                onClick={() => handleSort('total_item')}
+              >
+                <div className="flex items-center">
+                  M19
+                  {getSortIcon('total_item')}
+                </div>
+              </th>
+              <th
+                className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
+                  "textMuted",
+                  currentTheme
+                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
+                  "textPrimary",
+                  currentTheme
+                )} ${getThemeClasses("transition", currentTheme)}`}
+                onClick={() => handleSort('total_item')}
+              >
+                <div className="flex items-center">
+                  M20
+                  {getSortIcon('total_item')}
+                </div>
+              </th>
+              <th
+                className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
+                  "textMuted",
+                  currentTheme
+                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
+                  "textPrimary",
+                  currentTheme
+                )} ${getThemeClasses("transition", currentTheme)}`}
+                onClick={() => handleSort('total_item')}
+              >
+                <div className="flex items-center">
+                  M21
+                  {getSortIcon('total_item')}
+                </div>
+              </th>
+              <th
+                className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
+                  "textMuted",
+                  currentTheme
+                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
+                  "textPrimary",
+                  currentTheme
+                )} ${getThemeClasses("transition", currentTheme)}`}
+                onClick={() => handleSort('total_item')}
+              >
+                <div className="flex items-center">
+                  M22
+                  {getSortIcon('total_item')}
+                </div>
+              </th>
+              <th
+                className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
+                  "textMuted",
+                  currentTheme
+                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
+                  "textPrimary",
+                  currentTheme
+                )} ${getThemeClasses("transition", currentTheme)}`}
+                onClick={() => handleSort('total_item')}
+              >
+                <div className="flex items-center">
+                  M23
+                  {getSortIcon('total_item')}
+                </div>
+              </th>
+              <th
+                className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
+                  "textMuted",
+                  currentTheme
+                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
+                  "textPrimary",
+                  currentTheme
+                )} ${getThemeClasses("transition", currentTheme)}`}
+                onClick={() => handleSort('total_item')}
+              >
+                <div className="flex items-center">
+                  M24
+                  {getSortIcon('total_item')}
                 </div>
               </th>
               <th
@@ -276,16 +424,16 @@ const SaleTable = ({
             {currentItems.length > 0 ? (
               currentItems.map((draft_sale) => (
                 <tr
-                  key={draft_sale.billno}
+                  key={draft_sale.BPCode}
                   className={getThemeClasses("tableRow", currentTheme)}
                 >
                   <td
-                    className={`px-6 py-4 whitespace-nowrap text-center text-sm font-medium ${getThemeClasses(
+                    className={`px-6 py-4 whitespace-nowrap text-left text-sm font-medium ${getThemeClasses(
                       "textPrimary",
                       currentTheme
                     )}`}
                   >
-                    {draft_sale.billno}
+                    {draft_sale.BranchCode}
                   </td>
                   <td
                     className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
@@ -293,33 +441,111 @@ const SaleTable = ({
                       currentTheme
                     )}`}
                   >
-                    {moment(draft_sale.document_date).format(
-                      "DD/MM/YYYY HH:mm:ss"
-                    )}
+                    {draft_sale.BPCode}
                   </td>
                   <td
-                    className={`px-6 py-4 whitespace-nowrap text-right text-sm ${getThemeClasses(
+                    className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
                       "textSecondary",
                       currentTheme
                     )}`}
                   >
-                    {draft_sale.total_item}
+                    {draft_sale.BStk}
                   </td>
                   <td
                     className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
-                      "textPrimary",
+                      "textSecondary",
                       currentTheme
                     )}`}
                   >
-                    {draft_sale.emp_code}
+                    {draft_sale.BQty13}
                   </td>
                   <td
                     className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
-                      "textPrimary",
+                      "textSecondary",
                       currentTheme
                     )}`}
                   >
-                    {draft_sale.branch_code}
+                    {draft_sale.BQty14}
+                  </td>
+                  <td
+                    className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
+                      "textSecondary",
+                      currentTheme
+                    )}`}
+                  >
+                    {draft_sale.BQty15}
+                  </td>
+                  <td
+                    className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
+                      "textSecondary",
+                      currentTheme
+                    )}`}
+                  >
+                    {draft_sale.BQty16}
+                  </td>
+                  <td
+                    className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
+                      "textSecondary",
+                      currentTheme
+                    )}`}
+                  >
+                    {draft_sale.BQty17}
+                  </td>
+                  <td
+                    className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
+                      "textSecondary",
+                      currentTheme
+                    )}`}
+                  >
+                    {draft_sale.BQty18}
+                  </td>
+                  <td
+                    className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
+                      "textSecondary",
+                      currentTheme
+                    )}`}
+                  >
+                    {draft_sale.BQty19}
+                  </td>
+                  <td
+                    className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
+                      "textSecondary",
+                      currentTheme
+                    )}`}
+                  >
+                    {draft_sale.BQty20}
+                  </td>
+                  <td
+                    className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
+                      "textSecondary",
+                      currentTheme
+                    )}`}
+                  >
+                    {draft_sale.BQty21}
+                  </td>
+                  <td
+                    className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
+                      "textSecondary",
+                      currentTheme
+                    )}`}
+                  >
+                    {draft_sale.BQty22}
+                  </td>
+                  <td
+                    className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
+                      "textSecondary",
+                      currentTheme
+                    )}`}
+                  >
+                    {draft_sale.BQty23}
+                  </td>
+                  <td
+                    className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
+                      "textSecondary",
+                      currentTheme
+                    )}`}
+                  >
+                    {draft_sale.BQty24}
                   </td>
                   <td
                     className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
@@ -329,14 +555,14 @@ const SaleTable = ({
                   >
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        draft_sale.post_status === "P"
+                        draft_sale.Data_Sync === "N"
                           ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                          : draft_sale.post_status === "D"
+                          : draft_sale.Data_Sync === "Y"
                           ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
                           : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
                       }`}
                     >
-                      {draft_sale.post_status}
+                      {draft_sale.Data_Sync}
                     </span>
                   </td>
                   <td

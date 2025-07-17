@@ -3,8 +3,7 @@ import { Search } from 'lucide-react';
 
 import { getThemeClasses } from '../../utils/themes';
 import { AppContext } from '../../contexts';
-import { loadDraftSaleById, loadDraftSaleInfo } from '../../api/saleApi';
-import { loadAllProduct } from '../../api/productApi';
+import { loadStcardInfo, loadStcardViewDetail } from '../../api/stcardApi';
 import ReviewModal from './ReviewModal';
 import SearchForm from './SearchForm';
 import SaleTable from './SaleTable';
@@ -101,26 +100,11 @@ const Sales = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const initLoadProduct = async () => {
-    try {
-      // สมมติว่ามี API สำหรับโหลดรายละเอียด
-      const { data, error } = await loadAllProduct();
-      if (data) {
-        
-      } else {
-        alert(error || 'ไม่สามารถโหลดข้อมูลได้');
-      }
-    } catch (error) {
-      alert('เกิดข้อผิดพลาดในการโหลดข้อมูล');
-      console.error('Error loading sale detail:', error);
-    }
-  };
-
   // ฟังก์ชันสำหรับ Review ข้อมูลการขาย
-  const handleReviewSale = async (id) => {
+  const handleReviewSale = async (billno) => {
     try {
       // สมมติว่ามี API สำหรับโหลดรายละเอียด
-      const { data, error } = await loadDraftSaleById({ id });
+      const { data, error } = await loadStcardViewDetail({ billNo: billno });
       
       if (data) {
         setCurrentSaleData(data);
@@ -136,7 +120,7 @@ const Sales = () => {
   };
 
   const initLoadData = async () => {
-    const { data, error } = await loadDraftSaleInfo({
+    const { data, error } = await loadStcardInfo({
       branchCode: db
     })
 
@@ -215,7 +199,6 @@ const Sales = () => {
 
   useEffect(() => {
     initLoadData()
-    initLoadProduct()
   }, [])
 
   useEffect(() => {

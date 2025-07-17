@@ -1,6 +1,6 @@
+import { useState, useEffect } from 'react';
 import { 
   Eye, 
-  Edit,
   FileText,
   ChevronLeft,
   ChevronRight,
@@ -11,7 +11,6 @@ import {
   ArrowDown
 } from 'lucide-react';
 import moment from 'moment';
-import { useState, useEffect } from 'react';
 
 const SaleTable = ({
     getThemeClasses,
@@ -177,7 +176,7 @@ const SaleTable = ({
                 onClick={() => handleSort('billno')}
               >
                 <div className="flex items-center">
-                  เลขที่ใบเสร็จ
+                  สาขา
                   {getSortIcon('billno')}
                 </div>
               </th>
@@ -192,7 +191,7 @@ const SaleTable = ({
                 onClick={() => handleSort('document_date')}
               >
                 <div className="flex items-center justify-center">
-                  วันที่สร้างเอกสาร
+                  วันที่สร้าง
                   {getSortIcon('document_date')}
                 </div>
               </th>
@@ -207,7 +206,7 @@ const SaleTable = ({
                 onClick={() => handleSort('total_item')}
               >
                 <div className="flex items-center">
-                  จำนวนสินค้า
+                  เลขที่บิล
                   {getSortIcon('total_item')}
                 </div>
               </th>
@@ -222,7 +221,37 @@ const SaleTable = ({
                 onClick={() => handleSort('emp_code')}
               >
                 <div className="flex items-center">
-                  พนักงานทำรายการ
+                  สินค้า
+                  {getSortIcon('emp_code')}
+                </div>
+              </th>
+              <th
+                className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
+                  "textMuted",
+                  currentTheme
+                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
+                  "textPrimary",
+                  currentTheme
+                )} ${getThemeClasses("transition", currentTheme)}`}
+                onClick={() => handleSort('emp_code')}
+              >
+                <div className="flex items-center">
+                  คลัง
+                  {getSortIcon('emp_code')}
+                </div>
+              </th>
+              <th
+                className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
+                  "textMuted",
+                  currentTheme
+                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
+                  "textPrimary",
+                  currentTheme
+                )} ${getThemeClasses("transition", currentTheme)}`}
+                onClick={() => handleSort('emp_code')}
+              >
+                <div className="flex items-center">
+                  ประเภท
                   {getSortIcon('emp_code')}
                 </div>
               </th>
@@ -237,7 +266,7 @@ const SaleTable = ({
                 onClick={() => handleSort('branch_code')}
               >
                 <div className="flex items-center">
-                  สาขา
+                  Sync
                   {getSortIcon('branch_code')}
                 </div>
               </th>
@@ -275,7 +304,7 @@ const SaleTable = ({
             {currentItems.length > 0 ? (
               currentItems.map((draft_sale) => (
                 <tr
-                  key={draft_sale.billno}
+                  key={draft_sale.BranchCode}
                   className={getThemeClasses("tableRow", currentTheme)}
                 >
                   <td
@@ -284,7 +313,7 @@ const SaleTable = ({
                       currentTheme
                     )}`}
                   >
-                    {draft_sale.billno}
+                    {draft_sale.BranchCode}
                   </td>
                   <td
                     className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
@@ -292,8 +321,8 @@ const SaleTable = ({
                       currentTheme
                     )}`}
                   >
-                    {moment(draft_sale.document_date).format(
-                      "DD/MM/YYYY HH:mm:ss"
+                    {moment(draft_sale.S_Date).format(
+                      "DD/MM/YYYY"
                     )}
                   </td>
                   <td
@@ -302,7 +331,7 @@ const SaleTable = ({
                       currentTheme
                     )}`}
                   >
-                    {draft_sale.total_item}
+                    {draft_sale.S_No}
                   </td>
                   <td
                     className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
@@ -310,7 +339,7 @@ const SaleTable = ({
                       currentTheme
                     )}`}
                   >
-                    {draft_sale.emp_code}
+                    {draft_sale.S_PCode}
                   </td>
                   <td
                     className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
@@ -318,7 +347,23 @@ const SaleTable = ({
                       currentTheme
                     )}`}
                   >
-                    {draft_sale.branch_code}
+                    {draft_sale.S_Stk}
+                  </td>
+                  <td
+                    className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
+                      "textPrimary",
+                      currentTheme
+                    )}`}
+                  >
+                    {draft_sale.S_Rem}
+                  </td>
+                  <td
+                    className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
+                      "textPrimary",
+                      currentTheme
+                    )}`}
+                  >
+                    {draft_sale.Data_Sync}
                   </td>
                   <td
                     className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(

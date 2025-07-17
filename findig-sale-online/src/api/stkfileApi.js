@@ -1,10 +1,10 @@
 import apiClient from "../httpRequest";
 
-export const loadStcardInfo = async (payload) => {
+export const loadStfileInfo = async (payload) => {
     const dbConfig = localStorage.getItem('db') || ''
     try {
         const { branchCode } = payload
-        const response = await apiClient.get(`/api/stcard?branchCode=${branchCode}&dbConfig=${dbConfig}`)
+        const response = await apiClient.get(`/api/stkfile?branchCode=${branchCode}&dbConfig=${dbConfig}`)
         return { data: response.data, error: null }
     } catch (error) {
         console.log('error=>', error)
@@ -18,11 +18,11 @@ export const loadStcardInfo = async (payload) => {
     }
 }
 
-export const loadStcardViewDetail = async (payload) => {
+export const loadStfileViewDetail = async (payload) => {
     const dbConfig = localStorage.getItem('db') || ''
     try {
-        const { billNo } = payload
-        const response = await apiClient.get(`/api/stcard/${billNo}?dbConfig=${dbConfig}`)
+        const { productCode } = payload
+        const response = await apiClient.get(`/api/stkfile/${productCode}?dbConfig=${dbConfig}`)
         return { data: response.data, error: null }
     } catch (error) {
         console.log('error=>', error)

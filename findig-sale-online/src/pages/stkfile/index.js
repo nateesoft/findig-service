@@ -3,8 +3,7 @@ import { Search } from 'lucide-react';
 
 import { getThemeClasses } from '../../utils/themes';
 import { AppContext } from '../../contexts';
-import { loadDraftSaleById, loadDraftSaleInfo } from '../../api/saleApi';
-import { loadAllProduct } from '../../api/productApi';
+import { loadStfileInfo, loadStfileViewDetail } from '../../api/stkfileApi';
 import ReviewModal from './ReviewModal';
 import SearchForm from './SearchForm';
 import SaleTable from './SaleTable';
@@ -37,12 +36,6 @@ const Sales = () => {
   const [showPostModal, setShowPostModal] = useState(false);
   const [modalMode, setModalMode] = useState('create'); // 'create', 'edit', 'review'
   const [currentSaleData, setCurrentSaleData] = useState(null);
-  
-  // POST Process States
-  const [postProgress, setPostProgress] = useState(0);
-  const [postStatus, setPostStatus] = useState('idle'); // 'idle', 'processing', 'completed', 'error'
-  const [processedItems, setProcessedItems] = useState([]);
-  const [currentProcessingItem, setCurrentProcessingItem] = useState(null);
   
   // Search criteria state
   const [searchCriteria, setSearchCriteria] = useState({
@@ -77,32 +70,6 @@ const Sales = () => {
     qty: 0
   });
 
-  const [saleItems, setSaleItems] = useState([]);
-
-  // ฟังก์ชันค้นหาสินค้า
-  const searchProducts = (term) => {
-    if (!term) return [];
-    const searchTerm = term.toLowerCase();
-    return mockProducts.filter(product => 
-      product.barcode.includes(searchTerm) || 
-      product.name.toLowerCase().includes(searchTerm)
-    ).slice(0, 10); // จำกัดผลลัพธ์ 10 รายการ
-  };
-
-  // Auto-complete logic
-  useEffect(() => {
-    if (productSearchTerm && productSearchTerm.length >= 2) {
-      const filtered = searchProducts(productSearchTerm);
-      setFilteredProducts(filtered);
-      setShowAutocomplete(filtered.length > 0);
-      setSelectedProductIndex(-1);
-    } else {
-      setFilteredProducts([]);
-      setShowAutocomplete(false);
-      setSelectedProductIndex(-1);
-    }
-  }, [productSearchTerm]);
-
   // ปิด autocomplete เมื่อคลิกข้างนอก
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -116,71 +83,11 @@ const Sales = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const resetNewSaleForm = () => {
-    setSaleHeader({
-      branchCode: '',
-      billNo: '',
-      empCode: userInfo.UserName,
-      createDate: new Date().toISOString().split('T')[0],
-    });
-    setCurrentItem({
-      barcode: '',
-      productName: '',
-      stock: 'A1',
-      qty: 0
-    });
-    setSaleItems([]);
-    setCurrentSaleData(null);
-  };
-
-  const resetCurrentItem = () => {
-    setCurrentItem({
-      barcode: '',
-      productName: '',
-      stock: 'A1',
-      qty: 0
-    });
-  };
-
-  const addItemToSale = () => {
-    if (!currentItem.barcode || !currentItem.productName || currentItem.qty <= 0) {
-      alert('กรุณากรอกข้อมูลสินค้าให้ครบถ้วน');
-      return;
-    }
-
-    const newItem = {
-      id: Date.now(), // simple ID generation
-      ...currentItem,
-      total: currentItem.qty // คำนวณยอดรวมได้ตามต้องการ
-    };
-
-    setSaleItems(prev => [...prev, newItem]);
-    console.log(saleItems)
-    resetCurrentItem();
-    setProductSearchTerm('');
-  };
-
-  const initLoadProduct = async () => {
-    try {
-      // สมมติว่ามี API สำหรับโหลดรายละเอียด
-      const { data, error } = await loadAllProduct();
-      console.log(data)
-      if (data) {
-        
-      } else {
-        alert(error || 'ไม่สามารถโหลดข้อมูลได้');
-      }
-    } catch (error) {
-      alert('เกิดข้อผิดพลาดในการโหลดข้อมูล');
-      console.error('Error loading sale detail:', error);
-    }
-  };
-
   // ฟังก์ชันสำหรับ Review ข้อมูลการขาย
-  const handleReviewSale = async (id) => {
+  const handleReviewSale = async (productCode) => {
     try {
       // สมมติว่ามี API สำหรับโหลดรายละเอียด
-      const { data, error } = await loadDraftSaleById({ id });
+      const { data, error } = await loadStfileViewDetail({ productCode });
       
       if (data) {
         setCurrentSaleData(data);
@@ -196,11 +103,12 @@ const Sales = () => {
   };
 
   const initLoadData = async () => {
-    const { data, error } = await loadDraftSaleInfo({
+    const { data, error } = await loadStfileInfo({
       branchCode: db
     })
 
     if(data) {
+      console.log(data)
       setDraftSale(data)
     }else {
       alert(error);
@@ -275,7 +183,6 @@ const Sales = () => {
 
   useEffect(() => {
     initLoadData()
-    initLoadProduct()
   }, [])
 
   useEffect(() => {
@@ -285,10 +192,6 @@ const Sales = () => {
           setShowSaleModal(false);
           setShowReviewModal(false);
           setShowPostModal(false);
-        } else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-          if (showSaleModal && currentItem.barcode && currentItem.productName && currentItem.qty > 0) {
-            addItemToSale();
-          }
         }
       }
     };

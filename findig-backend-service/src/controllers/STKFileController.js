@@ -4,7 +4,7 @@ const StkfileRepository = require("../repository/StkfileRepository")
 const getAllSTKFile = async (req, res, next) => {
   try {
     const { branchCode } = req.query
-    const stkfileInfo = await STKFileService.get({
+    const stkfileInfo = await STKFileService.getSTKFile({
       payload: { branch_code: branchCode },
       repository: StkfileRepository,
       db: req.db
