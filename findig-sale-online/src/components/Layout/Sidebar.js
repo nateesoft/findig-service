@@ -9,7 +9,8 @@ import {
   Home,
   ChevronDown,
   ChevronRight,
-  Settings
+  Settings,
+  Box
 } from 'lucide-react';
 import { getThemeClasses, themes } from '../../utils/themes';
 import { MENU_GROUPS } from '../../utils/constants';
@@ -29,6 +30,7 @@ const Sidebar = ({
   const iconMap = {
     dashboard: Home,
     sales: ShoppingCart,
+    postSales: Box,
     reports: BarChart3,
     products: Package,
     customers: Users,
@@ -43,6 +45,8 @@ const Sidebar = ({
   const pageToPath = {
     'dashboard': '/dashboard',
     'sales': '/sales',
+    'stcard': '/stcard',
+    'stkfile': '/stkfile',
     'products': '/products',
     'customers': '/customers',
     'reports': '/reports',
@@ -123,7 +127,6 @@ const Sidebar = ({
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    console.log('Main menu button clicked:', group.id);
                     handleMenuClick(group);
                   }}
                   style={{ 

@@ -12,8 +12,9 @@ export const MENU_GROUPS = [
     id: 'sales',
     label: 'กลุ่มเมนูการขาย',
     items: [
-      { id: 'sales-record', label: 'บันทึกข้อมูลการขาย', page: 'sales' },
-      { id: 'user-groups', label: 'กำหนดรหัสกลุ่มผู้ใช้งาน', page: 'user-groups' }
+      { id: 'sales-record', label: 'ข้อมูลการขาย', page: 'sales' },
+      { id: 'stcard', label: 'ข้อมูล stcard', page: 'stcard' },
+      { id: 'stkfile', label: 'ข้อมูล stkfile', page: 'stkfile' }
     ]
   },
   {
@@ -25,21 +26,12 @@ export const MENU_GROUPS = [
     ]
   },
   {
-    id: 'products',
-    label: 'จัดการสินค้า',
-    page: 'products'
-  },
-  {
-    id: 'customers',
-    label: 'จัดการลูกค้า',
-    page: 'customers'
-  },
-  {
     id: 'settings',
     label: 'ตั้งค่าระบบ',
     items: [
-      { id: 'system-settings', label: 'ปรับแต่งระบบ', page: 'system-settings' },
-      { id: 'branch-info', label: 'ข้อมูลรายละเอียดสาขา', page: 'branch-info' }
+      { id: 'branch-info', label: 'ข้อมูลรายละเอียดสาขา', page: 'branch-info' },
+      { id: 'user-groups', label: 'กำหนดรหัสกลุ่มผู้ใช้งาน', page: 'user-groups' },
+      { id: 'system-settings', label: 'ปรับแต่งระบบ', page: 'system-settings' }
     ]
   }
 ];

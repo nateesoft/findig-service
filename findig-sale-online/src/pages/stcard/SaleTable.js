@@ -18,7 +18,6 @@ const SaleTable = ({
     currentTheme,
     filteredSales,
     handleReviewSale,
-    handleEditSale,
     searchCriteria,
     resetSearch
 }) => {
@@ -156,14 +155,6 @@ const SaleTable = ({
           currentTheme
         )}`}
       >
-        <h3
-          className={`text-lg font-semibold ${getThemeClasses(
-            "textPrimary",
-            currentTheme
-          )}`}
-        >
-          รายการข้อมูลการขาย
-        </h3>
         {sortedSales.length > 0 && (
           <p className={`text-sm ${getThemeClasses("textMuted", currentTheme)} mt-2`}>
             แสดงรายการ {startIndex + 1}-{Math.min(endIndex, sortedSales.length)} จากทั้งหมด {sortedSales.length} รายการ
@@ -366,22 +357,6 @@ const SaleTable = ({
                         title="ดูรายละเอียด"
                       >
                         <Eye className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleEditSale(draft_sale.id)}
-                        className={`p-2 rounded-lg ${getThemeClasses(
-                          "textMuted",
-                          currentTheme
-                        )} hover:${getThemeClasses(
-                          "textSecondary",
-                          currentTheme
-                        )} ${getThemeClasses(
-                          "transition",
-                          currentTheme
-                        )} hover:bg-yellow-50 dark:hover:bg-yellow-900`}
-                        title="แก้ไข"
-                      >
-                        <Edit className="w-4 h-4" />
                       </button>
                     </div>
                   </td>

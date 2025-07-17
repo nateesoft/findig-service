@@ -20,6 +20,8 @@ import ProtectedRoute from "./components/Auth/ProtectedRoute"
 
 import Dashboard from "./pages/Dashboard"
 import Sales from "./pages/sale/Sales"
+import StcardPage from "./pages/stcard"
+import StkfilePage from "./pages/stkfile"
 import UserGroups from "./pages/UserGroups"
 import Products from "./pages/Products"
 import Customers from "./pages/Customers"
@@ -321,6 +323,60 @@ const AppContent = () => {
                 sidebarOpen={sidebarOpen}
               >
                 <Sales
+                  currentTheme={currentTheme}
+                  searchTerm={searchTerm}
+                  setSearchTerm={setSearchTerm}
+                  selectedCustomer={selectedCustomer}
+                  setSelectedCustomer={setSelectedCustomer}
+                  cart={cart}
+                  setCart={setCart}
+                />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/stcard"
+          element={
+            <ProtectedRoute user={user}>
+              <AppLayout
+                user={user}
+                currentTheme={currentTheme}
+                setSidebarOpen={setSidebarOpen}
+                setShowLogoutConfirm={setShowLogoutConfirm}
+                expandedMenus={expandedMenus}
+                setExpandedMenus={setExpandedMenus}
+                sidebarOpen={sidebarOpen}
+              >
+                <StcardPage
+                  currentTheme={currentTheme}
+                  searchTerm={searchTerm}
+                  setSearchTerm={setSearchTerm}
+                  selectedCustomer={selectedCustomer}
+                  setSelectedCustomer={setSelectedCustomer}
+                  cart={cart}
+                  setCart={setCart}
+                />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/stkfile"
+          element={
+            <ProtectedRoute user={user}>
+              <AppLayout
+                user={user}
+                currentTheme={currentTheme}
+                setSidebarOpen={setSidebarOpen}
+                setShowLogoutConfirm={setShowLogoutConfirm}
+                expandedMenus={expandedMenus}
+                setExpandedMenus={setExpandedMenus}
+                sidebarOpen={sidebarOpen}
+              >
+                <StkfilePage
                   currentTheme={currentTheme}
                   searchTerm={searchTerm}
                   setSearchTerm={setSearchTerm}
