@@ -6,7 +6,7 @@ import {
 
 import { getThemeClasses } from '../../utils/themes';
 import { AppContext } from '../../contexts';
-import { createDraftSaleInfo, loadDraftSaleById, loadDraftSaleInfo, updateDraftSaleInfo } from '../../api/saleApi';
+import { createDraftSaleInfo, loadDraftSaleById, loadDraftSaleInfo, processStockFromSale, updateDraftSaleInfo } from '../../api/saleApi';
 import { loadAllProduct } from '../../api/productApi';
 import POSTModal from './POSTModal';
 import ReviewModal from './ReviewModal';
@@ -392,7 +392,7 @@ const Sales = () => {
   
   // ฟังก์ชันสำหรับเปิด POST Modal
   const handlePostStock = () => {
-    const tempSales = filteredSales.filter(sale => sale.post_status === 'N' || sale.post_status === 'D');
+    const tempSales = filteredSales.filter(sale => sale.post_status === 'N');
     
     if (tempSales.length === 0) {
       alert('ไม่มีรายการที่สามารถ POST ได้');
@@ -410,18 +410,18 @@ const Sales = () => {
   // ฟังก์ชันจำลองการ POST แต่ละรายการ
   const processPostItem = async (item, index, total) => {
     setCurrentProcessingItem(item);
-    
-    // จำลองการประมวลผล
-    await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
-    
-    // จำลองผลลัพธ์ (90% สำเร็จ, 10% ผิดพลาด)
-    const isSuccess = Math.random() > 0.1;
+
+    let isSuccess = false
+    const { data, error } = await processStockFromSale({ branchCode: db, saleInfo: item })
+    if(data) {
+      isSuccess = true
+    }
     
     const result = {
       ...item,
       processed: true,
       success: isSuccess,
-      message: isSuccess ? 'POST สำเร็จ' : 'เกิดข้อผิดพลาด: ไม่สามารถตัดสต๊อกได้',
+      message: isSuccess ? 'POST สำเร็จ' : error,
       processedAt: new Date().toISOString()
     };
     
@@ -433,7 +433,7 @@ const Sales = () => {
 
   // ฟังก์ชันหลักสำหรับ POST Process
   const handleConfirmPost = async () => {
-    const tempSales = filteredSales.filter(sale => sale.post_status === 'N' || sale.post_status === 'D');
+    const tempSales = filteredSales.filter(sale => sale.post_status === 'N');
     
     setPostStatus('processing');
     setPostProgress(0);

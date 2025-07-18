@@ -5,6 +5,11 @@ const { generateUUID } = require("../utils/StringUtil")
 const DraftSaleDetailsService = require("../services/DraftSaleDetailsService")
 const DraftSaleDetailsRepository = require('../repository/DraftSaleDetailsRepository')
 
+const StcardService = require("../services/StcardService")
+const StcardRepository = require("../repository/StcardRepository")
+const StkfileService = require("../services/StkfileService")
+const StkfileRepository = require("../repository/StkfileRepository")
+
 const getData = async ({ payload, repository, db }) => {
   const results = await repository.getData({ payload, db })
   return mappingResultData(results)
@@ -94,10 +99,52 @@ const deleteData = async ({ payload, repository, db }) => {
   return results
 }
 
+const processStockFromSale = async ({ payload, repository, db }) => {
+  const { id, billno } = payload
+
+  const resultDetails = await DraftSaleDetailsService.getSaleDetailsByBillNo({ 
+    payload: { billno },
+    repository: DraftSaleDetailsRepository,
+    db
+  })
+
+  const mappingPayload = {
+    ...payload,
+    S_Date: getMoment().format('YYYY-MM-DD HH:mm:ss')
+  }
+
+  const processStcard = await StcardService.processStock({
+    payload: {
+      billInfo: mappingPayload,
+      sale_items: resultDetails
+    },
+    repository: StcardRepository,
+    db
+  })
+
+  const processStkfile = await StkfileService.processStock({
+    payload: {
+      billInfo: mappingPayload,
+      sale_items: resultDetails
+    },
+    repository: StkfileRepository,
+    db
+  })
+
+  if(processStcard && processStkfile) {
+    const results = await repository.processStockFromSale({ payload: { id }, db })
+    return results
+  } else {
+    return { error: "Failed to process stock from sale." }
+  }
+
+}
+
 module.exports = {
   getData,
   getDataById,
   saveData,
   updateData,
-  deleteData
+  deleteData,
+  processStockFromSale
 }

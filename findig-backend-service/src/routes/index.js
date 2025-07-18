@@ -27,6 +27,7 @@ router.get('/api/draftsale/:id', DraftSaleController.getDataById)
 router.post('/api/draftsale', DraftSaleController.saveData)
 router.put('/api/draftsale/:id', DraftSaleController.updateData)
 router.delete('/api/draftsale/:id', DraftSaleController.deleteData)
+router.post('/api/draftsale/process-stock', DraftSaleController.processStockFromSale)
 
 router.get('/api/draftsale_detail', DraftSaleDetailsController.getData)
 router.get('/api/draftsale_detail/:id', DraftSaleDetailsController.getDataById)

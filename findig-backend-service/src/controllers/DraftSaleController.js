@@ -90,10 +90,25 @@ const deleteData = async (req, res, next) => {
   }
 }
 
+const processStockFromSale = async (req, res, next) => {
+  try {
+    const { saleInfo } = req.body
+    const dataInfo = await DraftSaleService.processStockFromSale({
+      payload: { ...saleInfo },
+      repository: DraftSaleRepository,
+      db: req.db
+    })
+    res.json(dataInfo)
+  } catch (error) {
+    next(error)
+  }
+}
+
 module.exports = {
   getData,
   getDataById,
   saveData,
   updateData,
-  deleteData
+  deleteData,
+  processStockFromSale
 }

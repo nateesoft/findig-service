@@ -6,6 +6,7 @@ import {
   AlertTriangle,
   Clock} from 'lucide-react';
 import moment from 'moment';
+
 import { getThemeClasses } from '../../utils/themes';
 
 const POSTModal = ({ currentTheme, postStatus, filteredSales, currentProcessingItem, handleConfirmPost, setShowPostModal, postProgress, processedItems }) => {
@@ -65,7 +66,7 @@ const POSTModal = ({ currentTheme, postStatus, filteredSales, currentProcessingI
                   </h4>
                   
                   {(() => {
-                    const tempSales = filteredSales.filter(sale => sale.post_status === 'N' || sale.post_status === 'D');
+                    const tempSales = filteredSales.filter(sale => sale.post_status === 'N');
                     const totalItems = tempSales.reduce((sum, sale) => sum + (sale.total_item || 0), 0);
                     
                     return (
@@ -239,7 +240,7 @@ const POSTModal = ({ currentTheme, postStatus, filteredSales, currentProcessingI
                     </button>
                     <button
                       onClick={handleConfirmPost}
-                      disabled={filteredSales.filter(sale => sale.post_status === 'N' || sale.post_status === 'D').length === 0}
+                      disabled={filteredSales.filter(sale => sale.post_status === 'N').length === 0}
                       className={`px-6 py-2 text-white rounded-lg font-medium bg-green-500 hover:bg-green-600 ${getThemeClasses('transition', currentTheme)} hover:shadow-lg flex items-center disabled:opacity-50 disabled:cursor-not-allowed`}
                     >
                       <Upload className="w-4 h-4 mr-2" />
