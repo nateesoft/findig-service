@@ -75,8 +75,8 @@ const LoginPage = ( { onLogin, setUser }) => {
               className={`w-full px-4 py-3 border rounded-lg text-center text-sm ${getThemeClasses('input', currentTheme)}`}
             >
               <option value="">เลือกสาขา</option>
-              <option value="001">findigrealtime.dyndns.biz/</option>
-              <option value="002">localhost</option>
+              <option value="909">findigrealtime.dyndns.biz/</option>
+              <option value="TST">localhost</option>
             </select>
           </div>
           <div>
