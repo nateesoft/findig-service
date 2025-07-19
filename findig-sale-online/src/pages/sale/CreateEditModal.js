@@ -187,7 +187,8 @@ const CreateEditModal = ({
                 >
                   รหัสสาขา
                 </label>
-                <select
+                <input
+                  type="text"
                   value={saleHeader.branchCode}
                   onChange={(e) =>
                     setSaleHeader({ ...saleHeader, branchCode: e.target.value })
@@ -196,11 +197,9 @@ const CreateEditModal = ({
                     "input",
                     currentTheme
                   )}`}
-                >
-                  <option value="">เลือกสาขา</option>
-                  <option value="909">909 - สำนักงานใหญ่ ICS</option>
-                  <option value="TST">TST - สาขาทดสอบระบบ</option>
-                </select>
+                  placeholder="รหัสสาขา"
+                  disabled
+                />
               </div>
             </div>
           </div>

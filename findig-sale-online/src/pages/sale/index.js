@@ -55,7 +55,8 @@ const Sales = () => {
     branchCode: '',
     billNo: '',
     empCode: userInfo.UserName,
-    createDate: new Date().toISOString().split('T')[0]
+    createDate: new Date().toISOString().split('T')[0],
+    branchCode: db
   });
 
   const [currentItem, setCurrentItem] = useState({
@@ -164,7 +165,7 @@ const Sales = () => {
 
   const resetNewSaleForm = () => {
     setSaleHeader({
-      branchCode: '',
+      branchCode: db,
       billNo: '',
       empCode: userInfo.UserName,
       createDate: new Date().toISOString().split('T')[0],
@@ -259,7 +260,7 @@ const Sales = () => {
       
       if (data) {
         setSaleHeader({
-          branchCode: data.branchCode || '',
+          branchCode: db,
           billNo: data.billNo || '',
           empCode: data.empCode || '',
           createDate: data.createDate || new Date().toISOString().split('T')[0]
