@@ -1,7 +1,11 @@
 const { mappingResultData } = require("../utils/ConvertThai")
+const { getMoment } = require("../utils/MomentUtil")
 
 const getSTKFile = async ({ payload, repository, db }) => {
-  const results = await repository.getData({ payload, db })
+  const { branch_code } = payload
+  const results = await repository.getData({ payload: {
+    Branch: branch_code
+  }, db })
   return mappingResultData(results)
 }
 
@@ -10,7 +14,7 @@ const processStock = async ({ payload, repository, db }) => {
   sale_items.forEach(async item => {
     const existing = await repository.findByProductStockCode({
       payload: {
-        BranchCode: billInfo.branch_code,
+        Branch: billInfo.branch_code,
         BPCode: item.barcode,
         BStk: item.stock_code
       },
@@ -18,7 +22,7 @@ const processStock = async ({ payload, repository, db }) => {
     })
 
     const stkfile = {
-      BranchCode: billInfo.branch_code,
+      Branch: billInfo.branch_code,
       BPCode: item.barcode,
       BStk: item.stock_code,
       BQty: 0,
@@ -49,7 +53,9 @@ const processStock = async ({ payload, repository, db }) => {
       BQty22: 0,
       BQty23: 0,
       BQty24: 0,
-      Data_Sync: "N"
+      SendToPOS: "N",
+      LastUpdate: getMoment().format("YYYY-MM-DD"),
+      LastTimeUpdate: getMoment().format("HH:mm:ss")
     }
 
     if (existing) {

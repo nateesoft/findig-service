@@ -10,7 +10,6 @@ import {
   ArrowUp,
   ArrowDown
 } from 'lucide-react';
-import moment from 'moment';
 
 const SaleTable = ({
     getThemeClasses,
@@ -173,11 +172,11 @@ const SaleTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('billno')}
+                onClick={() => handleSort('Branch')}
               >
                 <div className="flex items-center">
                   รหัสสาขา
-                  {getSortIcon('billno')}
+                  {getSortIcon('Branch')}
                 </div>
               </th>
               <th
@@ -188,11 +187,11 @@ const SaleTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('document_date')}
+                onClick={() => handleSort('BPCode')}
               >
                 <div className="flex items-center justify-center">
                   รหัสสินค้า
-                  {getSortIcon('document_date')}
+                  {getSortIcon('BPCode')}
                 </div>
               </th>
               <th
@@ -203,11 +202,11 @@ const SaleTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('total_item')}
+                onClick={() => handleSort('BStk')}
               >
                 <div className="flex items-center">
                   คลังสินค้า
-                  {getSortIcon('total_item')}
+                  {getSortIcon('BStk')}
                 </div>
               </th>
               <th
@@ -218,11 +217,11 @@ const SaleTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('total_item')}
+                onClick={() => handleSort('BQty13')}
               >
                 <div className="flex items-center">
                   M13
-                  {getSortIcon('total_item')}
+                  {getSortIcon('BQty13')}
                 </div>
               </th>
               <th
@@ -233,11 +232,11 @@ const SaleTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('total_item')}
+                onClick={() => handleSort('BQty14')}
               >
                 <div className="flex items-center">
                   M14
-                  {getSortIcon('total_item')}
+                  {getSortIcon('BQty14')}
                 </div>
               </th>
               <th
@@ -248,11 +247,11 @@ const SaleTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('total_item')}
+                onClick={() => handleSort('BQty15')}
               >
                 <div className="flex items-center">
                   M15
-                  {getSortIcon('total_item')}
+                  {getSortIcon('BQty15')}
                 </div>
               </th>
               <th
@@ -263,11 +262,11 @@ const SaleTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('total_item')}
+                onClick={() => handleSort('BQty16')}
               >
                 <div className="flex items-center">
                   M16
-                  {getSortIcon('total_item')}
+                  {getSortIcon('BQty16')}
                 </div>
               </th>
               <th
@@ -278,11 +277,11 @@ const SaleTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('total_item')}
+                onClick={() => handleSort('BQty17')}
               >
                 <div className="flex items-center">
                   M17
-                  {getSortIcon('total_item')}
+                  {getSortIcon('BQty17')}
                 </div>
               </th>
               <th
@@ -293,11 +292,11 @@ const SaleTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('total_item')}
+                onClick={() => handleSort('BQty18')}
               >
                 <div className="flex items-center">
                   M18
-                  {getSortIcon('total_item')}
+                  {getSortIcon('BQty18')}
                 </div>
               </th>
               <th
@@ -308,11 +307,11 @@ const SaleTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('total_item')}
+                onClick={() => handleSort('BQty19')}
               >
                 <div className="flex items-center">
                   M19
-                  {getSortIcon('total_item')}
+                  {getSortIcon('BQty19')}
                 </div>
               </th>
               <th
@@ -323,11 +322,11 @@ const SaleTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('total_item')}
+                onClick={() => handleSort('BQty20')}
               >
                 <div className="flex items-center">
                   M20
-                  {getSortIcon('total_item')}
+                  {getSortIcon('BQty20')}
                 </div>
               </th>
               <th
@@ -338,11 +337,11 @@ const SaleTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('total_item')}
+                onClick={() => handleSort('BQty21')}
               >
                 <div className="flex items-center">
                   M21
-                  {getSortIcon('total_item')}
+                  {getSortIcon('BQty21')}
                 </div>
               </th>
               <th
@@ -353,11 +352,11 @@ const SaleTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('total_item')}
+                onClick={() => handleSort('BQty22')}
               >
                 <div className="flex items-center">
                   M22
-                  {getSortIcon('total_item')}
+                  {getSortIcon('BQty22')}
                 </div>
               </th>
               <th
@@ -368,11 +367,11 @@ const SaleTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('total_item')}
+                onClick={() => handleSort('BQty23')}
               >
                 <div className="flex items-center">
                   M23
-                  {getSortIcon('total_item')}
+                  {getSortIcon('BQty23')}
                 </div>
               </th>
               <th
@@ -383,11 +382,11 @@ const SaleTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('total_item')}
+                onClick={() => handleSort('BQty24')}
               >
                 <div className="flex items-center">
                   M24
-                  {getSortIcon('total_item')}
+                  {getSortIcon('BQty24')}
                 </div>
               </th>
               <th
@@ -398,11 +397,11 @@ const SaleTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('post_status')}
+                onClick={() => handleSort('SendToPOS')}
               >
                 <div className="flex items-center">
-                  สถานะ POST
-                  {getSortIcon('post_status')}
+                  Sync Data
+                  {getSortIcon('SendToPOS')}
                 </div>
               </th>
               <th
@@ -433,7 +432,7 @@ const SaleTable = ({
                       currentTheme
                     )}`}
                   >
-                    {draft_sale.BranchCode}
+                    {draft_sale.Branch}
                   </td>
                   <td
                     className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
@@ -555,14 +554,14 @@ const SaleTable = ({
                   >
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        draft_sale.Data_Sync === "N"
+                        draft_sale.SendToPOS === "N"
                           ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                          : draft_sale.Data_Sync === "Y"
+                          : draft_sale.SendToPOS === "Y"
                           ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
                           : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
                       }`}
                     >
-                      {draft_sale.Data_Sync}
+                      {draft_sale.SendToPOS}
                     </span>
                   </td>
                   <td
@@ -592,7 +591,7 @@ const SaleTable = ({
             ) : (
               <tr>
                 <td
-                  colSpan="7"
+                  colSpan="17"
                   className={`px-6 py-8 text-center text-sm ${getThemeClasses(
                     "textMuted",
                     currentTheme

@@ -63,7 +63,6 @@ const Sidebar = ({
   const currentPage = pathToPage[location.pathname];
 
   const toggleMenu = (menuId) => {
-    console.log('Toggle menu clicked:', menuId);
     setExpandedMenus(prev => ({
       ...prev,
       [menuId]: !prev[menuId]
@@ -71,7 +70,6 @@ const Sidebar = ({
   };
 
   const handleMenuClick = (item) => {
-    console.log('Menu clicked:', item);
     if (item.page) {
       navigate(pageToPath[item.page]);
       setSidebarOpen(false);
@@ -81,7 +79,6 @@ const Sidebar = ({
   };
 
   const handleSubmenuClick = (page) => {
-    console.log('Submenu clicked:', page);
     navigate(pageToPath[page]);
     setSidebarOpen(false);
   };
@@ -168,7 +165,6 @@ const Sidebar = ({
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
-                          console.log('Submenu button clicked:', item.page);
                           handleSubmenuClick(item.page);
                         }}
                         style={{ 
@@ -206,7 +202,6 @@ const Sidebar = ({
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            console.log('Logout button clicked');
             setShowLogoutConfirm(true);
           }}
           style={{ 

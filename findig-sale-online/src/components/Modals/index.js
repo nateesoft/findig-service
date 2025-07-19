@@ -276,7 +276,6 @@ const ModalDemo = () => {
               cancelText={activeModal.cancelText}
               showCancel={activeModal.showCancel}
               onConfirm={() => {
-                console.log('Confirmed!');
                 setActiveModal(null);
               }}
             />

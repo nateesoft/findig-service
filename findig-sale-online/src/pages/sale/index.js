@@ -14,21 +14,7 @@ import CreateEditModal from './CreateEditModal'
 import SearchForm from './SearchForm';
 import SaleTable from './SaleTable';
 
-// Mock data สำหรับสินค้า
-const mockProducts = [
-  { barcode: '1234567890123', name: 'เสื้อยืดสีขาว', stock: 'A1', price: 250, available: 50 },
-  { barcode: '1234567890124', name: 'เสื้อยืดสีดำ', stock: 'A1', price: 250, available: 30 },
-  { barcode: '1234567890125', name: 'กางเกงยีนส์', stock: 'A2', price: 890, available: 25 },
-  { barcode: '1234567890126', name: 'รองเท้าผ้าใบ', stock: 'B1', price: 1200, available: 20 },
-  { barcode: '1234567890127', name: 'กระเป๋าใส่เอกสาร', stock: 'A1', price: 350, available: 15 },
-  { barcode: '1234567890128', name: 'หูฟัง Bluetooth', stock: 'B1', price: 1500, available: 10 },
-  { barcode: '1234567890129', name: 'แก้วน้ำสแตนเลส', stock: 'A2', price: 180, available: 40 },
-  { barcode: '1234567890130', name: 'พาวเวอร์แบงค์', stock: 'B1', price: 890, available: 35 },
-  { barcode: '1234567890131', name: 'สายชาร์จ USB-C', stock: 'A1', price: 120, available: 60 },
-  { barcode: '1234567890132', name: 'เคสโทรศัพท์', stock: 'A2', price: 200, available: 45 },
-  { barcode: '1234567890133', name: 'ฟิล์มกันรอย', stock: 'B1', price: 80, available: 100 },
-  { barcode: '1234567890134', name: 'ที่วางโทรศัพท์', stock: 'A1', price: 150, available: 25 }
-];
+import { mockPosProducts } from '../../data/mockData';
 
 const Sales = () => {
   const { appData } = useContext(AppContext)
@@ -43,13 +29,11 @@ const Sales = () => {
   const [modalMode, setModalMode] = useState('create'); // 'create', 'edit', 'review'
   const [currentSaleData, setCurrentSaleData] = useState(null);
   
-  // POST Process States
   const [postProgress, setPostProgress] = useState(0);
   const [postStatus, setPostStatus] = useState('idle'); // 'idle', 'processing', 'completed', 'error'
   const [processedItems, setProcessedItems] = useState([]);
   const [currentProcessingItem, setCurrentProcessingItem] = useState(null);
   
-  // Search criteria state
   const [searchCriteria, setSearchCriteria] = useState({
     billNo: '',
     dateFrom: '',
@@ -59,16 +43,13 @@ const Sales = () => {
     postStatus: ''
   });
 
-  // Product search states
   const [productSearchTerm, setProductSearchTerm] = useState('');
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [showAutocomplete, setShowAutocomplete] = useState(false);
   const [selectedProductIndex, setSelectedProductIndex] = useState(-1);
   
-  // Refs
   const barcodeInputRef = useRef(null);
   const autocompleteRef = useRef(null);
-  const productSearchInputRef = useRef(null);
   
   const [saleHeader, setSaleHeader] = useState({
     branchCode: '',
@@ -86,17 +67,15 @@ const Sales = () => {
 
   const [saleItems, setSaleItems] = useState([]);
 
-  // ฟังก์ชันค้นหาสินค้า
   const searchProducts = (term) => {
     if (!term) return [];
     const searchTerm = term.toLowerCase();
-    return mockProducts.filter(product => 
+    return mockPosProducts.filter(product => 
       product.barcode.includes(searchTerm) || 
       product.name.toLowerCase().includes(searchTerm)
     ).slice(0, 10); // จำกัดผลลัพธ์ 10 รายการ
   };
 
-  // Auto-complete logic
   useEffect(() => {
     if (productSearchTerm && productSearchTerm.length >= 2) {
       const filtered = searchProducts(productSearchTerm);
@@ -110,7 +89,6 @@ const Sales = () => {
     }
   }, [productSearchTerm]);
 
-  // ปิด autocomplete เมื่อคลิกข้างนอก
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (autocompleteRef.current && !autocompleteRef.current.contains(event.target)) {
@@ -123,7 +101,6 @@ const Sales = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // จัดการ keyboard navigation ใน autocomplete
   const handleBarcodeKeyDown = (e) => {
     if (!showAutocomplete || filteredProducts.length === 0) return;
 
@@ -151,7 +128,6 @@ const Sales = () => {
     }
   };
 
-  // เลือกสินค้าจาก autocomplete หรือ search modal
   const selectProduct = (product) => {
     setCurrentItem({
       barcode: product.barcode,
@@ -163,21 +139,18 @@ const Sales = () => {
     setShowAutocomplete(false);
     setSelectedProductIndex(-1);
     
-    // Focus ไปที่ quantity input
     setTimeout(() => {
       const qtyInput = document.querySelector('input[type="number"]');
       if (qtyInput) qtyInput.focus();
     }, 100);
   };
 
-  // จัดการการเปลี่ยนแปลงใน barcode input
   const handleBarcodeChange = (e) => {
     const value = e.target.value;
     setCurrentItem({...currentItem, barcode: value});
     setProductSearchTerm(value);
     
-    // ถ้าตรงกับบาร์โค้ดในระบบ จะเติมข้อมูลอัตโนมัติ
-    const exactMatch = mockProducts.find(product => product.barcode === value);
+    const exactMatch = mockPosProducts.find(product => product.barcode === value);
     if (exactMatch) {
       setCurrentItem({
         barcode: exactMatch.barcode,
@@ -228,7 +201,6 @@ const Sales = () => {
     };
 
     setSaleItems(prev => [...prev, newItem]);
-    console.log(saleItems)
     resetCurrentItem();
     setProductSearchTerm('');
   };
@@ -252,9 +224,7 @@ const Sales = () => {
 
   const initLoadProduct = async () => {
     try {
-      // สมมติว่ามี API สำหรับโหลดรายละเอียด
       const { data, error } = await loadAllProduct();
-      console.log(data)
       if (data) {
         
       } else {
@@ -266,10 +236,8 @@ const Sales = () => {
     }
   };
 
-  // ฟังก์ชันสำหรับ Review ข้อมูลการขาย
   const handleReviewSale = async (id) => {
     try {
-      // สมมติว่ามี API สำหรับโหลดรายละเอียด
       const { data, error } = await loadDraftSaleById({ id });
       
       if (data) {
@@ -285,13 +253,11 @@ const Sales = () => {
     }
   };
 
-  // ฟังก์ชันสำหรับ Edit ข้อมูลการขาย
   const handleEditSale = async (id) => {
     try {
       const { data, error } = await loadDraftSaleById({ id });
       
       if (data) {
-        // โหลดข้อมูลลงในฟอร์ม
         setSaleHeader({
           branchCode: data.branchCode || '',
           billNo: data.billNo || '',
@@ -299,7 +265,6 @@ const Sales = () => {
           createDate: data.createDate || new Date().toISOString().split('T')[0]
         });
         
-        // โหลดรายการสินค้า
         setSaleItems(data.items || []);
         setCurrentSaleData(data);
         setModalMode('edit');
@@ -330,7 +295,6 @@ const Sales = () => {
       let result;
       
       if (modalMode === 'edit') {
-        // อัปเดตข้อมูลที่มีอยู่
         result = await updateDraftSaleInfo({
           branchCode: saleHeader.branchCode, 
           billNo: saleHeader.billNo, 
@@ -339,7 +303,6 @@ const Sales = () => {
           saleItems
         });
       } else {
-        // สร้างใหม่
         result = await createDraftSaleInfo({
           branchCode: saleHeader.branchCode, 
           billNo: saleHeader.billNo, 
@@ -353,12 +316,12 @@ const Sales = () => {
 
       if(data) {
         const actionText = modalMode === 'edit' ? 'อัปเดต' : 'บันทึก';
-        alert(`${actionText}ใบขายเรียบร้อย!\n` +
-              `เลขที่: ${saleHeader.billNo}\n` +
-              `วันที่: ${saleHeader.createDate}\n` +
-              `สาขาทำรายการ: ${saleHeader.branchCode}\n` +
-              `จำนวนรายการ: ${saleItems.length} รายการ\n` +
-              `จำนวนสินค้ารวม: ${totalQty} ชิ้น`);
+        // alert(`${actionText}ใบขายเรียบร้อย!\n` +
+        //       `เลขที่: ${saleHeader.billNo}\n` +
+        //       `วันที่: ${saleHeader.createDate}\n` +
+        //       `สาขาทำรายการ: ${saleHeader.branchCode}\n` +
+        //       `จำนวนรายการ: ${saleItems.length} รายการ\n` +
+        //       `จำนวนสินค้ารวม: ${totalQty} ชิ้น`);
         initLoadData();
       } else {
         alert(error);
@@ -390,7 +353,6 @@ const Sales = () => {
     setShowSaleModal(true);
   };
   
-  // ฟังก์ชันสำหรับเปิด POST Modal
   const handlePostStock = () => {
     const tempSales = filteredSales.filter(sale => sale.post_status === 'N');
     
@@ -399,7 +361,6 @@ const Sales = () => {
       return;
     }
     
-    // Reset state
     setPostProgress(0);
     setPostStatus('idle');
     setProcessedItems([]);
@@ -407,7 +368,6 @@ const Sales = () => {
     setShowPostModal(true);
   };
 
-  // ฟังก์ชันจำลองการ POST แต่ละรายการ
   const processPostItem = async (item, index, total) => {
     setCurrentProcessingItem(item);
 
@@ -431,7 +391,6 @@ const Sales = () => {
     return result;
   };
 
-  // ฟังก์ชันหลักสำหรับ POST Process
   const handleConfirmPost = async () => {
     const tempSales = filteredSales.filter(sale => sale.post_status === 'N');
     
@@ -450,7 +409,6 @@ const Sales = () => {
       setCurrentProcessingItem(null);
       setPostStatus('completed');
       
-      // รีโหลดข้อมูลหลังจาก POST เสร็จ
       setTimeout(() => {
         initLoadData();
       }, 1000);
@@ -461,18 +419,15 @@ const Sales = () => {
     }
   };
 
-  // ฟังก์ชันการค้นหา
   const handleSearch = () => {
     let filtered = [...draftSale];
 
-    // ค้นหาตามเลขที่ใบเสร็จ
     if (searchCriteria.billNo.trim()) {
       filtered = filtered.filter(item => 
         item.billno.toLowerCase().includes(searchCriteria.billNo.toLowerCase())
       );
     }
 
-    // ค้นหาตามช่วงวันที่
     if (searchCriteria.dateFrom) {
       filtered = filtered.filter(item => 
         new Date(item.document_date) >= new Date(searchCriteria.dateFrom)
@@ -485,21 +440,18 @@ const Sales = () => {
       );
     }
 
-    // ค้นหาตามสาขา
     if (searchCriteria.branchCode) {
       filtered = filtered.filter(item => 
         item.branch_code === searchCriteria.branchCode
       );
     }
 
-    // ค้นหาตามพนักงาน
     if (searchCriteria.empCode.trim()) {
       filtered = filtered.filter(item => 
         item.emp_code.toLowerCase().includes(searchCriteria.empCode.toLowerCase())
       );
     }
 
-    // ค้นหาตามสถานะ POST
     if (searchCriteria.postStatus) {
       filtered = filtered.filter(item => 
         item.post_status === searchCriteria.postStatus
@@ -509,7 +461,6 @@ const Sales = () => {
     setFilteredSales(filtered);
   };
 
-  // ล้างการค้นหา
   const resetSearch = () => {
     setSearchCriteria({
       billNo: '',
@@ -522,7 +473,6 @@ const Sales = () => {
     setFilteredSales(draftSale);
   };
 
-  // อัปเดต filteredSales เมื่อ draftSale เปลี่ยน
   useEffect(() => {
     setFilteredSales(draftSale);
   }, [draftSale]);
@@ -578,7 +528,6 @@ const Sales = () => {
         </div>
       </div>
 
-      {/* Search Form */}
       {showSearchForm && (
         <SearchForm
           getThemeClasses={getThemeClasses}
@@ -592,7 +541,6 @@ const Sales = () => {
         />
       )}
 
-      {/* Sales Table */}
       <SaleTable
         getThemeClasses={getThemeClasses}
         currentTheme={currentTheme}
@@ -603,7 +551,6 @@ const Sales = () => {
         resetSearch={resetSearch}
       />
 
-      {/* POST Modal */}
       {showPostModal && (
         <POSTModal
           currentTheme={currentTheme}
@@ -617,7 +564,6 @@ const Sales = () => {
         />
       )}
 
-      {/* Review Modal */}
       {showReviewModal && currentSaleData && (
         <ReviewModal 
           getThemeClasses={getThemeClasses}
@@ -627,7 +573,6 @@ const Sales = () => {
         />
       )}
 
-      {/* Sale Modal (Create/Edit) */}
       {showSaleModal && (
         <CreateEditModal
           getThemeClasses={getThemeClasses}

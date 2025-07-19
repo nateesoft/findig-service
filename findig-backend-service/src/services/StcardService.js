@@ -2,7 +2,8 @@ const { mappingResultData } = require("../utils/ConvertThai")
 const { getMoment } = require("../utils/MomentUtil")
 
 const getSTCard = async ({ payload, repository, db }) => {
-  const results = await repository.getData({payload, db })
+  const { branch_code } = payload
+  const results = await repository.getData({payload: { S_Bran: branch_code }, db })
   return mappingResultData(results)
 }
 
@@ -11,7 +12,7 @@ const processStock = async ({ payload, repository, db }) => {
   sale_items.forEach(async (item, index) => {
     const existing = await repository.findByBillNoPCode({
       payload: {
-        BranchCode: billInfo.branch_code,
+        S_Bran: billInfo.branch_code,
         S_No: billInfo.billno,
         S_PCode: item.barcode
       },
@@ -19,13 +20,12 @@ const processStock = async ({ payload, repository, db }) => {
     })
 
     const stcard = {
-      BranchCode: billInfo.branch_code,
+      S_Bran: billInfo.branch_code,
       S_Date: getMoment(item.create_date).format('YYYY-MM-DD HH:mm:ss'),
       S_No: billInfo.billno,
       S_SubNo: "",
       S_Que: (index + 1),
       S_PCode: item.barcode,
-      S_PName: item.product_name,
       S_Stk: item.stock_code,
       S_In: 0,
       S_Out: item.qty,
@@ -37,7 +37,7 @@ const processStock = async ({ payload, repository, db }) => {
       S_EntryDate: getMoment().format('YYYY-MM-DD'),
       S_EntryTime: getMoment().format('HH:mm:ss'),
       S_Link: "",
-      Source_Data: "MANUAL",
+      Source_Data: "WEB",
       Data_Sync: "N"
     }
 

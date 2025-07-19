@@ -19,9 +19,11 @@ import SessionIndicator from "./components/Common/SessionIndicator"
 import ProtectedRoute from "./components/Auth/ProtectedRoute"
 
 import Dashboard from "./pages/Dashboard"
-import Sales from "./pages/sale/Sales"
+
+import Sales from "./pages/sale"
 import StcardPage from "./pages/stcard"
 import StkfilePage from "./pages/stkfile"
+
 import UserGroups from "./pages/UserGroups"
 import Products from "./pages/Products"
 import Customers from "./pages/Customers"
@@ -156,8 +158,6 @@ const AppContent = () => {
       if (logoutTimer) clearTimeout(logoutTimer)
       if (countdownInterval) clearInterval(countdownInterval)
 
-      console.log('resetTimers')
-
       // setShowSessionWarning(false)
       setSessionCountdown(60)
 
@@ -185,7 +185,6 @@ const AppContent = () => {
     }
 
     const handleAutoLogout = () => {
-      console.log('handleAutoLogout:', user)
       if (warningTimer) clearTimeout(warningTimer)
       if (logoutTimer) clearTimeout(logoutTimer)
       if (countdownInterval) clearInterval(countdownInterval)
@@ -207,7 +206,6 @@ const AppContent = () => {
       if (showLogoutConfirm || showSessionWarning) return
       if (e.isTrusted === false) return
 
-      console.log("Activity detected:", e.type)
       const now = Date.now()
       setLastActivity(now)
       resetTimers()

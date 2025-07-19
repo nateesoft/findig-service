@@ -258,7 +258,6 @@ const CreateEditModal = ({
                     <Search className="w-4 h-4" />
                   </button>
 
-                  {/* Autocomplete Dropdown */}
                   {showAutocomplete && filteredProducts.length > 0 && (
                     <div
                       className={`w-full mt-1 ${getThemeClasses(

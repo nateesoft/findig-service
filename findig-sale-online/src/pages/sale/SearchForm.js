@@ -211,9 +211,8 @@ const SearchForm = ({
               )}`}
             >
               <option value="">ทุกสถานะ</option>
-              <option value="N">TEMP</option>
+              <option value="N">WAIT</option>
               <option value="Y">POSTED</option>
-              <option value="C">CANCELLED</option>
             </select>
           </div>
         </div>

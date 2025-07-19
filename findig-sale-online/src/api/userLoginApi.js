@@ -5,7 +5,6 @@ export const validateLogin = async (payload) => {
         const response = await apiClient.post(`/api/posuser/login`, payload)
         return { data: response.data, error: null }
     } catch (error) {
-        console.log('error=>', error)
         if (error.response) {
             return { data: null, error: error.response.data.message };
         } else if (error.request) {
@@ -40,7 +39,6 @@ export const loadStcardInfo = async (payload) => {
         const response = await apiClient.get(`/api/stcard?dbConfig=${dbConfig}`)
         return { data: response.data, error: null }
     } catch (error) {
-        console.log('error=>', error)
         if (error.response) {
             return { data: null, error: error.response.data.message };
         } else if (error.request) {

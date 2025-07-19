@@ -43,13 +43,13 @@ const SaleTable = ({
     let bValue = b[sortField];
     
     // จัดการกับข้อมูลวันที่
-    if (sortField === 'document_date') {
+    if (sortField === 'S_Date') {
       aValue = new Date(aValue);
       bValue = new Date(bValue);
     }
     
     // จัดการกับข้อมูลตัวเลข
-    if (sortField === 'total_item') {
+    if (sortField === 'S_Que') {
       aValue = Number(aValue);
       bValue = Number(bValue);
     }
@@ -173,11 +173,11 @@ const SaleTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('billno')}
+                onClick={() => handleSort('S_Bran')}
               >
                 <div className="flex items-center">
                   สาขา
-                  {getSortIcon('billno')}
+                  {getSortIcon('S_Bran')}
                 </div>
               </th>
               <th
@@ -188,11 +188,11 @@ const SaleTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('document_date')}
+                onClick={() => handleSort('S_Date')}
               >
                 <div className="flex items-center justify-center">
                   วันที่สร้าง
-                  {getSortIcon('document_date')}
+                  {getSortIcon('S_Date')}
                 </div>
               </th>
               <th
@@ -203,11 +203,11 @@ const SaleTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('total_item')}
+                onClick={() => handleSort('S_No')}
               >
                 <div className="flex items-center">
                   เลขที่บิล
-                  {getSortIcon('total_item')}
+                  {getSortIcon('S_No')}
                 </div>
               </th>
               <th
@@ -218,11 +218,11 @@ const SaleTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('emp_code')}
+                onClick={() => handleSort('S_PCode')}
               >
                 <div className="flex items-center">
                   สินค้า
-                  {getSortIcon('emp_code')}
+                  {getSortIcon('S_PCode')}
                 </div>
               </th>
               <th
@@ -233,11 +233,26 @@ const SaleTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('emp_code')}
+                onClick={() => handleSort('S_Que')}
+              >
+                <div className="flex items-center">
+                  จำนวน
+                  {getSortIcon('S_Que')}
+                </div>
+              </th>
+              <th
+                className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
+                  "textMuted",
+                  currentTheme
+                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
+                  "textPrimary",
+                  currentTheme
+                )} ${getThemeClasses("transition", currentTheme)}`}
+                onClick={() => handleSort('S_Stk')}
               >
                 <div className="flex items-center">
                   คลัง
-                  {getSortIcon('emp_code')}
+                  {getSortIcon('S_Stk')}
                 </div>
               </th>
               <th
@@ -248,11 +263,11 @@ const SaleTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('emp_code')}
+                onClick={() => handleSort('S_Rem')}
               >
                 <div className="flex items-center">
                   ประเภท
-                  {getSortIcon('emp_code')}
+                  {getSortIcon('S_Rem')}
                 </div>
               </th>
               <th
@@ -263,26 +278,11 @@ const SaleTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('branch_code')}
+                onClick={() => handleSort('Data_Sync')}
               >
                 <div className="flex items-center">
-                  Sync
-                  {getSortIcon('branch_code')}
-                </div>
-              </th>
-              <th
-                className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
-                  "textMuted",
-                  currentTheme
-                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
-                  "textPrimary",
-                  currentTheme
-                )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('post_status')}
-              >
-                <div className="flex items-center">
-                  สถานะ POST
-                  {getSortIcon('post_status')}
+                  Sync Data
+                  {getSortIcon('Data_Sync')}
                 </div>
               </th>
               <th
@@ -304,7 +304,7 @@ const SaleTable = ({
             {currentItems.length > 0 ? (
               currentItems.map((draft_sale) => (
                 <tr
-                  key={draft_sale.BranchCode}
+                  key={draft_sale.S_No}
                   className={getThemeClasses("tableRow", currentTheme)}
                 >
                   <td
@@ -313,7 +313,7 @@ const SaleTable = ({
                       currentTheme
                     )}`}
                   >
-                    {draft_sale.BranchCode}
+                    {draft_sale.S_Bran}
                   </td>
                   <td
                     className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
@@ -347,6 +347,14 @@ const SaleTable = ({
                       currentTheme
                     )}`}
                   >
+                    {draft_sale.S_Que}
+                  </td>
+                  <td
+                    className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
+                      "textPrimary",
+                      currentTheme
+                    )}`}
+                  >
                     {draft_sale.S_Stk}
                   </td>
                   <td
@@ -363,24 +371,16 @@ const SaleTable = ({
                       currentTheme
                     )}`}
                   >
-                    {draft_sale.Data_Sync}
-                  </td>
-                  <td
-                    className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
-                      "textPrimary",
-                      currentTheme
-                    )}`}
-                  >
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        draft_sale.post_status === "P"
+                        draft_sale.Data_Sync === "Y"
                           ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                          : draft_sale.post_status === "D"
+                          : draft_sale.Data_Sync === "N"
                           ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
                           : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
                       }`}
                     >
-                      {draft_sale.post_status}
+                      {draft_sale.Data_Sync}
                     </span>
                   </td>
                   <td
@@ -410,7 +410,7 @@ const SaleTable = ({
             ) : (
               <tr>
                 <td
-                  colSpan="7"
+                  colSpan="9"
                   className={`px-6 py-8 text-center text-sm ${getThemeClasses(
                     "textMuted",
                     currentTheme

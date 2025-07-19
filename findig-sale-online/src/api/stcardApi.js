@@ -7,7 +7,6 @@ export const loadStcardInfo = async (payload) => {
         const response = await apiClient.get(`/api/stcard?branchCode=${branchCode}&dbConfig=${dbConfig}`)
         return { data: response.data, error: null }
     } catch (error) {
-        console.log('error=>', error)
         if (error.response) {
             return { data: null, error: error.response.data.message };
         } else if (error.request) {
@@ -25,7 +24,6 @@ export const loadStcardViewDetail = async (payload) => {
         const response = await apiClient.get(`/api/stcard/${billNo}?dbConfig=${dbConfig}`)
         return { data: response.data, error: null }
     } catch (error) {
-        console.log('error=>', error)
         if (error.response) {
             return { data: null, error: error.response.data.message };
         } else if (error.request) {

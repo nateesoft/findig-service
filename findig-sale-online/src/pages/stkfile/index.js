@@ -8,22 +8,6 @@ import ReviewModal from './ReviewModal';
 import SearchForm from './SearchForm';
 import SaleTable from './SaleTable';
 
-// Mock data สำหรับสินค้า
-const mockProducts = [
-  { barcode: '1234567890123', name: 'เสื้อยืดสีขาว', stock: 'A1', price: 250, available: 50 },
-  { barcode: '1234567890124', name: 'เสื้อยืดสีดำ', stock: 'A1', price: 250, available: 30 },
-  { barcode: '1234567890125', name: 'กางเกงยีนส์', stock: 'A2', price: 890, available: 25 },
-  { barcode: '1234567890126', name: 'รองเท้าผ้าใบ', stock: 'B1', price: 1200, available: 20 },
-  { barcode: '1234567890127', name: 'กระเป๋าใส่เอกสาร', stock: 'A1', price: 350, available: 15 },
-  { barcode: '1234567890128', name: 'หูฟัง Bluetooth', stock: 'B1', price: 1500, available: 10 },
-  { barcode: '1234567890129', name: 'แก้วน้ำสแตนเลส', stock: 'A2', price: 180, available: 40 },
-  { barcode: '1234567890130', name: 'พาวเวอร์แบงค์', stock: 'B1', price: 890, available: 35 },
-  { barcode: '1234567890131', name: 'สายชาร์จ USB-C', stock: 'A1', price: 120, available: 60 },
-  { barcode: '1234567890132', name: 'เคสโทรศัพท์', stock: 'A2', price: 200, available: 45 },
-  { barcode: '1234567890133', name: 'ฟิล์มกันรอย', stock: 'B1', price: 80, available: 100 },
-  { barcode: '1234567890134', name: 'ที่วางโทรศัพท์', stock: 'A1', price: 150, available: 25 }
-];
-
 const Sales = () => {
   const { appData } = useContext(AppContext)
   const { currentTheme, db, userInfo } = appData
@@ -108,7 +92,6 @@ const Sales = () => {
     })
 
     if(data) {
-      console.log(data)
       setDraftSale(data)
     }else {
       alert(error);

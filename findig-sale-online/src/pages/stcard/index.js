@@ -8,25 +8,9 @@ import ReviewModal from './ReviewModal';
 import SearchForm from './SearchForm';
 import SaleTable from './SaleTable';
 
-// Mock data สำหรับสินค้า
-const mockProducts = [
-  { barcode: '1234567890123', name: 'เสื้อยืดสีขาว', stock: 'A1', price: 250, available: 50 },
-  { barcode: '1234567890124', name: 'เสื้อยืดสีดำ', stock: 'A1', price: 250, available: 30 },
-  { barcode: '1234567890125', name: 'กางเกงยีนส์', stock: 'A2', price: 890, available: 25 },
-  { barcode: '1234567890126', name: 'รองเท้าผ้าใบ', stock: 'B1', price: 1200, available: 20 },
-  { barcode: '1234567890127', name: 'กระเป๋าใส่เอกสาร', stock: 'A1', price: 350, available: 15 },
-  { barcode: '1234567890128', name: 'หูฟัง Bluetooth', stock: 'B1', price: 1500, available: 10 },
-  { barcode: '1234567890129', name: 'แก้วน้ำสแตนเลส', stock: 'A2', price: 180, available: 40 },
-  { barcode: '1234567890130', name: 'พาวเวอร์แบงค์', stock: 'B1', price: 890, available: 35 },
-  { barcode: '1234567890131', name: 'สายชาร์จ USB-C', stock: 'A1', price: 120, available: 60 },
-  { barcode: '1234567890132', name: 'เคสโทรศัพท์', stock: 'A2', price: 200, available: 45 },
-  { barcode: '1234567890133', name: 'ฟิล์มกันรอย', stock: 'B1', price: 80, available: 100 },
-  { barcode: '1234567890134', name: 'ที่วางโทรศัพท์', stock: 'A1', price: 150, available: 25 }
-];
-
 const Sales = () => {
   const { appData } = useContext(AppContext)
-  const { currentTheme, db, userInfo } = appData
+  const { currentTheme, db } = appData
 
   const [draftSale, setDraftSale] = useState([])
   const [filteredSales, setFilteredSales] = useState([])
@@ -39,17 +23,16 @@ const Sales = () => {
   
   // Search criteria state
   const [searchCriteria, setSearchCriteria] = useState({
-    billNo: '',
-    dateFrom: '',
-    dateTo: '',
-    branchCode: '',
-    empCode: '',
-    postStatus: ''
+    S_No: '',
+    S_Date_Start: '',
+    S_Date_End: '',
+    S_Bran: '',
+    S_User: '',
+    Data_Sync: '',
+    S_Stk: '',
+    S_PCode: ''
   });
 
-  // Product search states
-  const [productSearchTerm, setProductSearchTerm] = useState('');
-  const [filteredProducts, setFilteredProducts] = useState([]);
   const [showAutocomplete, setShowAutocomplete] = useState(false);
   const [selectedProductIndex, setSelectedProductIndex] = useState(-1);
   
@@ -62,30 +45,6 @@ const Sales = () => {
     stock: 'A1',
     qty: 0
   });
-
-  // ฟังก์ชันค้นหาสินค้า
-  const searchProducts = (term) => {
-    if (!term) return [];
-    const searchTerm = term.toLowerCase();
-    return mockProducts.filter(product => 
-      product.barcode.includes(searchTerm) || 
-      product.name.toLowerCase().includes(searchTerm)
-    ).slice(0, 10); // จำกัดผลลัพธ์ 10 รายการ
-  };
-
-  // Auto-complete logic
-  useEffect(() => {
-    if (productSearchTerm && productSearchTerm.length >= 2) {
-      const filtered = searchProducts(productSearchTerm);
-      setFilteredProducts(filtered);
-      setShowAutocomplete(filtered.length > 0);
-      setSelectedProductIndex(-1);
-    } else {
-      setFilteredProducts([]);
-      setShowAutocomplete(false);
-      setSelectedProductIndex(-1);
-    }
-  }, [productSearchTerm]);
 
   // ปิด autocomplete เมื่อคลิกข้างนอก
   useEffect(() => {
@@ -105,7 +64,6 @@ const Sales = () => {
     try {
       // สมมติว่ามี API สำหรับโหลดรายละเอียด
       const { data, error } = await loadStcardViewDetail({ billNo: billno });
-      
       if (data) {
         setCurrentSaleData(data);
         setModalMode('review');
@@ -131,48 +89,54 @@ const Sales = () => {
     }
   }
   
-  // ฟังก์ชันการค้นหา
   const handleSearch = () => {
     let filtered = [...draftSale];
 
-    // ค้นหาตามเลขที่ใบเสร็จ
-    if (searchCriteria.billNo.trim()) {
+    if (searchCriteria.S_No.trim()) {
       filtered = filtered.filter(item => 
-        item.billno.toLowerCase().includes(searchCriteria.billNo.toLowerCase())
+        item.S_No.toLowerCase().includes(searchCriteria.S_No.toLowerCase())
       );
     }
 
-    // ค้นหาตามช่วงวันที่
-    if (searchCriteria.dateFrom) {
+    if (searchCriteria.S_Date_Start) {
       filtered = filtered.filter(item => 
-        new Date(item.document_date) >= new Date(searchCriteria.dateFrom)
+        new Date(item.S_Date) >= new Date(searchCriteria.S_Date_Start)
       );
     }
 
-    if (searchCriteria.dateTo) {
+    if (searchCriteria.S_Date_End) {
       filtered = filtered.filter(item => 
-        new Date(item.document_date) <= new Date(searchCriteria.dateTo)
+        new Date(item.S_Date) <= new Date(searchCriteria.S_Date_End)
       );
     }
 
-    // ค้นหาตามสาขา
-    if (searchCriteria.branchCode) {
+    if (searchCriteria.S_Bran) {
       filtered = filtered.filter(item => 
-        item.branch_code === searchCriteria.branchCode
+        item.S_Bran === searchCriteria.S_Bran
       );
     }
 
-    // ค้นหาตามพนักงาน
-    if (searchCriteria.empCode.trim()) {
+    if (searchCriteria.S_User.trim()) {
       filtered = filtered.filter(item => 
-        item.emp_code.toLowerCase().includes(searchCriteria.empCode.toLowerCase())
+        item.S_User.toLowerCase().includes(searchCriteria.S_User.toLowerCase())
       );
     }
 
-    // ค้นหาตามสถานะ POST
-    if (searchCriteria.postStatus) {
+    if (searchCriteria.Data_Sync) {
       filtered = filtered.filter(item => 
-        item.post_status === searchCriteria.postStatus
+        item.Data_Sync === searchCriteria.Data_Sync
+      );
+    }
+
+    if (searchCriteria.S_Stk) {
+      filtered = filtered.filter(item => 
+        item.S_Stk === searchCriteria.S_Stk
+      );
+    }
+
+    if (searchCriteria.S_PCode) {
+      filtered = filtered.filter(item => 
+        item.S_PCode === searchCriteria.S_PCode
       );
     }
 
@@ -182,12 +146,14 @@ const Sales = () => {
   // ล้างการค้นหา
   const resetSearch = () => {
     setSearchCriteria({
-      billNo: '',
-      dateFrom: '',
-      dateTo: '',
-      branchCode: '',
-      empCode: '',
-      postStatus: ''
+      S_No: '',
+      S_Date_Start: '',
+      S_Date_End: '',
+      S_Bran: '',
+      S_User: '',
+      Data_Sync: '',
+      S_Stk: '',
+      S_PCode: ''
     });
     setFilteredSales(draftSale);
   };

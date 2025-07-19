@@ -6,7 +6,6 @@ export const loadAllProduct = async () => {
         const response = await apiClient.get(`/api/draftsale?dbConfig=${dbConfig}&branchCode=${dbConfig}`)
         return { data: response.data, error: null }
     } catch (error) {
-        console.log('error=>', error)
         if (error.response) {
             return { data: null, error: error.response.data.message };
         } else if (error.request) {

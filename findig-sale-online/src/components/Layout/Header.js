@@ -15,7 +15,6 @@ const Header = ({
   const handleMobileMenuClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log('Mobile menu button clicked');
     setSidebarOpen(true);
   };
 

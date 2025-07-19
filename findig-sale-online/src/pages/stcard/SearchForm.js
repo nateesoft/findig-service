@@ -45,7 +45,7 @@ const SearchForm = ({
                 currentTheme
               )}`}
             >
-              ค้นหาข้อมูลการขาย
+              ค้นหาข้อมูล
             </h3>
             <p
               className={`text-sm ${getThemeClasses(
@@ -69,22 +69,21 @@ const SearchForm = ({
               )} mb-2`}
             >
               <FileText className="w-4 h-4 inline mr-2" />
-              เลขที่ใบเสร็จ
+              เลขที่บิล
             </label>
             <input
               type="text"
-              value={searchCriteria.billNo}
+              value={searchCriteria.S_No}
               onChange={(e) =>
-                setSearchCriteria({ ...searchCriteria, billNo: e.target.value })
+                setSearchCriteria({ ...searchCriteria, S_No: e.target.value })
               }
               className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
                 "input",
                 currentTheme
               )}`}
-              placeholder="ค้นหาเลขที่ใบเสร็จ"
+              placeholder="ค้นหาเลขที่บิล"
             />
           </div>
-
           <div>
             <label
               className={`block text-sm font-medium ${getThemeClasses(
@@ -97,11 +96,11 @@ const SearchForm = ({
             </label>
             <input
               type="date"
-              value={searchCriteria.dateFrom}
+              value={searchCriteria.S_Date_Start}
               onChange={(e) =>
                 setSearchCriteria({
                   ...searchCriteria,
-                  dateFrom: e.target.value
+                  S_Date_Start: e.target.value
                 })
               }
               className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
@@ -110,7 +109,6 @@ const SearchForm = ({
               )}`}
             />
           </div>
-
           <div>
             <label
               className={`block text-sm font-medium ${getThemeClasses(
@@ -123,9 +121,9 @@ const SearchForm = ({
             </label>
             <input
               type="date"
-              value={searchCriteria.dateTo}
+              value={searchCriteria.S_Date_End}
               onChange={(e) =>
-                setSearchCriteria({ ...searchCriteria, dateTo: e.target.value })
+                setSearchCriteria({ ...searchCriteria, S_Date_End: e.target.value })
               }
               className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
                 "input",
@@ -133,7 +131,6 @@ const SearchForm = ({
               )}`}
             />
           </div>
-
           <div>
             <label
               className={`block text-sm font-medium ${getThemeClasses(
@@ -144,11 +141,11 @@ const SearchForm = ({
               รหัสสาขา
             </label>
             <select
-              value={searchCriteria.branchCode}
+              value={searchCriteria.S_Bran}
               onChange={(e) =>
                 setSearchCriteria({
                   ...searchCriteria,
-                  branchCode: e.target.value
+                  S_Bran: e.target.value
                 })
               }
               className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
@@ -161,7 +158,6 @@ const SearchForm = ({
               <option value="002">002 - สาขาทดสอบระบบ</option>
             </select>
           </div>
-
           <div>
             <label
               className={`block text-sm font-medium ${getThemeClasses(
@@ -173,11 +169,11 @@ const SearchForm = ({
             </label>
             <input
               type="text"
-              value={searchCriteria.empCode}
+              value={searchCriteria.S_User}
               onChange={(e) =>
                 setSearchCriteria({
                   ...searchCriteria,
-                  empCode: e.target.value
+                  S_User: e.target.value
                 })
               }
               className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
@@ -187,7 +183,6 @@ const SearchForm = ({
               placeholder="ค้นหารหัสพนักงาน"
             />
           </div>
-
           <div>
             <label
               className={`block text-sm font-medium ${getThemeClasses(
@@ -195,14 +190,14 @@ const SearchForm = ({
                 currentTheme
               )} mb-2`}
             >
-              สถานะ POST
+              Sync Data
             </label>
             <select
-              value={searchCriteria.postStatus}
+              value={searchCriteria.Data_Sync}
               onChange={(e) =>
                 setSearchCriteria({
                   ...searchCriteria,
-                  postStatus: e.target.value
+                  Data_Sync: e.target.value
                 })
               }
               className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
@@ -211,10 +206,60 @@ const SearchForm = ({
               )}`}
             >
               <option value="">ทุกสถานะ</option>
-              <option value="N">TEMP</option>
-              <option value="Y">POSTED</option>
-              <option value="C">CANCELLED</option>
+              <option value="N">WAIT</option>
+              <option value="Y">SUCCESS</option>
             </select>
+          </div>
+          <div>
+            <label
+              className={`block text-sm font-medium ${getThemeClasses(
+                "textSecondary",
+                currentTheme
+              )} mb-2`}
+            >
+              คลังสินค้า
+            </label>
+            <select
+              value={searchCriteria.S_Stk}
+              onChange={(e) =>
+                setSearchCriteria({
+                  ...searchCriteria,
+                  S_Stk: e.target.value
+                })
+              }
+              className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
+                "input",
+                currentTheme
+              )}`}
+            >
+              <option value="">ทุกคลัง</option>
+              <option value="A1">คลังสินค้าหลัก</option>
+            </select>
+          </div>
+          <div>
+            <label
+              className={`block text-sm font-medium ${getThemeClasses(
+                "textSecondary",
+                currentTheme
+              )} mb-2`}
+            >
+              รหัสสินค้า
+            </label>
+            <input
+              type="text"
+              value={searchCriteria.S_PCode}
+              onChange={(e) =>
+                setSearchCriteria({
+                  ...searchCriteria,
+                  S_PCode: e.target.value
+                })
+              }
+              className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
+                "input",
+                currentTheme
+              )}`}
+              placeholder="ค้นหารหัสสินค้า"
+            />
           </div>
         </div>
 
