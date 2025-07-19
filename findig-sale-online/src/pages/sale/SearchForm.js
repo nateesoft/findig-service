@@ -157,8 +157,8 @@ const SearchForm = ({
               )}`}
             >
               <option value="">ทุกสาขา</option>
-              <option value="001">001 - สำนักงานใหญ่ ICS</option>
-              <option value="002">002 - สาขาทดสอบระบบ</option>
+              <option value="909">909 - สำนักงานใหญ่ ICS</option>
+              <option value="TST">TST - สาขาทดสอบระบบ</option>
             </select>
           </div>
 

@@ -367,22 +367,24 @@ const SaleTable = ({
                       >
                         <Eye className="w-4 h-4" />
                       </button>
-                      <button
-                        onClick={() => handleEditSale(draft_sale.id)}
-                        className={`p-2 rounded-lg ${getThemeClasses(
-                          "textMuted",
-                          currentTheme
-                        )} hover:${getThemeClasses(
-                          "textSecondary",
-                          currentTheme
-                        )} ${getThemeClasses(
-                          "transition",
-                          currentTheme
-                        )} hover:bg-yellow-50 dark:hover:bg-yellow-900`}
-                        title="แก้ไข"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
+                      {draft_sale.post_status !== "Y" && 
+                        <button
+                          onClick={() => handleEditSale(draft_sale.id)}
+                          className={`p-2 rounded-lg ${getThemeClasses(
+                            "textMuted",
+                            currentTheme
+                          )} hover:${getThemeClasses(
+                            "textSecondary",
+                            currentTheme
+                          )} ${getThemeClasses(
+                            "transition",
+                            currentTheme
+                          )} hover:bg-yellow-50 dark:hover:bg-yellow-900`}
+                          title="แก้ไข"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                      }
                     </div>
                   </td>
                 </tr>

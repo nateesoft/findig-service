@@ -1,7 +1,7 @@
 module.exports = [
   {
-    code: '001',
-    name: 'สาขาทดสอบระบบ 001',
+    code: '909',
+    name: 'Stock Realtime 909',
     driver: 'mysql',
     databases: {
       pos: {
@@ -28,8 +28,8 @@ module.exports = [
     }
   },
   {
-    code: '002',
-    name: 'สาขาทดสอบระบบ 002',
+    code: 'TST',
+    name: 'TEST Stock Realtime',
     driver: 'mysql2',
     databases: {
       pos: {
