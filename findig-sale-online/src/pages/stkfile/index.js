@@ -10,7 +10,7 @@ import SaleTable from './SaleTable';
 
 const Sales = () => {
   const { appData } = useContext(AppContext)
-  const { currentTheme, db, userInfo } = appData
+  const { currentTheme, db } = appData
 
   const [draftSale, setDraftSale] = useState([])
   const [filteredSales, setFilteredSales] = useState([])
@@ -23,36 +23,18 @@ const Sales = () => {
   
   // Search criteria state
   const [searchCriteria, setSearchCriteria] = useState({
-    billNo: '',
-    dateFrom: '',
-    dateTo: '',
-    branchCode: '',
-    empCode: '',
-    postStatus: ''
+    Branch: '',
+    BPCode: '',
+    BStk: '',
+    SendToPOS: ''
   });
 
   // Product search states
-  const [productSearchTerm, setProductSearchTerm] = useState('');
-  const [filteredProducts, setFilteredProducts] = useState([]);
   const [showAutocomplete, setShowAutocomplete] = useState(false);
   const [selectedProductIndex, setSelectedProductIndex] = useState(-1);
   
   // Refs
   const autocompleteRef = useRef(null);
-  
-  const [saleHeader, setSaleHeader] = useState({
-    branchCode: '',
-    billNo: '',
-    empCode: userInfo.UserName,
-    createDate: new Date().toISOString().split('T')[0]
-  });
-
-  const [currentItem, setCurrentItem] = useState({
-    barcode: '',
-    productName: '',
-    stock: 'A1',
-    qty: 0
-  });
 
   // ปิด autocomplete เมื่อคลิกข้างนอก
   useEffect(() => {
@@ -67,12 +49,9 @@ const Sales = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // ฟังก์ชันสำหรับ Review ข้อมูลการขาย
   const handleReviewSale = async (productCode) => {
     try {
-      // สมมติว่ามี API สำหรับโหลดรายละเอียด
       const { data, error } = await loadStfileViewDetail({ productCode });
-      
       if (data) {
         setCurrentSaleData(data);
         setModalMode('review');
@@ -98,48 +77,30 @@ const Sales = () => {
     }
   }
   
-  // ฟังก์ชันการค้นหา
   const handleSearch = () => {
     let filtered = [...draftSale];
 
-    // ค้นหาตามเลขที่ใบเสร็จ
-    if (searchCriteria.billNo.trim()) {
+    if (searchCriteria.Branch.trim()) {
       filtered = filtered.filter(item => 
-        item.billno.toLowerCase().includes(searchCriteria.billNo.toLowerCase())
+        item.Branch.toLowerCase().includes(searchCriteria.Branch.toLowerCase())
       );
     }
 
-    // ค้นหาตามช่วงวันที่
-    if (searchCriteria.dateFrom) {
+    if (searchCriteria.BPCode) {
       filtered = filtered.filter(item => 
-        new Date(item.document_date) >= new Date(searchCriteria.dateFrom)
+        item.BPCode === searchCriteria.BPCode
       );
     }
 
-    if (searchCriteria.dateTo) {
+    if (searchCriteria.BStk.trim()) {
       filtered = filtered.filter(item => 
-        new Date(item.document_date) <= new Date(searchCriteria.dateTo)
+        item.BStk.toLowerCase().includes(searchCriteria.BStk.toLowerCase())
       );
     }
 
-    // ค้นหาตามสาขา
-    if (searchCriteria.branchCode) {
+    if (searchCriteria.SendToPOS) {
       filtered = filtered.filter(item => 
-        item.branch_code === searchCriteria.branchCode
-      );
-    }
-
-    // ค้นหาตามพนักงาน
-    if (searchCriteria.empCode.trim()) {
-      filtered = filtered.filter(item => 
-        item.emp_code.toLowerCase().includes(searchCriteria.empCode.toLowerCase())
-      );
-    }
-
-    // ค้นหาตามสถานะ POST
-    if (searchCriteria.postStatus) {
-      filtered = filtered.filter(item => 
-        item.post_status === searchCriteria.postStatus
+        item.SendToPOS === searchCriteria.SendToPOS
       );
     }
 
@@ -149,12 +110,10 @@ const Sales = () => {
   // ล้างการค้นหา
   const resetSearch = () => {
     setSearchCriteria({
-      billNo: '',
-      dateFrom: '',
-      dateTo: '',
-      branchCode: '',
-      empCode: '',
-      postStatus: ''
+      Branch: '',
+      BPCode: '',
+      BStk: '',
+      SendToPOS: ''
     });
     setFilteredSales(draftSale);
   };
@@ -181,7 +140,7 @@ const Sales = () => {
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [showSaleModal, showReviewModal, showPostModal, currentItem]);
+  }, [showSaleModal, showReviewModal, showPostModal]);
 
   return (
     <div className="space-y-6">

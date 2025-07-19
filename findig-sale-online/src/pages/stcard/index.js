@@ -94,7 +94,7 @@ const Sales = () => {
 
     if (searchCriteria.S_No.trim()) {
       filtered = filtered.filter(item => 
-        item.S_No.toLowerCase().includes(searchCriteria.S_No.toLowerCase())
+        (item.S_No || '').toString().toLowerCase().includes(searchCriteria.S_No.toLowerCase().trim())
       );
     }
 
@@ -197,7 +197,6 @@ const Sales = () => {
         </div>
       </div>
 
-      {/* Search Form */}
       {showSearchForm && (
         <SearchForm
           getThemeClasses={getThemeClasses}
@@ -211,7 +210,6 @@ const Sales = () => {
         />
       )}
 
-      {/* Sales Table */}
       <SaleTable
         getThemeClasses={getThemeClasses}
         currentTheme={currentTheme}
@@ -221,7 +219,6 @@ const Sales = () => {
         resetSearch={resetSearch}
       />
 
-      {/* Review Modal */}
       {showReviewModal && currentSaleData && (
         <ReviewModal 
           getThemeClasses={getThemeClasses}

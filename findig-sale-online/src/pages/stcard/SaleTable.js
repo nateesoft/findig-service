@@ -302,9 +302,9 @@ const SaleTable = ({
             )} divide-y ${getThemeClasses("tableBorder", currentTheme)}`}
           >
             {currentItems.length > 0 ? (
-              currentItems.map((draft_sale) => (
+              currentItems.map((draft_sale, index) => (
                 <tr
-                  key={draft_sale.S_No}
+                  key={draft_sale.S_No + (index+1)}
                   className={getThemeClasses("tableRow", currentTheme)}
                 >
                   <td

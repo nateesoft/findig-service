@@ -1,6 +1,4 @@
 import {
-  Calendar,
-  FileText,
   Search,
   Filter,
   RefreshCw
@@ -68,87 +66,14 @@ const SearchForm = ({
                 currentTheme
               )} mb-2`}
             >
-              <FileText className="w-4 h-4 inline mr-2" />
-              เลขที่ใบเสร็จ
-            </label>
-            <input
-              type="text"
-              value={searchCriteria.billNo}
-              onChange={(e) =>
-                setSearchCriteria({ ...searchCriteria, billNo: e.target.value })
-              }
-              className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
-                "input",
-                currentTheme
-              )}`}
-              placeholder="ค้นหาเลขที่ใบเสร็จ"
-            />
-          </div>
-
-          <div>
-            <label
-              className={`block text-sm font-medium ${getThemeClasses(
-                "textSecondary",
-                currentTheme
-              )} mb-2`}
-            >
-              <Calendar className="w-4 h-4 inline mr-2" />
-              วันที่เริ่มต้น
-            </label>
-            <input
-              type="date"
-              value={searchCriteria.dateFrom}
-              onChange={(e) =>
-                setSearchCriteria({
-                  ...searchCriteria,
-                  dateFrom: e.target.value
-                })
-              }
-              className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
-                "input",
-                currentTheme
-              )}`}
-            />
-          </div>
-
-          <div>
-            <label
-              className={`block text-sm font-medium ${getThemeClasses(
-                "textSecondary",
-                currentTheme
-              )} mb-2`}
-            >
-              <Calendar className="w-4 h-4 inline mr-2" />
-              วันที่สิ้นสุด
-            </label>
-            <input
-              type="date"
-              value={searchCriteria.dateTo}
-              onChange={(e) =>
-                setSearchCriteria({ ...searchCriteria, dateTo: e.target.value })
-              }
-              className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
-                "input",
-                currentTheme
-              )}`}
-            />
-          </div>
-
-          <div>
-            <label
-              className={`block text-sm font-medium ${getThemeClasses(
-                "textSecondary",
-                currentTheme
-              )} mb-2`}
-            >
               รหัสสาขา
             </label>
             <select
-              value={searchCriteria.branchCode}
+              value={searchCriteria.Branch}
               onChange={(e) =>
                 setSearchCriteria({
                   ...searchCriteria,
-                  branchCode: e.target.value
+                  Branch: e.target.value
                 })
               }
               className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
@@ -169,22 +94,22 @@ const SearchForm = ({
                 currentTheme
               )} mb-2`}
             >
-              รหัสพนักงาน
+              รหัสสินค้า
             </label>
             <input
               type="text"
-              value={searchCriteria.empCode}
+              value={searchCriteria.BPCode}
               onChange={(e) =>
                 setSearchCriteria({
                   ...searchCriteria,
-                  empCode: e.target.value
+                  BPCode: e.target.value
                 })
               }
               className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
                 "input",
                 currentTheme
               )}`}
-              placeholder="ค้นหารหัสพนักงาน"
+              placeholder="ค้นหารหัสสินค้า"
             />
           </div>
 
@@ -195,14 +120,40 @@ const SearchForm = ({
                 currentTheme
               )} mb-2`}
             >
-              สถานะ POST
+              คลังสินค้า
             </label>
             <select
-              value={searchCriteria.postStatus}
+              value={searchCriteria.BStk}
               onChange={(e) =>
                 setSearchCriteria({
                   ...searchCriteria,
-                  postStatus: e.target.value
+                  BStk: e.target.value
+                })
+              }
+              className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
+                "input",
+                currentTheme
+              )}`}
+            >
+              <option value="">ทุกคลัง</option>
+              <option value="A1">คลังสินค้าหลัก</option>
+            </select>
+          </div>
+          <div>
+            <label
+              className={`block text-sm font-medium ${getThemeClasses(
+                "textSecondary",
+                currentTheme
+              )} mb-2`}
+            >
+              Sync Data
+            </label>
+            <select
+              value={searchCriteria.SendToPOS}
+              onChange={(e) =>
+                setSearchCriteria({
+                  ...searchCriteria,
+                  SendToPOS: e.target.value
                 })
               }
               className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
@@ -211,9 +162,8 @@ const SearchForm = ({
               )}`}
             >
               <option value="">ทุกสถานะ</option>
-              <option value="N">TEMP</option>
-              <option value="Y">POSTED</option>
-              <option value="C">CANCELLED</option>
+              <option value="N">WAIT</option>
+              <option value="Y">SUCCESS</option>
             </select>
           </div>
         </div>

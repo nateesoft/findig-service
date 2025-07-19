@@ -175,7 +175,7 @@ const SaleTable = ({
                 onClick={() => handleSort('Branch')}
               >
                 <div className="flex items-center">
-                  รหัสสาขา
+                  สาขา
                   {getSortIcon('Branch')}
                 </div>
               </th>
@@ -190,7 +190,7 @@ const SaleTable = ({
                 onClick={() => handleSort('BPCode')}
               >
                 <div className="flex items-center justify-center">
-                  รหัสสินค้า
+                  สินค้า
                   {getSortIcon('BPCode')}
                 </div>
               </th>
@@ -205,7 +205,7 @@ const SaleTable = ({
                 onClick={() => handleSort('BStk')}
               >
                 <div className="flex items-center">
-                  คลังสินค้า
+                  คลัง
                   {getSortIcon('BStk')}
                 </div>
               </th>
