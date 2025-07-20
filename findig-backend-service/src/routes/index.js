@@ -25,6 +25,7 @@ router.post('/api/posuser/login', PosUserController.validateLogin);
 router.patch('/api/posuser/logout', PosUserController.processLogout);
 
 router.get('/api/draftsale', DraftSaleController.getData)
+router.get('/api/draftsale/dashboard', DraftSaleController.getDataForDashboard)
 router.get('/api/draftsale/:id', DraftSaleController.getDataById)
 router.post('/api/draftsale', DraftSaleController.saveData)
 router.put('/api/draftsale/:id', DraftSaleController.updateData)

@@ -10,6 +10,11 @@ const getData = async ({ payload, repository, db }) => {
   return mappingResultData(results)
 }
 
+const getDataForDashboard = async ({ payload, repository, db }) => {
+  const results = await repository.getDataForDashboard({ payload, db })
+  return mappingResultData(results)
+}
+
 const getDataById = async ({ payload, repository, db }) => {
   const results = await repository.getDataById({ payload, db })
   if(results.length > 0) {
@@ -101,5 +106,6 @@ module.exports = {
   getDataById,
   saveData,
   updateData,
-  deleteData
+  deleteData,
+  getDataForDashboard
 }

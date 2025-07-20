@@ -5,6 +5,8 @@ import { loadPosUserAll } from '../api/userLoginApi';
 
 const UserGroups = ({ currentTheme }) => {
   const [userList, setUserList] = useState([])
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage] = useState(10) // จำนวนรายการต่อหน้า
 
   const initLoadAllUser = async () => {
     try {
@@ -23,11 +25,62 @@ const UserGroups = ({ currentTheme }) => {
     initLoadAllUser()
   }, [])
 
+  // คำนวณข้อมูลสำหรับหน้าปัจจุบัน
+  const indexOfLastItem = currentPage * itemsPerPage
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage
+  const currentUsers = userList.slice(indexOfFirstItem, indexOfLastItem)
+
+  // คำนวณจำนวนหน้าทั้งหมด
+  const totalPages = Math.ceil(userList.length / itemsPerPage)
+
+  // ฟังก์ชันเปลี่ยนหน้า
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber)
+  }
+
+  // ฟังก์ชันไปหน้าก่อนหน้า
+  const handlePrevious = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1)
+    }
+  }
+
+  // ฟังก์ชันไปหน้าถัดไป
+  const handleNext = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1)
+    }
+  }
+
+  // สร้างอาร์เรย์ของหมายเลขหน้า
+  const getPageNumbers = () => {
+    const pageNumbers = []
+    const maxPagesToShow = 5
+    let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2))
+    let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1)
+
+    if (endPage - startPage + 1 < maxPagesToShow) {
+      startPage = Math.max(1, endPage - maxPagesToShow + 1)
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(i)
+    }
+    return pageNumbers
+  }
+
   return (
     <div className="space-y-6">
       <div className={`${getThemeClasses('cardBg', currentTheme)} rounded-lg shadow-sm border ${getThemeClasses('cardBorder', currentTheme)}`}>
         <div className={`p-6 border-b ${getThemeClasses('cardBorder', currentTheme)}`}>
-          <h3 className={`text-lg font-semibold ${getThemeClasses('textPrimary', currentTheme)}`}>รายชื่อผู้ใช้งานในระบบ</h3>
+          <div className="flex justify-between items-center">
+            <h3 className={`text-lg font-semibold ${getThemeClasses('textPrimary', currentTheme)}`}>
+              รายชื่อผู้ใช้งานในระบบ
+            </h3>
+            <div className={`text-sm ${getThemeClasses('textMuted', currentTheme)}`}>
+              ทั้งหมด {userList.length} รายการ
+            </div>
+          </div>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -48,8 +101,8 @@ const UserGroups = ({ currentTheme }) => {
               </tr>
             </thead>
             <tbody className={`${getThemeClasses('cardBg', currentTheme)} divide-y ${getThemeClasses('tableBorder', currentTheme)}`}>
-              {userList && userList.map((user) => 
-                <tr className={getThemeClasses('tableRow', currentTheme)}>
+              {currentUsers && currentUsers.map((user, index) => 
+                <tr key={index} className={getThemeClasses('tableRow', currentTheme)}>
                   <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${getThemeClasses('textPrimary', currentTheme)}`}>
                     {user.UserName}
                   </td>
@@ -71,6 +124,62 @@ const UserGroups = ({ currentTheme }) => {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className={`px-6 py-3 border-t ${getThemeClasses('cardBorder', currentTheme)}`}>
+            <div className="flex items-center justify-between">
+              {/* ข้อมูลการแสดงผล */}
+              <div className={`text-sm ${getThemeClasses('textMuted', currentTheme)}`}>
+                แสดง {indexOfFirstItem + 1} - {Math.min(indexOfLastItem, userList.length)} จาก {userList.length} รายการ
+              </div>
+              
+              {/* ปุ่ม Pagination */}
+              <div className="flex items-center space-x-2">
+                {/* ปุ่มย้อนกลับ */}
+                <button
+                  onClick={handlePrevious}
+                  disabled={currentPage === 1}
+                  className={`px-3 py-1 rounded-md text-sm ${
+                    currentPage === 1
+                      ? `${getThemeClasses('textMuted', currentTheme)} cursor-not-allowed`
+                      : `${getThemeClasses('textPrimary', currentTheme)} hover:${getThemeClasses('cardBg', currentTheme)} border ${getThemeClasses('cardBorder', currentTheme)}`
+                  }`}
+                >
+                  ก่อนหน้า
+                </button>
+
+                {/* หมายเลขหน้า */}
+                {getPageNumbers().map((pageNumber) => (
+                  <button
+                    key={pageNumber}
+                    onClick={() => handlePageChange(pageNumber)}
+                    className={`px-3 py-1 rounded-md text-sm ${
+                      currentPage === pageNumber
+                        ? `bg-blue-500 text-white`
+                        : `${getThemeClasses('textPrimary', currentTheme)} hover:${getThemeClasses('cardBg', currentTheme)} border ${getThemeClasses('cardBorder', currentTheme)}`
+                    }`}
+                  >
+                    {pageNumber}
+                  </button>
+                ))}
+
+                {/* ปุ่มถัดไป */}
+                <button
+                  onClick={handleNext}
+                  disabled={currentPage === totalPages}
+                  className={`px-3 py-1 rounded-md text-sm ${
+                    currentPage === totalPages
+                      ? `${getThemeClasses('textMuted', currentTheme)} cursor-not-allowed`
+                      : `${getThemeClasses('textPrimary', currentTheme)} hover:${getThemeClasses('cardBg', currentTheme)} border ${getThemeClasses('cardBorder', currentTheme)}`
+                  }`}
+                >
+                  ถัดไป
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

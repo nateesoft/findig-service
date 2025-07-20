@@ -16,6 +16,22 @@ export const loadDraftSaleInfo = async (payload) => {
     }
 }
 
+export const loadDraftSaleDashboard = async (payload) => {
+    const dbConfig = localStorage.getItem('db') || ''
+    try {
+        const response = await apiClient.get(`/api/draftsale/dashboard?dbConfig=${dbConfig}&branchCode=${dbConfig}`)
+        return { data: response.data, error: null }
+    } catch (error) {
+        if (error.response) {
+            return { data: null, error: error.response.data.message };
+        } else if (error.request) {
+            return { data: null, error: "Network error. Please try again." };
+        } else {
+            return { data: null, error: error.message };
+        }
+    }
+}
+
 export const loadDraftSaleById = async (payload) => {
     const dbConfig = localStorage.getItem('db') || ''
     try {

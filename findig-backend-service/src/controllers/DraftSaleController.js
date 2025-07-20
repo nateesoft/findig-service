@@ -19,6 +19,22 @@ const getData = async (req, res, next) => {
   }
 }
 
+const getDataForDashboard = async (req, res, next) => {
+  try {
+    const { branchCode } = req.query
+    const dataInfo = await DraftSaleService.getDataForDashboard({
+      payload: {
+        branch_code: branchCode
+      },
+      repository: DraftSaleRepository,
+      db: req.db
+    })
+    res.json(dataInfo)
+  } catch (error) {
+    next(error)
+  }
+}
+
 const getDataById = async (req, res, next) => {
   try {
     const { id } = req.params
@@ -112,5 +128,6 @@ module.exports = {
   saveData,
   updateData,
   deleteData,
-  processStockFromSale
+  processStockFromSale,
+  getDataForDashboard
 }
