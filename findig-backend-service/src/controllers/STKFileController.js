@@ -1,4 +1,4 @@
-const STKFileService = require("../services/STKFileService")
+const STKFileService = require("../services/StkfileService")
 const StkfileRepository = require("../repository/StkfileRepository")
 
 const getAllSTKFile = async (req, res, next) => {

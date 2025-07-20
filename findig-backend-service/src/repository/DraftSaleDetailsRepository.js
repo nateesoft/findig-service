@@ -20,23 +20,25 @@ const getDataByBillNo = async ({ payload, db }) => {
 
 const saveData = async ({ payload, db }) => {
   const { id, billno, create_date, barcode, product_name, stock_code, qty, 
-        update_date, emp_code, emp_code_update } = payload
+        update_date, emp_code, emp_code_update, can_stock, can_set } = payload
   const sql = `INSERT INTO draft_sale_details
-            (id, billno, create_date, barcode, product_name, stock_code, qty, update_date, emp_code, emp_code_update)
-            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
+            (id, billno, create_date, barcode, product_name, stock_code, qty, update_date, 
+            emp_code, emp_code_update, can_stock, can_set)
+            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
   const results = await db.pos?.query(sql, 
     [id, billno, create_date, barcode, product_name, stock_code, qty, 
-      update_date, emp_code, emp_code_update])
+      update_date, emp_code, emp_code_update, can_stock, can_set])
   return results
 }
 
 const updateData = async ({ payload, db }) => {
   const { id, stock_code, qty, update_date, emp_code_update } = payload
   const sql = `UPDATE draft_sale_details
-              SET stock_code=?, qty=?, update_date=?, emp_code_update=? 
+              SET stock_code=?, qty=?, update_date=?, emp_code_update=?,
+              can_stock=?, can_set=? 
               WHERE id=?`
   const results = await db.pos?.query(sql, 
-    [stock_code, qty, update_date, emp_code_update, id])
+    [stock_code, qty, update_date, emp_code_update, can_stock, can_set, id])
   return results
 }
 

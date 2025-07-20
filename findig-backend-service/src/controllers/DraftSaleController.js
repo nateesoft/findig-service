@@ -1,6 +1,8 @@
 const DraftSaleService = require("../services/DraftSaleService")
 const DraftSaleRepository = require("../repository/DraftSaleRepository")
 
+const StockProcessService = require('../services/StockProcessService')
+
 const getData = async (req, res, next) => {
   try {
     const { branchCode } = req.query
@@ -93,7 +95,7 @@ const deleteData = async (req, res, next) => {
 const processStockFromSale = async (req, res, next) => {
   try {
     const { saleInfo } = req.body
-    const dataInfo = await DraftSaleService.processStockFromSale({
+    const dataInfo = await StockProcessService.processStockFromSale({
       payload: { ...saleInfo },
       repository: DraftSaleRepository,
       db: req.db

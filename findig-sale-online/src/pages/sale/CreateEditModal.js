@@ -325,7 +325,7 @@ const CreateEditModal = ({
                     currentTheme
                   )}`}
                 >
-                  <option value="">เลือกคลังสินค้า</option>
+                  <option value=""></option>
                   <option value="A1">คลังสินค้าหลัก</option>
                 </select>
               </div>

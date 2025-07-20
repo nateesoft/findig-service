@@ -9,7 +9,7 @@ const getSTCard = async ({ payload, repository, db }) => {
 
 const processStock = async ({ payload, repository, db }) => {
   const { billInfo, sale_items } = payload
-  sale_items.forEach(async (item, index) => {
+  for (const [index, item] of sale_items.entries()) {
     const existing = await repository.findByBillNoPCode({
       payload: {
         S_Bran: billInfo.branch_code,
@@ -46,7 +46,7 @@ const processStock = async ({ payload, repository, db }) => {
     } else {
       await repository.createStcard({ payload: { ...stcard }, db })
     }
-  })
+  }
 
   return true
 }
