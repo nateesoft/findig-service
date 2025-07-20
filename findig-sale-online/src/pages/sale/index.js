@@ -14,8 +14,6 @@ import CreateEditModal from './CreateEditModal'
 import SearchForm from './SearchForm';
 import SaleTable from './SaleTable';
 
-import { mockPosProducts } from '../../data/mockData';
-
 const Sales = () => {
   const { appData } = useContext(AppContext)
   const { currentTheme, db, userInfo } = appData
@@ -47,6 +45,8 @@ const Sales = () => {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [showAutocomplete, setShowAutocomplete] = useState(false);
   const [selectedProductIndex, setSelectedProductIndex] = useState(-1);
+
+  const [productList, setProductList] = useState([])
   
   const barcodeInputRef = useRef(null);
   const autocompleteRef = useRef(null);
@@ -62,8 +62,10 @@ const Sales = () => {
   const [currentItem, setCurrentItem] = useState({
     barcode: '',
     productName: '',
-    stock: 'A1',
-    qty: 0
+    stock: '',
+    qty: 0,
+    canStock: null,
+    canSet: null
   });
 
   const [saleItems, setSaleItems] = useState([]);
@@ -71,9 +73,9 @@ const Sales = () => {
   const searchProducts = (term) => {
     if (!term) return [];
     const searchTerm = term.toLowerCase();
-    return mockPosProducts.filter(product => 
-      product.barcode.includes(searchTerm) || 
-      product.name.toLowerCase().includes(searchTerm)
+    return productList.filter(product => 
+      product.PCode.toLowerCase().includes(searchTerm) || 
+      product.PDesc.toLowerCase().includes(searchTerm)
     ).slice(0, 10); // จำกัดผลลัพธ์ 10 รายการ
   };
 
@@ -131,19 +133,19 @@ const Sales = () => {
 
   const selectProduct = (product) => {
     setCurrentItem({
-      barcode: product.barcode,
-      productName: product.name,
+      barcode: product.PCode,
+      productName: product.PDesc,
       stock: product.stock,
-      qty: 1
+      qty: product.qty,
+      canStock: product.PStock,
+      canSet: product.PSet
     });
-    setProductSearchTerm(product.barcode);
-    setShowAutocomplete(false);
+    setProductSearchTerm(product.PCode);
     setSelectedProductIndex(-1);
     
     setTimeout(() => {
-      const qtyInput = document.querySelector('input[type="number"]');
-      if (qtyInput) qtyInput.focus();
-    }, 100);
+      setShowAutocomplete(false);
+    }, 50);
   };
 
   const handleBarcodeChange = (e) => {
@@ -151,13 +153,13 @@ const Sales = () => {
     setCurrentItem({...currentItem, barcode: value});
     setProductSearchTerm(value);
     
-    const exactMatch = mockPosProducts.find(product => product.barcode === value);
+    const exactMatch = productList.find(product => product.barcode === value);
     if (exactMatch) {
       setCurrentItem({
-        barcode: exactMatch.barcode,
-        productName: exactMatch.name,
-        stock: exactMatch.stock,
-        qty: 1
+        barcode: exactMatch.PCode,
+        productName: exactMatch.PDesc,
+        canStock: exactMatch.PStock,
+        canSet: exactMatch.PSet
       });
       setShowAutocomplete(false);
     }
@@ -173,19 +175,24 @@ const Sales = () => {
     setCurrentItem({
       barcode: '',
       productName: '',
-      stock: 'A1',
-      qty: 0
+      stock: '',
+      qty: 0,
+      canStock: null,
+      canSet: null
     });
     setSaleItems([]);
     setCurrentSaleData(null);
+    setProductSearchTerm('');
   };
 
   const resetCurrentItem = () => {
     setCurrentItem({
       barcode: '',
       productName: '',
-      stock: 'A1',
-      qty: 0
+      stock: '',
+      qty: 0,
+      canStock: null,
+      canSet: null
     });
   };
 
@@ -194,11 +201,10 @@ const Sales = () => {
       alert('กรุณากรอกข้อมูลสินค้าให้ครบถ้วน');
       return;
     }
-
     const newItem = {
-      id: Date.now(), // simple ID generation
+      id: Date.now(),
       ...currentItem,
-      total: currentItem.qty // คำนวณยอดรวมได้ตามต้องการ
+      total: currentItem.qty
     };
 
     setSaleItems(prev => [...prev, newItem]);
@@ -217,7 +223,9 @@ const Sales = () => {
         barcode: itemToEdit.barcode,
         productName: itemToEdit.productName,
         stock: itemToEdit.stock,
-        qty: itemToEdit.qty
+        qty: itemToEdit.qty || 0,
+        canStock: itemToEdit.canStock,
+        canSet: itemToEdit.canSet
       });
       removeItemFromSale(itemId);
     }
@@ -227,7 +235,7 @@ const Sales = () => {
     try {
       const { data, error } = await loadAllProduct();
       if (data) {
-        
+        setProductList(data)
       } else {
         alert(error || 'ไม่สามารถโหลดข้อมูลได้');
       }
@@ -578,7 +586,7 @@ const Sales = () => {
         <CreateEditModal
           getThemeClasses={getThemeClasses}
           currentTheme={currentTheme}
-          modsle={modalMode}
+          modalMode={modalMode}
           saleHeader={saleHeader}
           setSaleHeader={setSaleHeader}
           saleItems={saleItems}

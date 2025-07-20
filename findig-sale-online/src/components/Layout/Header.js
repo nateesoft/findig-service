@@ -4,12 +4,8 @@ import { Menu } from 'lucide-react';
 import { getThemeClasses, themes } from '../../utils/themes';
 import { AppContext } from '../../contexts';
 
-const Header = ({ 
-  currentTheme, 
-  setSidebarOpen, 
-  getThemeClasses: getClasses 
-}) => {
-  const { appData, setAppData } = useContext(AppContext)
+const Header = ({ currentTheme, setSidebarOpen}) => {
+  const { setAppData } = useContext(AppContext)
   const [showMobileThemes, setShowMobileThemes] = useState(false);
   
   const handleMobileMenuClick = (e) => {
@@ -19,7 +15,10 @@ const Header = ({
   };
 
   const handleMobileThemeSelect = (themeKey) => {
-    setAppData({ ...appData, currentTheme: themeKey })
+    setAppData(prevData => ({
+      ...prevData,
+      currentTheme: themeKey
+    }))
     setShowMobileThemes(false);
   };
   

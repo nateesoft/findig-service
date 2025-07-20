@@ -67,7 +67,6 @@ const AppLayout = ({
         <Header
           currentTheme={currentTheme}
           setSidebarOpen={setSidebarOpen}
-          getThemeClasses={getThemeClasses}
         />
 
         <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 lg:p-6">
@@ -189,7 +188,10 @@ const AppContent = () => {
       if (logoutTimer) clearTimeout(logoutTimer)
       if (countdownInterval) clearInterval(countdownInterval)
 
-      setAppData({ ...appData, userInfo: null })
+      setAppData(prevData => ({
+        ...prevData,
+        userInfo: null
+      }))
       localStorage.setItem('userInfo', null)
       setUser(null);
       navigate("/login")
@@ -249,7 +251,11 @@ const AppContent = () => {
   }
 
   const handleLogout = () => {
-    setAppData({ ...appData, userInfo: null })
+    setAppData(prevData => ({
+      ...prevData,
+      userInfo: null
+    }))
+
     localStorage.setItem('userInfo', null)
 
     setUser(null);

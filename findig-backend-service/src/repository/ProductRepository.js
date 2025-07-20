@@ -1,5 +1,5 @@
 const listAll = async ({ db }) => {
-  const sql = `SELECT * FROM product`
+  const sql = `SELECT PCode, PDesc, PStock, PSet FROM product`
   const results = await db.pos?.query(sql)
   return results
 };

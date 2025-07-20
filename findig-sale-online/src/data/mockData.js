@@ -212,16 +212,16 @@ export const mockBranchInfo = {
 
 // Mock Products Data
 export const mockPosProducts = [
-  { barcode: '1234567890123', name: 'เสื้อยืดสีขาว', stock: 'A1', price: 250, available: 50 },
-  { barcode: '1234567890124', name: 'เสื้อยืดสีดำ', stock: 'A1', price: 250, available: 30 },
-  { barcode: '1234567890125', name: 'กางเกงยีนส์', stock: 'A2', price: 890, available: 25 },
-  { barcode: '1234567890126', name: 'รองเท้าผ้าใบ', stock: 'B1', price: 1200, available: 20 },
-  { barcode: '1234567890127', name: 'กระเป๋าใส่เอกสาร', stock: 'A1', price: 350, available: 15 },
-  { barcode: '1234567890128', name: 'หูฟัง Bluetooth', stock: 'B1', price: 1500, available: 10 },
-  { barcode: '1234567890129', name: 'แก้วน้ำสแตนเลส', stock: 'A2', price: 180, available: 40 },
-  { barcode: '1234567890130', name: 'พาวเวอร์แบงค์', stock: 'B1', price: 890, available: 35 },
-  { barcode: '1234567890131', name: 'สายชาร์จ USB-C', stock: 'A1', price: 120, available: 60 },
-  { barcode: '1234567890132', name: 'เคสโทรศัพท์', stock: 'A2', price: 200, available: 45 },
-  { barcode: '1234567890133', name: 'ฟิล์มกันรอย', stock: 'B1', price: 80, available: 100 },
-  { barcode: '1234567890134', name: 'ที่วางโทรศัพท์', stock: 'A1', price: 150, available: 25 }
+  { barcode: '123', name: 'เสื้อยืดสีขาว', stock: '', price: 250, available: 50 },
+  { barcode: '124', name: 'เสื้อยืดสีดำ', stock: '', price: 250, available: 30 },
+  { barcode: '125', name: 'กางเกงยีนส์', stock: '', price: 890, available: 25 },
+  { barcode: '126', name: 'รองเท้าผ้าใบ', stock: '', price: 1200, available: 20 },
+  { barcode: '127', name: 'กระเป๋าใส่เอกสาร', stock: '', price: 350, available: 15 },
+  { barcode: '128', name: 'หูฟัง Bluetooth', stock: '', price: 1500, available: 10 },
+  { barcode: '129', name: 'แก้วน้ำสแตนเลส', stock: '', price: 180, available: 40 },
+  { barcode: '130', name: 'พาวเวอร์แบงค์', stock: '', price: 890, available: 35 },
+  { barcode: '131', name: 'สายชาร์จ USB-C', stock: '', price: 120, available: 60 },
+  { barcode: '132', name: 'เคสโทรศัพท์', stock: '', price: 200, available: 45 },
+  { barcode: '133', name: 'ฟิล์มกันรอย', stock: '', price: 80, available: 100 },
+  { barcode: '134', name: 'ที่วางโทรศัพท์', stock: '', price: 150, available: 25 }
 ];

@@ -5,7 +5,6 @@ import {
   Calendar,
   FileText,
   Trash2,
-  ShoppingCart,
   Search} from 'lucide-react';
 
 const CreateEditModal = ({
@@ -46,7 +45,6 @@ const CreateEditModal = ({
         )} transform animate-scale-in`}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Modal Header */}
         <div
           className={`sticky top-0 ${getThemeClasses(
             "cardBg",
@@ -122,14 +120,6 @@ const CreateEditModal = ({
               currentTheme === "dark" ? "border-blue-700" : "border-blue-200"
             }`}
           >
-            <h4
-              className={`text-lg font-semibold mb-4 ${getThemeClasses(
-                "textPrimary",
-                currentTheme
-              )}`}
-            >
-              ข้อมูลหัวเอกสาร
-            </h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label
@@ -211,15 +201,6 @@ const CreateEditModal = ({
               currentTheme
             )} border ${getThemeClasses("cardBorder", currentTheme)}`}
           >
-            <h4
-              className={`text-lg font-semibold mb-4 ${getThemeClasses(
-                "textPrimary",
-                currentTheme
-              )} flex items-center`}
-            >
-              <ShoppingCart className="w-5 h-5 mr-2" />
-              เพิ่มรายการสินค้า
-            </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="relative">
                 <label
@@ -269,7 +250,7 @@ const CreateEditModal = ({
                     >
                       {filteredProducts.map((product, index) => (
                         <div
-                          key={product.barcode}
+                          key={product.PCode}
                           onClick={() => selectProduct(product)}
                           className={`p-3 cursor-pointer ${getThemeClasses(
                             "transition",
@@ -277,7 +258,7 @@ const CreateEditModal = ({
                           )} ${
                             index === selectedProductIndex
                               ? "bg-blue-50 dark:bg-blue-900 dark:bg-opacity-20"
-                              : "hover:bg-gray-50 dark:hover:bg-gray-700"
+                              : "hover:bg-gray-200 dark:hover:bg-gray-200"
                           }`}
                         >
                           <div className="flex items-center justify-between">
@@ -288,33 +269,7 @@ const CreateEditModal = ({
                                   currentTheme
                                 )}`}
                               >
-                                {product.name}
-                              </p>
-                              <p
-                                className={`text-sm ${getThemeClasses(
-                                  "textSecondary",
-                                  currentTheme
-                                )}`}
-                              >
-                                {product.barcode}
-                              </p>
-                            </div>
-                            <div className="text-right">
-                              <p
-                                className={`text-sm ${getThemeClasses(
-                                  "textSecondary",
-                                  currentTheme
-                                )}`}
-                              >
-                                คลัง: {product.stock}
-                              </p>
-                              <p
-                                className={`text-sm ${getThemeClasses(
-                                  "textSecondary",
-                                  currentTheme
-                                )}`}
-                              >
-                                คงเหลือ: {product.available}
+                                {product.PCode} - {product.PDesc}
                               </p>
                             </div>
                           </div>
@@ -370,9 +325,8 @@ const CreateEditModal = ({
                     currentTheme
                   )}`}
                 >
-                  <option value="A1">A1</option>
-                  <option value="A2">A2</option>
-                  <option value="B1">B1</option>
+                  <option value="">เลือกคลังสินค้า</option>
+                  <option value="A1">คลังสินค้าหลัก</option>
                 </select>
               </div>
 
@@ -389,7 +343,7 @@ const CreateEditModal = ({
                   <input
                     type="number"
                     min="0"
-                    step="0.01"
+                    step="1"
                     value={currentItem.qty}
                     onChange={(e) =>
                       setCurrentItem({
@@ -408,6 +362,7 @@ const CreateEditModal = ({
                     disabled={
                       !currentItem.barcode ||
                       !currentItem.productName ||
+                      !currentItem.stock ||
                       currentItem.qty <= 0
                     }
                     className={`px-4 py-2 text-white rounded-lg font-medium ${getThemeClasses(
@@ -663,25 +618,8 @@ const CreateEditModal = ({
               ) : (
                 <Plus className="w-4 h-4 mr-2" />
               )}
-              {modalMode === "edit" ? "อัปเดตข้อมูล" : "ยืนยันข้อมูล"} (
-              {saleItems.length} รายการ)
+              {modalMode === "edit" ? "อัปเดตข้อมูล" : "ยืนยันข้อมูล"}
             </button>
-          </div>
-
-          <div
-            className={`mt-4 text-xs ${getThemeClasses(
-              "textMuted",
-              currentTheme
-            )} text-center p-2 rounded ${
-              currentTheme === "dark" ? "bg-gray-800" : "bg-gray-50"
-            }`}
-          >
-            <div className="flex items-center justify-center space-x-4">
-              <span>💡 เคล็ดลับ:</span>
-              <span>กด Ctrl+Enter เพื่อเพิ่มรายการเร็ว</span>
-              <span>•</span>
-              <span>กด Esc เพื่อยกเลิก</span>
-            </div>
           </div>
         </div>
       </div>

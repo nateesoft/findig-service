@@ -3,7 +3,7 @@ import apiClient from "../httpRequest";
 export const loadAllProduct = async () => {
     const dbConfig = localStorage.getItem('db') || ''
     try {
-        const response = await apiClient.get(`/api/draftsale?dbConfig=${dbConfig}&branchCode=${dbConfig}`)
+        const response = await apiClient.get(`/api/product?dbConfig=${dbConfig}`)
         return { data: response.data, error: null }
     } catch (error) {
         if (error.response) {

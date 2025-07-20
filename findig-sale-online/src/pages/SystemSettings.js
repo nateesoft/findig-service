@@ -11,7 +11,10 @@ const SystemSettings = ({ currentTheme, setCurrentTheme }) => {
   });
 
   const handleThemeChange = (newTheme) => {
-    setAppData({...appData, currentTheme: newTheme });
+    setAppData(prevData => ({
+      ...prevData,
+      currentTheme: newTheme
+    }))
     setSettings({...settings, theme: newTheme});
   };
 

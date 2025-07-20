@@ -28,7 +28,12 @@ const LoginPage = ( { onLogin, setUser }) => {
     if(userInfo) {
       localStorage.setItem('userInfo', JSON.stringify(userInfo))
       localStorage.setItem('db', loginData.branchCode)
-      setAppData({ ...appData, userInfo})
+
+      setAppData(prevData => ({
+        ...prevData,
+        userInfo: userInfo,
+        db: loginData.branchCode
+      }))
 
       setUser({
         id: 1,

@@ -1,4 +1,4 @@
-const { ASCII2Unicode, Unicode2ASCII } = require('./StringUtil')
+const { ASCII2Unicode } = require('./StringUtil')
 
 const mappingResultData = (result) => {
     const fields = Array.from(new Set(result.flatMap(obj => Object.keys(obj))));

@@ -52,7 +52,7 @@ const POSTModal = ({ currentTheme, postStatus, filteredSales, currentProcessingI
                       วันที่ประมวลผล
                     </h4>
                     <p className={`text-sm ${getThemeClasses('textSecondary', currentTheme)}`}>
-                      {moment().format('วันddddที่ D MMMM YYYY เวลา HH:mm:ss')}
+                      {moment().format('DD/MM/YYYY HH:mm:ss')}
                     </p>
                   </div>
                 </div>
