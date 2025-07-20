@@ -12,6 +12,7 @@ const DraftSaleController = require('../controllers/DraftSaleController')
 const DraftSaleDetailsController = require('../controllers/DraftSaleDetailsController')
 
 router.get('/api/branch', BranchController.getBranchData);
+router.get('/api/branch/:branchCode', BranchController.getBranchByCode);
 
 router.get('/api/stcard', STCardController.getAllSTCard);
 router.post('/api/stcard', STCardController.processStock);
@@ -19,6 +20,7 @@ router.post('/api/stcard', STCardController.processStock);
 router.get('/api/stkfile', STKFileController.getAllSTKFile);
 router.post('/api/stkfile', STKFileController.processStock);
 
+router.get('/api/posuser', PosUserController.getAllUser);
 router.post('/api/posuser/login', PosUserController.validateLogin);
 router.patch('/api/posuser/logout', PosUserController.processLogout);
 

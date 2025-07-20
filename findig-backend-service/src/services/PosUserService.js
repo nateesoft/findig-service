@@ -15,7 +15,13 @@ const processLogout = async ({ payload, repository, db }) => {
   return result.affectedRows > 0
 }
 
+const getAllUser = async ({ payload, repository, db }) => {
+  const results = await repository.listAllUser({ db })
+  return mappingResultData(results)
+};
+
 module.exports = {
     checkLogin,
-    processLogout
+    processLogout,
+    getAllUser
 }

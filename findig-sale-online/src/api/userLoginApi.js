@@ -33,10 +33,10 @@ export const sendToLogout = async (payload) => {
     }
 }
 
-export const loadStcardInfo = async (payload) => {
+export const loadPosUserAll = async (payload) => {
     const dbConfig = localStorage.getItem('db') || ''
     try {
-        const response = await apiClient.get(`/api/stcard?dbConfig=${dbConfig}`)
+        const response = await apiClient.get(`/api/posuser?dbConfig=${dbConfig}`)
         return { data: response.data, error: null }
     } catch (error) {
         if (error.response) {
@@ -48,3 +48,4 @@ export const loadStcardInfo = async (payload) => {
         }
     }
 }
+

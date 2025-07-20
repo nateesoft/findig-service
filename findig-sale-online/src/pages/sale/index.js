@@ -241,7 +241,6 @@ const Sales = () => {
       }
     } catch (error) {
       alert('เกิดข้อผิดพลาดในการโหลดข้อมูล');
-      console.error('Error loading sale detail:', error);
     }
   };
 

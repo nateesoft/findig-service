@@ -12,7 +12,15 @@ const updateUserLogout = async ({ payload, db }) => {
   return resultUpdate
 }
 
+const listAllUser = async ({ db }) => {
+  const sql = `SELECT * FROM posuser`
+  const results = await db.pos?.query(sql)
+  return results
+};
+
+
 module.exports = {
     checkLogin,
-    updateUserLogout
+    updateUserLogout,
+    listAllUser
 }

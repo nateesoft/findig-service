@@ -33,7 +33,21 @@ const processLogout = async (req, res, next) => {
   }
 }
 
+const getAllUser = async (req, res, next) => {
+  try {
+    const result = await PosUserService.getAllUser({
+      payload: {},
+      repository: PosUserRepository,
+      db: req.db
+    })
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   validateLogin,
-  processLogout
+  processLogout,
+  getAllUser
 }

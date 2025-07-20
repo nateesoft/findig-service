@@ -18,14 +18,6 @@ export const MENU_GROUPS = [
     ]
   },
   {
-    id: 'reports',
-    label: 'กลุ่มเมนูรายงานต่างๆ',
-    items: [
-      { id: 'sales-report', label: 'รายงานการขาย', page: 'reports' },
-      { id: 'inventory-report', label: 'รายงานสินค้าคงคลัง', page: 'inventory-report' }
-    ]
-  },
-  {
     id: 'settings',
     label: 'ตั้งค่าระบบ',
     items: [

@@ -5,21 +5,13 @@ const listAll = async ({ db }) => {
 };
 
 const findByCode = async ({ payload, db }) => {
-  const { Code } = payload
+  const { code } = payload
   const sql = `SELECT * FROM branch where Code = ?`
-  const results = await db.pos?.query(sql, [Code])
-  return results
-};
-
-const createData = async ({ payload, db }) => {
-  const { Code } = payload
-  const sql = `SELECT * FROM branch where Code = ?`
-  const results = await db.pos?.query(sql, [Code])
+  const results = await db.pos?.query(sql, [code])
   return results
 };
 
 module.exports = {
   listAll,
-  findByCode,
-  createData
+  findByCode
 }
