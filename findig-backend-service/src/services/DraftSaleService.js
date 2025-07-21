@@ -27,6 +27,7 @@ const getDataById = async ({ payload, repository, db }) => {
     const list2 = mappingResultData(resultDetails)
 
     const itemHeaders = list1.map(item => ({
+      ...item,
       billNo: item.billno,
       empCode: item.emp_code,
       empName: item.emp_name,
@@ -39,10 +40,18 @@ const getDataById = async ({ payload, repository, db }) => {
       updateDate: item.update_date
     }))
     const itemDetails = list2.map(item => ({
+      id: item.id,
+      billNo: item.billno,
+      createDate: item.create_date,
       barcode: item.barcode,
       productName: item.product_name,
       stock: item.stock_code,
-      qty: item.qty
+      qty: item.qty,
+      updateData: item.update_date,
+      empCode: item.emp_code,
+      empCodeUpdate: item.emp_code_update,
+      canStock: item.can_stock,
+      canSet: item.can_set
     }))
 
     return {
@@ -88,11 +97,40 @@ const saveData = async ({ payload, repository, db }) => {
 }
 
 const updateData = async ({ payload, repository, db }) => {
+  const { saleItems, billno, totalItem, empCode } = payload
   const mappingPayload = {
     ...payload,
+    total_item: totalItem,
+    emp_code_update: empCode,
     update_date: getMoment().format('YYYY-MM-DD HH:mm:ss')
   }
   const results = await repository.updateData({ payload: mappingPayload, db })
+  if(results) {
+    // delete old sale details
+    await DraftSaleDetailsService.deleteDataByBillNo({
+      payload: { billno },
+      repository: DraftSaleDetailsRepository,
+      db
+    })
+    // save new draft sale details
+    for (const sale of saleItems) {
+      await DraftSaleDetailsService.saveData({
+        payload: {
+          billno: billno, 
+          barcode: sale.barcode, 
+          product_name: sale.productName, 
+          stock_code: sale.stock, 
+          qty: sale.qty, 
+          emp_code: empCode,
+          emp_code_update: empCode,
+          can_stock: sale.canStock,
+          can_set: sale.canSet
+        },
+        repository: DraftSaleDetailsRepository,
+        db
+      })
+    };
+  }
   return results
 }
 

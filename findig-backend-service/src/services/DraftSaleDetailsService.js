@@ -46,11 +46,17 @@ const deleteData = async ({ payload, repository, db }) => {
   return results
 }
 
+const deleteDataByBillNo = async ({ payload, repository, db }) => {
+  const results = await repository.deleteDataByBillNo({ payload, db })
+  return results
+}
+
 module.exports = {
   getData,
   getDataById,
   saveData,
   updateData,
   deleteData,
-  getSaleDetailsByBillNo
+  getSaleDetailsByBillNo,
+  deleteDataByBillNo
 }

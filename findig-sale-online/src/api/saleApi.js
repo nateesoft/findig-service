@@ -68,7 +68,7 @@ export const createDraftSaleInfo = async (payload) => {
 export const updateDraftSaleInfo = async (payload) => {
     const dbConfig = localStorage.getItem('db') || ''
     try {
-        const response = await apiClient.put(`/api/draftsale_detail`, {...payload, dbConfig})
+        const response = await apiClient.put(`/api/draftsale/${payload.id}`, {...payload, dbConfig})
         return { data: response.data, error: null }
     } catch (error) {
         if (error.response) {

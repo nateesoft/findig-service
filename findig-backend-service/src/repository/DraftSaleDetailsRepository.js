@@ -49,11 +49,19 @@ const deleteData = async ({ payload, db }) => {
   return results
 }
 
+const deleteDataByBillNo = async ({ payload, db }) => {
+  const { billno } = payload
+  const sql = `DELETE FROM draft_sale_details WHERE billno=?`
+  const results = await db.pos?.query(sql, [billno])
+  return results
+}
+
 module.exports = {
   getData,
   getDataById,
   saveData,
   updateData,
   deleteData,
-  getDataByBillNo
+  getDataByBillNo,
+  deleteDataByBillNo
 }

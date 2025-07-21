@@ -219,14 +219,7 @@ const Sales = () => {
   const editSaleItem = (itemId) => {
     const itemToEdit = saleItems.find(item => item.id === itemId);
     if (itemToEdit) {
-      setCurrentItem({
-        barcode: itemToEdit.barcode,
-        productName: itemToEdit.productName,
-        stock: itemToEdit.stock,
-        qty: itemToEdit.qty || 0,
-        canStock: itemToEdit.canStock,
-        canSet: itemToEdit.canSet
-      });
+      setCurrentItem({ ...itemToEdit});
       removeItemFromSale(itemId);
     }
   };
@@ -267,9 +260,9 @@ const Sales = () => {
       
       if (data) {
         setSaleHeader({
+          ...data,
+          emp_code_update: userInfo.UserName,
           branchCode: db,
-          billNo: data.billNo || '',
-          empCode: data.empCode || '',
           createDate: data.createDate || new Date().toISOString().split('T')[0]
         });
         
@@ -301,12 +294,9 @@ const Sales = () => {
 
     try {
       let result;
-      
       if (modalMode === 'edit') {
         result = await updateDraftSaleInfo({
-          branchCode: saleHeader.branchCode, 
-          billNo: saleHeader.billNo, 
-          empCode: saleHeader.empCode, 
+          ...saleHeader,
           totalItem: totalQty,
           saleItems
         });
@@ -323,13 +313,6 @@ const Sales = () => {
       const { data, error } = result;
 
       if(data) {
-        const actionText = modalMode === 'edit' ? 'อัปเดต' : 'บันทึก';
-        // alert(`${actionText}ใบขายเรียบร้อย!\n` +
-        //       `เลขที่: ${saleHeader.billNo}\n` +
-        //       `วันที่: ${saleHeader.createDate}\n` +
-        //       `สาขาทำรายการ: ${saleHeader.branchCode}\n` +
-        //       `จำนวนรายการ: ${saleItems.length} รายการ\n` +
-        //       `จำนวนสินค้ารวม: ${totalQty} ชิ้น`);
         initLoadData();
       } else {
         alert(error);

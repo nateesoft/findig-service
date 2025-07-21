@@ -72,17 +72,8 @@ const saveData = async (req, res, next) => {
 
 const updateData = async (req, res, next) => {
   try {
-    const { id } = req.params
-    const { branchCode, billNo, empCode, totalItem, postStatus } = req.body
     const dataInfo = await DraftSaleService.updateData({
-      payload: {
-        billno: billNo,
-        branch_code: branchCode,
-        emp_code_update: empCode,
-        total_item: totalItem,
-        post_status: postStatus,
-        id
-      },
+      payload: { ...req.body },
       repository: DraftSaleRepository,
       db: req.db
     })
