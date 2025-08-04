@@ -584,7 +584,6 @@ const AppContent = () => {
   )
 }
 
-// ปรับปรุง initContext ให้ handle การ parse userInfo จาก localStorage ได้ดีขึ้น
 const getInitialUserInfo = () => {
   const stored = localStorage.getItem("userInfo")
   if (!stored || stored === 'null' || stored === 'undefined') {
@@ -599,7 +598,7 @@ const getInitialUserInfo = () => {
 }
 
 const initContext = {
-  db: localStorage.getItem('db') || '',
+  branchCode: localStorage.getItem('branchCode') || '',
   userInfo: getInitialUserInfo(),
   currentTheme: localStorage.getItem("currentTheme") || "sunset"
 }

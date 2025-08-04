@@ -2,8 +2,11 @@ import { useEffect, useState } from 'react';
 
 import { getThemeClasses } from '../utils/themes';
 import { loadPosUserAll } from '../api/userLoginApi';
+import { Modal } from '../components/Modals';
 
 const UserGroups = ({ currentTheme }) => {
+  const [activeModal, setActiveModal] = useState(null);
+
   const [userList, setUserList] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage] = useState(10) // จำนวนรายการต่อหน้า
@@ -14,10 +17,30 @@ const UserGroups = ({ currentTheme }) => {
       if(data) {
         setUserList(data)
       }else{
-        alert(error || 'ไม่สามารถโหลดข้อมูลได้')
+        setActiveModal({
+          type: 'error',
+          title: 'ไม่สามารถแสดงข้อมูลได้',
+          message: error || 'กรุณาลองใหม่อีกครั้ง',
+          actions: [
+            {
+              label: 'ตกลง',
+              onClick: () => setActiveModal(null)
+            }
+          ]
+        });
       }
     } catch (error) {
-      alert('เกิดข้อผิดพลาดในการโหลดข้อมูล');
+      setActiveModal({
+        type: 'error',
+        title: 'ไม่สามารถแสดงข้อมูลได้',
+        message: error || 'กรุณาลองใหม่อีกครั้ง',
+        actions: [
+          {
+            label: 'ตกลง',
+            onClick: () => setActiveModal(null)
+          }
+        ]
+      });
     }
   }
 
@@ -181,6 +204,22 @@ const UserGroups = ({ currentTheme }) => {
           </div>
         )}
       </div>
+
+      {activeModal && (
+        <Modal
+          isOpen={!!activeModal}
+          onClose={() => setActiveModal(null)}
+          type={activeModal.type}
+          title={activeModal.title}
+          message={activeModal.message}
+          confirmText={activeModal.confirmText}
+          cancelText={activeModal.cancelText}
+          showCancel={activeModal.showCancel}
+          onConfirm={() => {
+            setActiveModal(null)
+          }}
+        />
+      )}
     </div>
   );
 };

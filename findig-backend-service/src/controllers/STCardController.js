@@ -3,11 +3,23 @@ const StcardRepository = require("../repository/StcardRepository")
 
 const getAllSTCard = async (req, res, next) => {
   try {
-    const { branchCode } = req.query
-    const stcardInfo = await StcardService.getSTCard({
-      payload: { branch_code: branchCode },
+    const stcardInfo = await StcardService.getAllSTCard({
       repository: StcardRepository,
       db: req.db
+    })
+    res.json(stcardInfo)
+  } catch (error) {
+    next(error)
+  }
+}
+
+const getAllSTCardByCode = async (req, res, next) => {
+  const { branchCode } = req.params
+  try {
+    const stcardInfo = await StcardService.getSTCard({
+      repository: StcardRepository,
+      db: req.db,
+      branchCode
     })
     res.json(stcardInfo)
   } catch (error) {
@@ -30,5 +42,6 @@ const processStock = async (req, res, next) => {
 
 module.exports = {
   getAllSTCard,
-  processStock
+  processStock,
+  getAllSTCardByCode
 }

@@ -7,10 +7,13 @@ import { loadStcardInfo, loadStcardViewDetail } from '../../api/stcardApi';
 import ReviewModal from './ReviewModal';
 import SearchForm from './SearchForm';
 import SaleTable from './SaleTable';
+import { Modal } from '../../components/Modals';
 
 const Sales = () => {
+  const [activeModal, setActiveModal] = useState(null);
+
   const { appData } = useContext(AppContext)
-  const { currentTheme, db } = appData
+  const { currentTheme, branchCode } = appData
 
   const [draftSale, setDraftSale] = useState([])
   const [filteredSales, setFilteredSales] = useState([])
@@ -69,23 +72,52 @@ const Sales = () => {
         setModalMode('review');
         setShowReviewModal(true);
       } else {
-        alert(error || 'ไม่สามารถโหลดข้อมูลได้');
+        setActiveModal({
+          type: 'error',
+          title: 'ไม่สามารถแสดงข้อมูลได้',
+          message: error || 'กรุณาลองใหม่อีกครั้ง',
+          actions: [
+            {
+              label: 'ตกลง',
+              onClick: () => setActiveModal(null)
+            }
+          ]
+        });
       }
     } catch (error) {
-      alert('เกิดข้อผิดพลาดในการโหลดข้อมูล');
-      console.error('Error loading sale detail:', error);
+      setActiveModal({
+        type: 'error',
+        title: 'ไม่สามารถแสดงข้อมูลได้',
+        message: error || 'เกิดข้อผิดพลาดในการโหลดข้อมูล',
+        actions: [
+          {
+            label: 'ตกลง',
+            onClick: () => setActiveModal(null)
+          }
+        ]
+      });
     }
   };
 
   const initLoadData = async () => {
     const { data, error } = await loadStcardInfo({
-      branchCode: db
+      branchCode: branchCode
     })
 
     if(data) {
       setDraftSale(data)
     }else {
-      alert(error);
+      setActiveModal({
+        type: 'error',
+        title: 'ไม่สามารถแสดงข้อมูลได้',
+        message: error || 'กรุณาลองใหม่อีกครั้ง',
+        actions: [
+          {
+            label: 'ตกลง',
+            onClick: () => setActiveModal(null)
+          }
+        ]
+      });
     }
   }
   
@@ -225,6 +257,22 @@ const Sales = () => {
           currentTheme={currentTheme}
           currentSaleData={currentSaleData}
           setShowReviewModal={setShowReviewModal}
+        />
+      )}
+
+      {activeModal && (
+        <Modal
+          isOpen={!!activeModal}
+          onClose={() => setActiveModal(null)}
+          type={activeModal.type}
+          title={activeModal.title}
+          message={activeModal.message}
+          confirmText={activeModal.confirmText}
+          cancelText={activeModal.cancelText}
+          showCancel={activeModal.showCancel}
+          onConfirm={() => {
+            setActiveModal(null)
+          }}
         />
       )}
     </div>

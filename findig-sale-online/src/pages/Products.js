@@ -3,8 +3,11 @@ import { Plus, Search, Edit, Trash2, X } from 'lucide-react';
 
 import { getThemeClasses } from '../utils/themes';
 import { mockProducts } from '../data/mockData';
+import { Modal } from '../components/Modals';
 
 const Products = ({ currentTheme, searchTerm, setSearchTerm }) => {
+  const [activeModal, setActiveModal] = useState(null);
+
   const [showAddModal, setShowAddModal] = useState(false);
   const [newProduct, setNewProduct] = useState({
     code: '',
@@ -17,10 +20,20 @@ const Products = ({ currentTheme, searchTerm, setSearchTerm }) => {
 
   const addProduct = () => {
     if (!newProduct.name || !newProduct.price) {
-      alert('กรุณากรอกข้อมูลให้ครบถ้วน');
       return;
     }
-    alert('เพิ่มสินค้าเรียบร้อย');
+    setActiveModal({
+      type: 'success',
+      title: 'บันทึกข้อมูลสำเร็จ',
+      message: 'บันทึกข้อมูลสินค้าเรียบร้อยแล้ว',
+      actions: [
+        {
+          label: 'ตกลง',
+          onClick: () => setActiveModal(null)
+        }
+      ]
+    });
+
     setShowAddModal(false);
     setNewProduct({
       code: '',
@@ -259,6 +272,22 @@ const Products = ({ currentTheme, searchTerm, setSearchTerm }) => {
             </div>
           </div>
         </div>
+      )}
+
+      {activeModal && (
+        <Modal
+          isOpen={!!activeModal}
+          onClose={() => setActiveModal(null)}
+          type={activeModal.type}
+          title={activeModal.title}
+          message={activeModal.message}
+          confirmText={activeModal.confirmText}
+          cancelText={activeModal.cancelText}
+          showCancel={activeModal.showCancel}
+          onConfirm={() => {
+            setActiveModal(null)
+          }}
+        />
       )}
     </div>
   );

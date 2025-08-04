@@ -1,13 +1,15 @@
 import apiClient from "../httpRequest";
 
-export const loadStcardInfo = async (payload) => {
-    const dbConfig = localStorage.getItem('db') || ''
+export const loadStcardInfo = async () => {
+    const branchCode = localStorage.getItem('branchCode') || ''
     try {
-        const { branchCode } = payload
-        const response = await apiClient.get(`/api/stcard?branchCode=${branchCode}&dbConfig=${dbConfig}`)
+        const response = await apiClient.get(`/api/stcard/${branchCode}`)
         return { data: response.data, error: null }
     } catch (error) {
         if (error.response) {
+            if (error.response.status === 504) {
+                return { data: null, error: error.response.statusText }
+            }
             return { data: null, error: error.response.data.message };
         } else if (error.request) {
             return { data: null, error: "Network error. Please try again." };
@@ -18,13 +20,16 @@ export const loadStcardInfo = async (payload) => {
 }
 
 export const loadStcardViewDetail = async (payload) => {
-    const dbConfig = localStorage.getItem('db') || ''
+    const branchCode = localStorage.getItem('branchCode') || ''
     try {
         const { billNo } = payload
-        const response = await apiClient.get(`/api/stcard/${billNo}?dbConfig=${dbConfig}`)
+        const response = await apiClient.get(`/api/stcard/${billNo}?branchCode=${branchCode}`)
         return { data: response.data, error: null }
     } catch (error) {
         if (error.response) {
+            if (error.response.status === 504) {
+                return { data: null, error: error.response.statusText }
+            }
             return { data: null, error: error.response.data.message };
         } else if (error.request) {
             return { data: null, error: "Network error. Please try again." };

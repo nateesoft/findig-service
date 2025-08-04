@@ -5,6 +5,12 @@ const getData = async ({ payload, db }) => {
   return results
 }
 
+const getAllData = async ({ db }) => {
+  const sql = `select * from stkfile order by Branch`
+  const results = await db.pos?.query(sql)
+  return results
+}
+
 const findByProductStockCode = async ({ payload, db }) => {
   const { Branch, BPCode, BStk } = payload
   const sql = `select * from stkfile where Branch=? and BPCode=? and BStk=?`
@@ -70,6 +76,7 @@ const updateStkFile = async ({ payload, db }) => {
 
 module.exports = {
   getData,
+  getAllData,
   createStkFile,
   updateStkFile,
   findByProductStockCode

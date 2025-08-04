@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useState } from 'react';
 import { LogOut, X } from 'lucide-react';
 
 import { getThemeClasses, themes } from '../../utils/themes';
@@ -10,20 +10,18 @@ const LogoutConfirmModal = ({
   onLogout, 
   setSidebarOpen, 
   userInfo, 
-  currentTheme,
-  dbConfig
+  currentTheme
 }) => {
   if (!showLogoutConfirm) return null;
 
   const handleLogout = async () => {
-    const { data, error } = await sendToLogout(userInfo, dbConfig)
+    const { data, error } = await sendToLogout(userInfo)
     if(data) {
       onLogout();
       setShowLogoutConfirm(false);
-      // Reset states when logging out
       setSidebarOpen(false);
     } else {
-      alert("Cannot logout")
+      alert("ไม่สามารถออกจากระบบได้:"+error)
     } 
   }
 

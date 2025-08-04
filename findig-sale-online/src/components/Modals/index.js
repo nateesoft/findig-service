@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Info, AlertTriangle, AlertCircle, CheckCircle } from 'lucide-react';
 
-const Modal = ({ 
+export const Modal = ({ 
   isOpen, 
   onClose, 
   type = 'info', 
@@ -145,8 +145,8 @@ const Modal = ({
   );
 };
 
-const ModalDemo = () => {
-  const [activeModal, setActiveModal] = useState(null);
+const ModalDemo = ({ activeModal, setActiveModal }) => {
+  // const [activeModal, setActiveModal] = useState(null);
 
   const modals = [
     {

@@ -1,14 +1,32 @@
 import React, { useContext, useState } from 'react';
+
 import { getThemeClasses, themes } from '../utils/themes';
 import { DEFAULT_SETTINGS } from '../utils/constants';
 import { AppContext } from '../contexts';
+import { Modal } from '../components/Modals';
 
 const SystemSettings = ({ currentTheme, setCurrentTheme }) => {
-  const { appData, setAppData } = useContext(AppContext)
+  const [activeModal, setActiveModal] = useState(null);
+  
+  const { setAppData } = useContext(AppContext)
   const [settings, setSettings] = useState({
     ...DEFAULT_SETTINGS,
     theme: currentTheme
   });
+
+  const showSuccessModal = () => {
+    setActiveModal({
+      type: 'success',
+      title: 'บันทึกการตั้งค่าเรียบร้อย',
+      message: 'การตั้งค่าของคุณถูกบันทึกเรียบร้อยแล้ว',
+      actions: [
+        {
+          label: 'ตกลง',
+          onClick: () => setActiveModal(null)
+        }
+      ]
+    });
+  };
 
   const handleThemeChange = (newTheme) => {
     setAppData(prevData => ({
@@ -177,12 +195,28 @@ const SystemSettings = ({ currentTheme, setCurrentTheme }) => {
 
       <div className="flex justify-end">
         <button
-          onClick={() => alert('บันทึกการตั้งค่าเรียบร้อย')}
+          onClick={showSuccessModal}
           className={`text-white px-6 py-2 rounded-lg font-medium transition-colors ${getThemeClasses('primaryBtn', currentTheme)}`}
         >
           บันทึกการตั้งค่า
         </button>
       </div>
+
+      {activeModal && (
+        <Modal
+          isOpen={!!activeModal}
+          onClose={() => setActiveModal(null)}
+          type={activeModal.type}
+          title={activeModal.title}
+          message={activeModal.message}
+          confirmText={activeModal.confirmText}
+          cancelText={activeModal.cancelText}
+          showCancel={activeModal.showCancel}
+          onConfirm={() => {
+            setActiveModal(null)
+          }}
+        />
+      )}
     </div>
   );
 };

@@ -1,7 +1,7 @@
 const pools = require('./dbPools.js');
 
 const selectBranchDb = (req, res, next) => {
-  const dbConfig = req.body.dbConfig || req.query.dbConfig || req.headers['x-branch-code'];
+  const dbConfig = process.env.dbConfig;//req.body.dbConfig || req.query.dbConfig || req.headers['x-branch-code'];
 
   if (!dbConfig) {
     return res.status(400).json({ error: 'Database Config is required' });
@@ -12,7 +12,6 @@ const selectBranchDb = (req, res, next) => {
     return res.status(404).json({ error: 'Branch not found' });
   }
 
-  // สร้าง unified API: req.db.main.query(...) ได้เลย
   req.db = {};
 
   for (const [dbKey, dbInfo] of Object.entries(branchPools)) {

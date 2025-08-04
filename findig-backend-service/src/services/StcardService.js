@@ -1,10 +1,44 @@
+const cache = require('../utils/cache')
+
 const { mappingResultData } = require("../utils/ConvertThai")
 const { getMoment } = require("../utils/MomentUtil")
 
-const getSTCard = async ({ payload, repository, db }) => {
-  const { branch_code } = payload
-  const results = await repository.getData({payload: { S_Bran: branch_code }, db })
-  return mappingResultData(results)
+const getSTCard = async ({ branchCode, repository, db }) => {
+  const cacheKey = 'getSTCard_'+getMoment().format('YYYY-MM-DD')
+
+  const cached = cache.get(cacheKey)
+  if (cached) {
+    console.log('🔄 Cache hit')
+    return cached;
+  } else {
+    console.log('🚀 Cache miss, querying DB')
+
+    const results = await repository.getData({payload: { 
+      S_Bran: branchCode 
+    }, db })
+    const mapped = mappingResultData(results)
+
+    cache.set(cacheKey, mapped, 60);
+    return mapped
+  }
+}
+
+const getAllSTCard = async ({ repository, db }) => {
+  const cacheKey = 'getAllSTCard_'+getMoment().format('YYYY-MM-DD')
+
+  const cached = cache.get(cacheKey)
+  if (cached) {
+    console.log('🔄 Cache hit')
+    return cached;
+  } else {
+    console.log('🚀 Cache miss, querying DB')
+  
+    const results = await repository.getAllData({db })
+    const mapped = mappingResultData(results)
+  
+    cache.set(cacheKey, mapped, 60);
+    return mapped
+  }
 }
 
 const processStock = async ({ payload, repository, db }) => {
@@ -53,5 +87,6 @@ const processStock = async ({ payload, repository, db }) => {
 
 module.exports = {
   getSTCard,
+  getAllSTCard,
   processStock
 }

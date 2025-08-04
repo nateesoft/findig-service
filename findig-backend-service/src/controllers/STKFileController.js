@@ -3,11 +3,22 @@ const StkfileRepository = require("../repository/StkfileRepository")
 
 const getAllSTKFile = async (req, res, next) => {
   try {
-    const { branchCode } = req.query
-    const stkfileInfo = await STKFileService.getSTKFile({
-      payload: { branch_code: branchCode },
+    const stkfileInfo = await STKFileService.getAllSTKFile({
       repository: StkfileRepository,
       db: req.db
+    })
+    res.json(stkfileInfo)
+  } catch (error) {
+    next(error)
+  }
+}
+const getAllSTKFileByCode = async (req, res, next) => {
+  const { branchCode } = req.params
+  try {
+    const stkfileInfo = await STKFileService.getSTKFile({
+      repository: StkfileRepository,
+      db: req.db,
+      branchCode
     })
     res.json(stkfileInfo)
   } catch (error) {
@@ -31,5 +42,6 @@ const processStock = async (req, res, next) => {
 
 module.exports = {
   getAllSTKFile,
-  processStock
+  processStock,
+  getAllSTKFileByCode
 }

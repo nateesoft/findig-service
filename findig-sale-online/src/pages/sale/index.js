@@ -13,10 +13,13 @@ import ReviewModal from './ReviewModal';
 import CreateEditModal from './CreateEditModal'
 import SearchForm from './SearchForm';
 import SaleTable from './SaleTable';
+import { Modal } from '../../components/Modals';
 
 const Sales = () => {
+  const [activeModal, setActiveModal] = useState(null);
+
   const { appData } = useContext(AppContext)
-  const { currentTheme, db, userInfo } = appData
+  const { currentTheme, branchCode, userInfo } = appData
 
   const [draftSale, setDraftSale] = useState([])
   const [filteredSales, setFilteredSales] = useState([])
@@ -56,7 +59,7 @@ const Sales = () => {
     billNo: '',
     empCode: userInfo.UserName,
     createDate: new Date().toISOString().split('T')[0],
-    branchCode: db
+    branchCode: branchCode
   });
 
   const [currentItem, setCurrentItem] = useState({
@@ -167,7 +170,7 @@ const Sales = () => {
 
   const resetNewSaleForm = () => {
     setSaleHeader({
-      branchCode: db,
+      branchCode: branchCode,
       billNo: '',
       empCode: userInfo.UserName,
       createDate: new Date().toISOString().split('T')[0],
@@ -198,7 +201,17 @@ const Sales = () => {
 
   const addItemToSale = () => {
     if (!currentItem.barcode || !currentItem.productName || currentItem.qty <= 0) {
-      alert('กรุณากรอกข้อมูลสินค้าให้ครบถ้วน');
+      setActiveModal({
+        type: 'warning',
+        title: 'ไม่สามารถบันทึกข้อมูลได้',
+        message: 'กรุณากรอกข้อมูลสินค้าให้ครบถ้วน',
+        actions: [
+          {
+            label: 'ตกลง',
+            onClick: () => setActiveModal(null)
+          }
+        ]
+      });
       return;
     }
     const newItem = {
@@ -230,10 +243,30 @@ const Sales = () => {
       if (data) {
         setProductList(data)
       } else {
-        alert(error || 'ไม่สามารถโหลดข้อมูลได้');
+        setActiveModal({
+          type: 'error',
+          title: 'ไม่สามารถแสดงข้อมูลได้',
+          message: error || 'กรุณาลองใหม่อีกครั้ง',
+          actions: [
+            {
+              label: 'ตกลง',
+              onClick: () => setActiveModal(null)
+            }
+          ]
+        });
       }
     } catch (error) {
-      alert('เกิดข้อผิดพลาดในการโหลดข้อมูล');
+      setActiveModal({
+        type: 'error',
+        title: 'ไม่สามารถแสดงข้อมูลได้',
+        message: error || 'กรุณาลองใหม่อีกครั้ง',
+        actions: [
+          {
+            label: 'ตกลง',
+            onClick: () => setActiveModal(null)
+          }
+        ]
+      });
     }
   };
 
@@ -246,11 +279,30 @@ const Sales = () => {
         setModalMode('review');
         setShowReviewModal(true);
       } else {
-        alert(error || 'ไม่สามารถโหลดข้อมูลได้');
+        setActiveModal({
+          type: 'error',
+          title: 'ไม่สามารถแสดงข้อมูลได้',
+          message: error || 'กรุณาลองใหม่อีกครั้ง',
+          actions: [
+            {
+              label: 'ตกลง',
+              onClick: () => setActiveModal(null)
+            }
+          ]
+        });
       }
     } catch (error) {
-      alert('เกิดข้อผิดพลาดในการโหลดข้อมูล');
-      console.error('Error loading sale detail:', error);
+      setActiveModal({
+        type: 'error',
+        title: 'ไม่สามารถแสดงข้อมูลได้',
+        message: error || 'กรุณาลองใหม่อีกครั้ง',
+        actions: [
+          {
+            label: 'ตกลง',
+            onClick: () => setActiveModal(null)
+          }
+        ]
+      });
     }
   };
 
@@ -262,7 +314,7 @@ const Sales = () => {
         setSaleHeader({
           ...data,
           emp_code_update: userInfo.UserName,
-          branchCode: db,
+          branchCode: branchCode,
           createDate: data.createDate || new Date().toISOString().split('T')[0]
         });
         
@@ -271,22 +323,50 @@ const Sales = () => {
         setModalMode('edit');
         setShowSaleModal(true);
       } else {
-        alert(error || 'ไม่สามารถโหลดข้อมูลได้');
+        setActiveModal({
+          type: 'error',
+          title: 'ไม่สามารถแสดงข้อมูลได้',
+          message: error || 'กรุณาลองใหม่อีกครั้ง',
+          actions: [
+            {
+              label: 'ตกลง',
+              onClick: () => setActiveModal(null)
+            }
+          ]
+        });
       }
     } catch (error) {
-      alert('เกิดข้อผิดพลาดในการโหลดข้อมูล');
-      console.error('Error loading sale for edit:', error);
+      setActiveModal({
+        type: 'error',
+        title: 'ไม่สามารถแสดงข้อมูลได้',
+        message: error || 'กรุณาลองใหม่อีกครั้ง',
+        actions: [
+          {
+            label: 'ตกลง',
+            onClick: () => setActiveModal(null)
+          }
+        ]
+      });
     }
   };
 
   const handleNewSaleSubmit = async () => {
     if (!saleHeader.billNo) {
-      alert('กรุณาระบุข้อมูลเลขที่ใบเสร็จ');
       return;
     }
 
     if (saleItems.length === 0) {
-      alert('กรุณาเพิ่มรายการสินค้าอย่างน้อย 1 รายการ');
+      setActiveModal({
+        type: 'warning',
+        title: 'ไม่สามารถเพิ่มข้อมูลได้',
+        message: 'กรุณาเพิ่มรายการสินค้าอย่างน้อย 1 รายการ',
+        actions: [
+          {
+            label: 'ตกลง',
+            onClick: () => setActiveModal(null)
+          }
+        ]
+      });
       return;
     }
 
@@ -315,11 +395,30 @@ const Sales = () => {
       if(data) {
         initLoadData();
       } else {
-        alert(error);
+        setActiveModal({
+          type: 'error',
+          title: 'ไม่สามารถแสดงข้อมูลได้',
+          message: error || 'กรุณาลองใหม่อีกครั้ง',
+          actions: [
+            {
+              label: 'ตกลง',
+              onClick: () => setActiveModal(null)
+            }
+          ]
+        });
       }
     } catch (error) {
-      alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
-      console.error('Error saving sale:', error);
+      setActiveModal({
+        type: 'error',
+        title: 'ไม่สามารถแสดงข้อมูลได้',
+        message: error || 'กรุณาลองใหม่อีกครั้ง',
+        actions: [
+          {
+            label: 'ตกลง',
+            onClick: () => setActiveModal(null)
+          }
+        ]
+      });
     }
     
     resetNewSaleForm();
@@ -328,13 +427,23 @@ const Sales = () => {
 
   const initLoadData = async () => {
     const { data, error } = await loadDraftSaleInfo({
-      branchCode: db
+      branchCode: branchCode
     })
 
     if(data) {
       setDraftSale(data)
     }else {
-      alert(error);
+      setActiveModal({
+        type: 'error',
+        title: 'ไม่สามารถแสดงข้อมูลได้',
+        message: error || 'กรุณาลองใหม่อีกครั้ง',
+        actions: [
+          {
+            label: 'ตกลง',
+            onClick: () => setActiveModal(null)
+          }
+        ]
+      });
     }
   }
 
@@ -348,7 +457,17 @@ const Sales = () => {
     const tempSales = filteredSales.filter(sale => sale.post_status === 'N');
     
     if (tempSales.length === 0) {
-      alert('ไม่มีรายการที่สามารถ POST ได้');
+      setActiveModal({
+        type: 'warning',
+        title: 'ไม่สามารถ POST ข้อมูลได้',
+        message: 'ไม่มีรายการที่สามารถ POST ได้',
+        actions: [
+          {
+            label: 'ตกลง',
+            onClick: () => setActiveModal(null)
+          }
+        ]
+      });
       return;
     }
     
@@ -363,7 +482,7 @@ const Sales = () => {
     setCurrentProcessingItem(item);
 
     let isSuccess = false
-    const { data, error } = await processStockFromSale({ branchCode: db, saleInfo: item })
+    const { data, error } = await processStockFromSale({ branchCode: branchCode, saleInfo: item })
     if(data) {
       isSuccess = true
     }
@@ -589,6 +708,22 @@ const Sales = () => {
           setShowSaleModal={setShowSaleModal}
           resetNewSaleForm={resetNewSaleForm}
           handleNewSaleSubmit={handleNewSaleSubmit}
+        />
+      )}
+
+      {activeModal && (
+        <Modal
+          isOpen={!!activeModal}
+          onClose={() => setActiveModal(null)}
+          type={activeModal.type}
+          title={activeModal.title}
+          message={activeModal.message}
+          confirmText={activeModal.confirmText}
+          cancelText={activeModal.cancelText}
+          showCancel={activeModal.showCancel}
+          onConfirm={() => {
+            setActiveModal(null)
+          }}
         />
       )}
     </div>

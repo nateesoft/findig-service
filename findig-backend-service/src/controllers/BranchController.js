@@ -14,6 +14,19 @@ const getBranchData = async (req, res, next) => {
   }
 };
 
+const findAllBranch = async (req, res, next) => {
+  try {
+    const result = await BranchService.findAllBranch({
+      payload: {},
+      repository: BranchRepository,
+      db: req.db
+    })
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
 const getBranchByCode = async (req, res, next) => {
   try {
     const { branchCode } = req.params
@@ -32,5 +45,6 @@ const getBranchByCode = async (req, res, next) => {
 
 module.exports = {
   getBranchData,
-  getBranchByCode
+  getBranchByCode,
+  findAllBranch
 }

@@ -1,6 +1,6 @@
 module.exports = [
   {
-    code: '909',
+    code: 'PRODUCTION',
     name: 'Stock Realtime 909',
     driver: 'mysql',
     databases: {
@@ -28,7 +28,7 @@ module.exports = [
     }
   },
   {
-    code: 'TST',
+    code: 'DEVELOPMENT',
     name: 'TEST Stock Realtime',
     driver: 'mysql2',
     databases: {

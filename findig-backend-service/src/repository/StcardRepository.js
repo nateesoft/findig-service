@@ -1,6 +1,12 @@
+const getAllData = async ({ db }) => {
+  const sql = `select * from stcard order by S_Bran, S_Date`
+  const results = await db.pos?.query(sql)
+  return results
+}
+
 const getData = async ({ payload, db }) => {
   const { S_Bran } = payload
-  const sql = `select * from stcard where S_Bran=?`
+  const sql = `select * from stcard where S_Bran=? order by S_Date`
   const results = await db.pos?.query(sql, [S_Bran])
   return results
 }
@@ -54,6 +60,7 @@ const results = await db.pos?.query(sql, [
 
 module.exports = {
   getData,
+  getAllData,
   createStcard,
   updateStcard,
   findByBillNoPCode,

@@ -4,8 +4,10 @@ import moment from 'moment';
 
 import { getThemeClasses } from '../utils/themes';
 import { loadDraftSaleDashboard } from '../api/saleApi';
+import { Modal } from '../components/Modals';
 
 const Dashboard = ({ currentTheme }) => {
+  const [activeModal, setActiveModal] = useState(null);
   const [lastDraftSale, setLastDraftSale] = useState([])
 
   const initLoadLastDraftSale = async () => {
@@ -14,10 +16,30 @@ const Dashboard = ({ currentTheme }) => {
       if(data) {
         setLastDraftSale(data)
       }else{
-        alert(error || 'ไม่สามารถโหลดข้อมูลได้')
+        setActiveModal({
+          type: 'error',
+          title: 'ไม่สามารถแสดงข้อมูลได้',
+          message: error || 'กรุณาลองใหม่อีกครั้ง',
+          actions: [
+            {
+              label: 'ตกลง',
+              onClick: () => setActiveModal(null)
+            }
+          ]
+        });
       }
     } catch (error) {
-      alert('เกิดข้อผิดพลาดในการโหลดข้อมูล');
+      setActiveModal({
+        type: 'error',
+        title: 'ไม่สามารถแสดงข้อมูลได้',
+        message: error || 'กรุณาลองใหม่อีกครั้ง',
+        actions: [
+          {
+            label: 'ตกลง',
+            onClick: () => setActiveModal(null)
+          }
+        ]
+      });
     }
   }
   
@@ -77,6 +99,22 @@ const Dashboard = ({ currentTheme }) => {
           </table>
         </div>
       </div>
+
+      {activeModal && (
+        <Modal
+          isOpen={!!activeModal}
+          onClose={() => setActiveModal(null)}
+          type={activeModal.type}
+          title={activeModal.title}
+          message={activeModal.message}
+          confirmText={activeModal.confirmText}
+          cancelText={activeModal.cancelText}
+          showCancel={activeModal.showCancel}
+          onConfirm={() => {
+            setActiveModal(null)
+          }}
+        />
+      )}
     </div>
   );
 };

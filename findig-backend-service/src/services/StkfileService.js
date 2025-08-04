@@ -1,15 +1,68 @@
+const cache = require('../utils/cache')
+
 const { mappingResultData } = require("../utils/ConvertThai")
 const { getMoment } = require("../utils/MomentUtil")
 
 const CompanyService = require('../services/CompanyService')
 const CompanyRepository = require('../repository/CompanyRepository')
 
-const getSTKFile = async ({ payload, repository, db }) => {
-  const { branch_code } = payload
-  const results = await repository.getData({ payload: {
-    Branch: branch_code
-  }, db })
-  return mappingResultData(results)
+const getSTKFile = async ({ branchCode, repository, db }) => {
+  const cacheKey = 'getSTKFile_'+getMoment().format('YYYY-MM-DD')
+
+  const cached = cache.get(cacheKey)
+  if (cached) {
+    console.log('🔄 Cache hit')
+    return cached;
+  } else {
+    console.log('🚀 Cache miss, querying DB')
+    
+    const results = await repository.getData({ payload: {
+      Branch: branchCode
+    }, db })
+    const mapped = mappingResultData(results)
+
+    cache.set(cacheKey, mapped, 60);
+    return mapped
+  }
+}
+
+const getAllSTKFile = async ({ repository, db }) => {
+  const cacheKey = 'getAllSTKFile_'+getMoment().format('YYYY-MM-DD')
+
+  const cached = cache.get(cacheKey)
+  if (cached) {
+    console.log('🔄 Cache hit')
+    return cached;
+  } else {
+    console.log('🚀 Cache miss, querying DB')
+  
+    const results = await repository.getAllData({ db })
+    const mapped = mappingResultData(results)
+  
+    cache.set(cacheKey, mapped, 60);
+    return mapped
+  }
+
+}
+
+const getAllSTKFileByCode = async ({ repository, db, payload }) => {
+  const { branchCode } = payload
+  const cacheKey = 'getAllSTKFile_'+getMoment().format('YYYY-MM-DD')
+
+  const cached = cache.get(cacheKey)
+  if (cached) {
+    console.log('🔄 Cache hit')
+    return cached;
+  } else {
+    console.log('🚀 Cache miss, querying DB')
+  
+    const results = await repository.getData({ db, branchCode })
+    const mapped = mappingResultData(results)
+  
+    cache.set(cacheKey, mapped, 60);
+    return mapped
+  }
+
 }
 
 const GetActionMon = async ({ db }) => {
@@ -104,5 +157,7 @@ const processStock = async ({ payload, repository, db }) => {
 
 module.exports = {
   getSTKFile,
-  processStock
+  getAllSTKFile,
+  processStock,
+  getAllSTKFileByCode
 }
