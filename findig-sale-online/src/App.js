@@ -24,7 +24,7 @@ import Sales from "./pages/sale"
 import StcardPage from "./pages/stcard"
 import StkfilePage from "./pages/stkfile"
 
-import UserGroups from "./pages/UserGroups"
+import UserGroups from "./pages/posuser"
 import Products from "./pages/Products"
 import Customers from "./pages/Customers"
 import Reports from "./pages/Reports"

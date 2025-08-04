@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
 import { 
   Eye, 
+  Edit,
   FileText,
   ChevronLeft,
   ChevronRight,
@@ -11,11 +11,14 @@ import {
   ArrowDown
 } from 'lucide-react';
 import moment from 'moment';
+import { useState, useEffect } from 'react';
 
-const SaleTable = ({
+const DataTable = ({
     getThemeClasses,
     currentTheme,
     filteredSales,
+    handleReviewSale,
+    handleEditSale,
     searchCriteria,
     resetSearch
 }) => {
@@ -42,13 +45,13 @@ const SaleTable = ({
     let bValue = b[sortField];
     
     // จัดการกับข้อมูลวันที่
-    if (sortField === 'S_Date') {
+    if (sortField === 'document_date') {
       aValue = new Date(aValue);
       bValue = new Date(bValue);
     }
     
     // จัดการกับข้อมูลตัวเลข
-    if (sortField === 'S_Que') {
+    if (sortField === 'total_item') {
       aValue = Number(aValue);
       bValue = Number(bValue);
     }
@@ -153,6 +156,14 @@ const SaleTable = ({
           currentTheme
         )}`}
       >
+        <h3
+          className={`text-lg font-semibold ${getThemeClasses(
+            "textPrimary",
+            currentTheme
+          )}`}
+        >
+          รายการข้อมูลการขาย
+        </h3>
         {sortedSales.length > 0 && (
           <p className={`text-sm ${getThemeClasses("textMuted", currentTheme)} mt-2`}>
             แสดงรายการ {startIndex + 1}-{Math.min(endIndex, sortedSales.length)} จากทั้งหมด {sortedSales.length} รายการ
@@ -172,11 +183,11 @@ const SaleTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('S_Bran')}
+                onClick={() => handleSort('billno')}
               >
                 <div className="flex items-center">
-                  สาขา
-                  {getSortIcon('S_Bran')}
+                  เลขที่ใบเสร็จ
+                  {getSortIcon('billno')}
                 </div>
               </th>
               <th
@@ -187,11 +198,11 @@ const SaleTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('S_Date')}
+                onClick={() => handleSort('document_date')}
               >
                 <div className="flex items-center justify-center">
-                  วันที่สร้าง
-                  {getSortIcon('S_Date')}
+                  วันที่สร้างเอกสาร
+                  {getSortIcon('document_date')}
                 </div>
               </th>
               <th
@@ -202,11 +213,11 @@ const SaleTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('S_No')}
+                onClick={() => handleSort('total_item')}
               >
                 <div className="flex items-center">
-                  เลขที่บิล
-                  {getSortIcon('S_No')}
+                  จำนวนสินค้า
+                  {getSortIcon('total_item')}
                 </div>
               </th>
               <th
@@ -217,11 +228,11 @@ const SaleTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('S_PCode')}
+                onClick={() => handleSort('emp_code')}
               >
                 <div className="flex items-center">
-                  สินค้า
-                  {getSortIcon('S_PCode')}
+                  พนักงานทำรายการ
+                  {getSortIcon('emp_code')}
                 </div>
               </th>
               <th
@@ -232,11 +243,11 @@ const SaleTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('S_Que')}
+                onClick={() => handleSort('branch_code')}
               >
                 <div className="flex items-center">
-                  จำนวน
-                  {getSortIcon('S_Que')}
+                  สาขา
+                  {getSortIcon('branch_code')}
                 </div>
               </th>
               <th
@@ -247,42 +258,20 @@ const SaleTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('S_Stk')}
+                onClick={() => handleSort('post_status')}
               >
                 <div className="flex items-center">
-                  คลัง
-                  {getSortIcon('S_Stk')}
+                  สถานะ POST
+                  {getSortIcon('post_status')}
                 </div>
               </th>
               <th
-                className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
+                className={`px-6 py-3 text-center text-xs font-medium ${getThemeClasses(
                   "textMuted",
                   currentTheme
-                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
-                  "textPrimary",
-                  currentTheme
-                )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('S_Rem')}
+                )} uppercase tracking-wider`}
               >
-                <div className="flex items-center">
-                  ประเภท
-                  {getSortIcon('S_Rem')}
-                </div>
-              </th>
-              <th
-                className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
-                  "textMuted",
-                  currentTheme
-                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
-                  "textPrimary",
-                  currentTheme
-                )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('Data_Sync')}
-              >
-                <div className="flex items-center">
-                  Sync Data
-                  {getSortIcon('Data_Sync')}
-                </div>
+                จัดการ
               </th>
             </tr>
           </thead>
@@ -293,9 +282,9 @@ const SaleTable = ({
             )} divide-y ${getThemeClasses("tableBorder", currentTheme)}`}
           >
             {currentItems.length > 0 ? (
-              currentItems.map((draft_sale, index) => (
+              currentItems.map((draft_sale) => (
                 <tr
-                  key={draft_sale.S_No + (index+1)}
+                  key={draft_sale.billno}
                   className={getThemeClasses("tableRow", currentTheme)}
                 >
                   <td
@@ -304,7 +293,7 @@ const SaleTable = ({
                       currentTheme
                     )}`}
                   >
-                    {draft_sale.S_Bran}
+                    {draft_sale.billno}
                   </td>
                   <td
                     className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
@@ -312,8 +301,8 @@ const SaleTable = ({
                       currentTheme
                     )}`}
                   >
-                    {moment(draft_sale.S_Date).format(
-                      "DD/MM/YYYY"
+                    {moment(draft_sale.document_date).format(
+                      "DD/MM/YYYY HH:mm:ss"
                     )}
                   </td>
                   <td
@@ -322,7 +311,7 @@ const SaleTable = ({
                       currentTheme
                     )}`}
                   >
-                    {draft_sale.S_No}
+                    {draft_sale.total_item}
                   </td>
                   <td
                     className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
@@ -330,7 +319,7 @@ const SaleTable = ({
                       currentTheme
                     )}`}
                   >
-                    {draft_sale.S_PCode}
+                    {draft_sale.emp_code}
                   </td>
                   <td
                     className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
@@ -338,23 +327,7 @@ const SaleTable = ({
                       currentTheme
                     )}`}
                   >
-                    {draft_sale.S_Que}
-                  </td>
-                  <td
-                    className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
-                      "textPrimary",
-                      currentTheme
-                    )}`}
-                  >
-                    {draft_sale.S_Stk}
-                  </td>
-                  <td
-                    className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
-                      "textPrimary",
-                      currentTheme
-                    )}`}
-                  >
-                    {draft_sale.S_Rem}
+                    {draft_sale.branch_code}
                   </td>
                   <td
                     className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
@@ -364,22 +337,62 @@ const SaleTable = ({
                   >
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        draft_sale.Data_Sync === "Y"
+                        draft_sale.post_status === "Y"
                           ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                          : draft_sale.Data_Sync === "N"
+                          : draft_sale.post_status === "N"
                           ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
                           : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
                       }`}
                     >
-                      {draft_sale.Data_Sync}
+                      {draft_sale.post_status}
                     </span>
+                  </td>
+                  <td
+                    className={`px-6 py-4 whitespace-nowrap text-center text-sm font-medium`}
+                  >
+                    <div className="flex justify-center space-x-2">
+                      <button
+                        onClick={() => handleReviewSale(draft_sale.id)}
+                        className={`p-2 rounded-lg ${getThemeClasses(
+                          "textSecondary",
+                          currentTheme
+                        )} hover:${getThemeClasses(
+                          "textPrimary",
+                          currentTheme
+                        )} ${getThemeClasses(
+                          "transition",
+                          currentTheme
+                        )} hover:bg-blue-50 dark:hover:bg-blue-900`}
+                        title="ดูรายละเอียด"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      {draft_sale.post_status !== "Y" && 
+                        <button
+                          onClick={() => handleEditSale(draft_sale.id)}
+                          className={`p-2 rounded-lg ${getThemeClasses(
+                            "textMuted",
+                            currentTheme
+                          )} hover:${getThemeClasses(
+                            "textSecondary",
+                            currentTheme
+                          )} ${getThemeClasses(
+                            "transition",
+                            currentTheme
+                          )} hover:bg-yellow-50 dark:hover:bg-yellow-900`}
+                          title="แก้ไข"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                      }
+                    </div>
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
                 <td
-                  colSpan="9"
+                  colSpan="7"
                   className={`px-6 py-8 text-center text-sm ${getThemeClasses(
                     "textMuted",
                     currentTheme
@@ -502,4 +515,4 @@ const SaleTable = ({
   )
 }
 
-export default SaleTable
+export default DataTable

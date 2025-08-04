@@ -5,7 +5,7 @@ import { getThemeClasses } from '../../utils/themes';
 import { AppContext } from '../../contexts';
 import { loadStfileInfo } from '../../api/stkfileApi';
 import SearchForm from './SearchForm';
-import SaleTable from './SaleTable';
+import DataTable from './DataTable';
 import { Modal } from '../../components/Modals';
 
 const Sales = () => {
@@ -18,9 +18,9 @@ const Sales = () => {
   const [filteredSales, setFilteredSales] = useState([])
   const [showSaleModal, setShowSaleModal] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
-  const [showSearchForm, setShowSearchForm] = useState(false);
+  const [showSearchForm, setShowSearchForm] = useState(true);
   const [showPostModal, setShowPostModal] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   
   // Search criteria state
   const [searchCriteria, setSearchCriteria] = useState({
@@ -104,10 +104,6 @@ const Sales = () => {
   }, [draftSale]);
 
   useEffect(() => {
-    initLoadData()
-  }, [])
-
-  useEffect(() => {
     const handleKeyDown = (e) => {
       if (showSaleModal || showReviewModal || showPostModal) {
         if (e.key === 'Escape') {
@@ -166,7 +162,7 @@ const Sales = () => {
         />
       )}
 
-      <SaleTable
+      <DataTable
         getThemeClasses={getThemeClasses}
         currentTheme={currentTheme}
         filteredSales={filteredSales}

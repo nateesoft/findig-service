@@ -1,10 +1,4 @@
-import {
-  Calendar,
-  FileText,
-  Search,
-  Filter,
-  RefreshCw
-} from "lucide-react"
+import { Calendar, FileText, Search, RefreshCw } from "lucide-react"
 
 const SearchForm = ({
   getThemeClasses,
@@ -90,7 +84,10 @@ const SearchForm = ({
               type="date"
               value={searchCriteria.S_Date_End}
               onChange={(e) =>
-                setSearchCriteria({ ...searchCriteria, S_Date_End: e.target.value })
+                setSearchCriteria({
+                  ...searchCriteria,
+                  S_Date_End: e.target.value
+                })
               }
               className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
                 "input",

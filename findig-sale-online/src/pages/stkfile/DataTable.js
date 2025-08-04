@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { 
-  Eye, 
   FileText,
   ChevronLeft,
   ChevronRight,
@@ -152,6 +151,14 @@ const SaleTable = ({
           currentTheme
         )}`}
       >
+        <h3
+          className={`text-lg font-semibold ${getThemeClasses(
+            "textPrimary",
+            currentTheme
+          )}`}
+        >
+          ข้อมูล STKFile
+        </h3>
         {sortedSales.length > 0 && (
           <p className={`text-sm ${getThemeClasses("textMuted", currentTheme)} mt-2`}>
             แสดงรายการ {startIndex + 1}-{Math.min(endIndex, sortedSales.length)} จากทั้งหมด {sortedSales.length} รายการ

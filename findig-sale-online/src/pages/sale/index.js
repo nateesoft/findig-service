@@ -12,7 +12,7 @@ import POSTModal from './POSTModal';
 import ReviewModal from './ReviewModal';
 import CreateEditModal from './CreateEditModal'
 import SearchForm from './SearchForm';
-import SaleTable from './SaleTable';
+import DataTable from './DataTable';
 import { Modal } from '../../components/Modals';
 
 const Sales = () => {
@@ -25,7 +25,7 @@ const Sales = () => {
   const [filteredSales, setFilteredSales] = useState([])
   const [showSaleModal, setShowSaleModal] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
-  const [showSearchForm, setShowSearchForm] = useState(false);
+  const [showSearchForm, setShowSearchForm] = useState(true);
   const [showPostModal, setShowPostModal] = useState(false);
   const [modalMode, setModalMode] = useState('create'); // 'create', 'edit', 'review'
   const [currentSaleData, setCurrentSaleData] = useState(null);
@@ -34,7 +34,7 @@ const Sales = () => {
   const [postStatus, setPostStatus] = useState('idle'); // 'idle', 'processing', 'completed', 'error'
   const [processedItems, setProcessedItems] = useState([]);
   const [currentProcessingItem, setCurrentProcessingItem] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   
   const [searchCriteria, setSearchCriteria] = useState({
     billNo: '',
@@ -624,7 +624,7 @@ const Sales = () => {
     return (
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <h1 className={`text-2xl font-bold ${getThemeClasses('textPrimary', currentTheme)}`}>ข้อมูลตาราง STCARD</h1>
+          <h1 className={`text-2xl font-bold ${getThemeClasses('textPrimary', currentTheme)}`}>เมนูบันทึกการขาย</h1>
         </div>
         <div className="flex items-center justify-center py-20">
           <div className="flex flex-col items-center space-y-4">
@@ -676,7 +676,7 @@ const Sales = () => {
         />
       )}
 
-      <SaleTable
+      <DataTable
         getThemeClasses={getThemeClasses}
         currentTheme={currentTheme}
         filteredSales={filteredSales}

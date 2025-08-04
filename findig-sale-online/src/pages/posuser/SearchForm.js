@@ -29,53 +29,24 @@ const SearchForm = ({
                 currentTheme
               )} mb-2`}
             >
-              รหัสสาขา
-            </label>
-            <select
-              value={searchCriteria.Branch}
-              onChange={(e) =>
-                setSearchCriteria({
-                  ...searchCriteria,
-                  Branch: e.target.value
-                })
-              }
-              className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
-                "input",
-                currentTheme
-              )}`}
-            >
-              <option value="">ทุกสาขา</option>
-              <option value="909">909 - สำนักงานใหญ่ ICS</option>
-              <option value="TST">TST - สาขาทดสอบระบบ</option>
-            </select>
-          </div>
-
-          <div>
-            <label
-              className={`block text-sm font-medium ${getThemeClasses(
-                "textSecondary",
-                currentTheme
-              )} mb-2`}
-            >
-              รหัสสินค้า
+              รหัสผู้ใช้
             </label>
             <input
               type="text"
-              value={searchCriteria.BPCode}
+              value={searchCriteria.UserName}
               onChange={(e) =>
                 setSearchCriteria({
                   ...searchCriteria,
-                  BPCode: e.target.value
+                  UserName: e.target.value
                 })
               }
               className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
                 "input",
                 currentTheme
               )}`}
-              placeholder="ค้นหารหัสสินค้า"
+              placeholder="ค้นหารหัสผู้ใช้"
             />
           </div>
-
           <div>
             <label
               className={`block text-sm font-medium ${getThemeClasses(
@@ -83,51 +54,23 @@ const SearchForm = ({
                 currentTheme
               )} mb-2`}
             >
-              คลังสินค้า
+              ชื่อ-นามสกุล
             </label>
-            <select
-              value={searchCriteria.BStk}
+            <input
+              type="text"
+              value={searchCriteria.Name}
               onChange={(e) =>
                 setSearchCriteria({
                   ...searchCriteria,
-                  BStk: e.target.value
+                  Name: e.target.value
                 })
               }
               className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
                 "input",
                 currentTheme
               )}`}
-            >
-              <option value="">ทุกคลัง</option>
-              <option value="A1">คลังสินค้าหลัก</option>
-            </select>
-          </div>
-          <div>
-            <label
-              className={`block text-sm font-medium ${getThemeClasses(
-                "textSecondary",
-                currentTheme
-              )} mb-2`}
-            >
-              Sync Data
-            </label>
-            <select
-              value={searchCriteria.SendToPOS}
-              onChange={(e) =>
-                setSearchCriteria({
-                  ...searchCriteria,
-                  SendToPOS: e.target.value
-                })
-              }
-              className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
-                "input",
-                currentTheme
-              )}`}
-            >
-              <option value="">ทุกสถานะ</option>
-              <option value="N">WAIT</option>
-              <option value="Y">SUCCESS</option>
-            </select>
+              placeholder="ค้นหาชื่อ-นามสกุล"
+            />
           </div>
         </div>
 
