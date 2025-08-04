@@ -10,9 +10,12 @@ const UserGroups = ({ currentTheme }) => {
   const [userList, setUserList] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage] = useState(10) // จำนวนรายการต่อหน้า
+  const [isLoading, setIsLoading] = useState(true);
 
   const initLoadAllUser = async () => {
     try {
+      setIsLoading(true);
+
       const { data, error } = await loadPosUserAll()
       if(data) {
         setUserList(data)
@@ -41,6 +44,8 @@ const UserGroups = ({ currentTheme }) => {
           }
         ]
       });
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -90,6 +95,22 @@ const UserGroups = ({ currentTheme }) => {
       pageNumbers.push(i)
     }
     return pageNumbers
+  }
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+          <h1 className={`text-2xl font-bold ${getThemeClasses('textPrimary', currentTheme)}`}>รายชื่อผู้ใช้งานในระบบ</h1>
+        </div>
+        <div className="flex items-center justify-center py-20">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <p className={`text-lg ${getThemeClasses('textSecondary', currentTheme)}`}>กำลังโหลดข้อมูล...</p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (

@@ -34,6 +34,7 @@ const Sales = () => {
   const [postStatus, setPostStatus] = useState('idle'); // 'idle', 'processing', 'completed', 'error'
   const [processedItems, setProcessedItems] = useState([]);
   const [currentProcessingItem, setCurrentProcessingItem] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   
   const [searchCriteria, setSearchCriteria] = useState({
     billNo: '',
@@ -428,25 +429,32 @@ const Sales = () => {
   };
 
   const initLoadData = async () => {
-    const { data, error } = await loadDraftSaleInfo({
-      branchCode: branchCode
-    })
+    try {
+      setIsLoading(true)
 
-    if(data) {
-      setDraftSale(data)
-    }else {
-      setActiveModal({
-        type: 'error',
-        title: 'ไม่สามารถแสดงข้อมูลได้',
-        message: error || 'กรุณาลองใหม่อีกครั้ง',
-        actions: [
-          {
-            label: 'ตกลง',
-            onClick: () => setActiveModal(null)
-          }
-        ]
-      });
+      const { data, error } = await loadDraftSaleInfo({
+        branchCode: branchCode
+      })
+
+      if(data) {
+        setDraftSale(data)
+      }else {
+        setActiveModal({
+          type: 'error',
+          title: 'ไม่สามารถแสดงข้อมูลได้',
+          message: error || 'กรุณาลองใหม่อีกครั้ง',
+          actions: [
+            {
+              label: 'ตกลง',
+              onClick: () => setActiveModal(null)
+            }
+          ]
+        });
+      }
+    } finally {
+      setIsLoading(false)
     }
+    
   }
 
   const handleCreateNew = () => {
@@ -611,6 +619,22 @@ const Sales = () => {
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [showSaleModal, showReviewModal, showPostModal, currentItem]);
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+          <h1 className={`text-2xl font-bold ${getThemeClasses('textPrimary', currentTheme)}`}>ข้อมูลตาราง STCARD</h1>
+        </div>
+        <div className="flex items-center justify-center py-20">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <p className={`text-lg ${getThemeClasses('textSecondary', currentTheme)}`}>กำลังโหลดข้อมูล...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
