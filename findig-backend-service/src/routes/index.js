@@ -41,6 +41,6 @@ router.post('/api/draftsale_detail', DraftSaleDetailsController.saveData)
 router.put('/api/draftsale_detail/:id', DraftSaleDetailsController.updateData)
 router.delete('/api/draftsale_detail/:id', DraftSaleDetailsController.deleteData)
 
-router.get('/api/product', ProductController.getProductData);
+router.post('/api/product', ProductController.getProductData);
 
 module.exports = router

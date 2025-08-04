@@ -16,7 +16,6 @@ const SaleTable = ({
     getThemeClasses,
     currentTheme,
     filteredSales,
-    handleReviewSale,
     searchCriteria,
     resetSearch
 }) => {
@@ -285,14 +284,6 @@ const SaleTable = ({
                   {getSortIcon('Data_Sync')}
                 </div>
               </th>
-              <th
-                className={`px-6 py-3 text-center text-xs font-medium ${getThemeClasses(
-                  "textMuted",
-                  currentTheme
-                )} uppercase tracking-wider`}
-              >
-                จัดการ
-              </th>
             </tr>
           </thead>
           <tbody
@@ -382,28 +373,6 @@ const SaleTable = ({
                     >
                       {draft_sale.Data_Sync}
                     </span>
-                  </td>
-                  <td
-                    className={`px-6 py-4 whitespace-nowrap text-center text-sm font-medium`}
-                  >
-                    <div className="flex justify-center space-x-2">
-                      <button
-                        onClick={() => handleReviewSale(draft_sale.id)}
-                        className={`p-2 rounded-lg ${getThemeClasses(
-                          "textSecondary",
-                          currentTheme
-                        )} hover:${getThemeClasses(
-                          "textPrimary",
-                          currentTheme
-                        )} ${getThemeClasses(
-                          "transition",
-                          currentTheme
-                        )} hover:bg-blue-50 dark:hover:bg-blue-900`}
-                        title="ดูรายละเอียด"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-                    </div>
                   </td>
                 </tr>
               ))

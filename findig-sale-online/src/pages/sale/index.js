@@ -151,10 +151,11 @@ const Sales = () => {
     }, 50);
   };
 
-  const handleBarcodeChange = (e) => {
+  const handleBarcodeChange = async (e) => {
     const value = e.target.value;
     setCurrentItem({...currentItem, barcode: value});
-    setProductSearchTerm(value);
+    
+    await initLoadProduct(value)
     
     const exactMatch = productList.find(product => product.barcode === value);
     if (exactMatch) {
@@ -237,11 +238,12 @@ const Sales = () => {
     }
   };
 
-  const initLoadProduct = async () => {
+  const initLoadProduct = async (searchText) => {
     try {
-      const { data, error } = await loadAllProduct();
+      const { data, error } = await loadAllProduct(searchText);
       if (data) {
         setProductList(data)
+        setProductSearchTerm(searchText);
       } else {
         setActiveModal({
           type: 'error',
@@ -589,7 +591,6 @@ const Sales = () => {
 
   useEffect(() => {
     initLoadData()
-    initLoadProduct()
   }, [])
 
   useEffect(() => {

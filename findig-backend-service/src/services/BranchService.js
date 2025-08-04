@@ -22,7 +22,7 @@ const findAllBranch = async ({ repository, db }) => {
   const mapped = mappingResultData(results)
 
   // 3. store to cache
-  cache.set(cacheKey, mapped, 60); // TTL = 60 sec
+  cache.set(cacheKey, mapped, 600); // TTL = 60 sec
   return mapped
 };
 

@@ -1,10 +1,9 @@
-import { useState, useEffect, useContext, useRef } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { Search } from 'lucide-react';
 
 import { getThemeClasses } from '../../utils/themes';
 import { AppContext } from '../../contexts';
-import { loadStfileInfo, loadStfileViewDetail } from '../../api/stkfileApi';
-import ReviewModal from './ReviewModal';
+import { loadStfileInfo } from '../../api/stkfileApi';
 import SearchForm from './SearchForm';
 import SaleTable from './SaleTable';
 import { Modal } from '../../components/Modals';
@@ -21,8 +20,7 @@ const Sales = () => {
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [showSearchForm, setShowSearchForm] = useState(false);
   const [showPostModal, setShowPostModal] = useState(false);
-  const [modalMode, setModalMode] = useState('create'); // 'create', 'edit', 'review'
-  const [currentSaleData, setCurrentSaleData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   
   // Search criteria state
   const [searchCriteria, setSearchCriteria] = useState({
@@ -32,34 +30,17 @@ const Sales = () => {
     SendToPOS: ''
   });
 
-  // Product search states
-  const [showAutocomplete, setShowAutocomplete] = useState(false);
-  const [selectedProductIndex, setSelectedProductIndex] = useState(-1);
-  
-  // Refs
-  const autocompleteRef = useRef(null);
 
-  // ปิด autocomplete เมื่อคลิกข้างนอก
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (autocompleteRef.current && !autocompleteRef.current.contains(event.target)) {
-        setShowAutocomplete(false);
-        setSelectedProductIndex(-1);
-      }
-    };
+  const initLoadData = async () => {
+    setIsLoading(true);
+    try{
+      const { data, error } = await loadStfileInfo({
+        branchCode: branchCode
+      })
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const handleReviewSale = async (productCode) => {
-    try {
-      const { data, error } = await loadStfileViewDetail({ productCode });
-      if (data) {
-        setCurrentSaleData(data);
-        setModalMode('review');
-        setShowReviewModal(true);
-      } else {
+      if(data) {
+        setDraftSale(data)
+      }else {
         setActiveModal({
           type: 'error',
           title: 'ไม่สามารถแสดงข้อมูลได้',
@@ -72,41 +53,10 @@ const Sales = () => {
           ]
         });
       }
-    } catch (error) {
-      setActiveModal({
-        type: 'error',
-        title: 'ไม่สามารถแสดงข้อมูลได้',
-        message: error || 'เกิดข้อผิดพลาดในการโหลดข้อมูล',
-        actions: [
-          {
-            label: 'ตกลง',
-            onClick: () => setActiveModal(null)
-          }
-        ]
-      });
+    } finally {
+      setIsLoading(false)
     }
-  };
-
-  const initLoadData = async () => {
-    const { data, error } = await loadStfileInfo({
-      branchCode: branchCode
-    })
-
-    if(data) {
-      setDraftSale(data)
-    }else {
-      setActiveModal({
-        type: 'error',
-        title: 'ไม่สามารถแสดงข้อมูลได้',
-        message: error || 'กรุณาลองใหม่อีกครั้ง',
-        actions: [
-          {
-            label: 'ตกลง',
-            onClick: () => setActiveModal(null)
-          }
-        ]
-      });
-    }
+    
   }
   
   const handleSearch = () => {
@@ -172,6 +122,22 @@ const Sales = () => {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [showSaleModal, showReviewModal, showPostModal]);
 
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+          <h1 className={`text-2xl font-bold ${getThemeClasses('textPrimary', currentTheme)}`}>ข้อมูลตาราง STKFILE</h1>
+        </div>
+        <div className="flex items-center justify-center py-20">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <p className={`text-lg ${getThemeClasses('textSecondary', currentTheme)}`}>กำลังโหลดข้อมูล...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
@@ -204,19 +170,9 @@ const Sales = () => {
         getThemeClasses={getThemeClasses}
         currentTheme={currentTheme}
         filteredSales={filteredSales}
-        handleReviewSale={handleReviewSale}
         searchCriteria={searchCriteria}
         resetSearch={resetSearch}
       />
-
-      {showReviewModal && currentSaleData && (
-        <ReviewModal 
-          getThemeClasses={getThemeClasses}
-          currentTheme={currentTheme}
-          currentSaleData={currentSaleData}
-          setShowReviewModal={setShowReviewModal}
-        />
-      )}
 
       {activeModal && (
         <Modal

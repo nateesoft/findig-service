@@ -1,8 +1,8 @@
 import apiClient from "../httpRequest";
 
-export const loadAllProduct = async () => {
+export const loadAllProduct = async (searchText) => {
     try {
-        const response = await apiClient.get(`/api/product`)
+        const response = await apiClient.post(`/api/product`, { searchText })
         return { data: response.data, error: null }
     } catch (error) {
         if (error.response) {

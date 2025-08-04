@@ -3,8 +3,9 @@ const ProductRepository = require("../repository/ProductRepository")
 
 const getProductData = async (req, res, next) => {
   try {
-    const result = await ProductService.getProductData({
-      payload: {},
+    const { searchText } = req.body
+    const result = await ProductService.searchProduct({
+      searchText,
       repository: ProductRepository,
       db: req.db
     })

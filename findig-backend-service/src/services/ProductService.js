@@ -1,10 +1,12 @@
+const cache = require('../utils/cache')
 const { mappingResultData } = require('../utils/ConvertThai')
 
-const getProductData = async ({ payload, repository, db }) => {
-  const results = await repository.listAll({ db })
-  return mappingResultData(results)
+const searchProduct = async ({ repository, db, searchText }) => {
+  const results = await repository.searchProduct({ db, searchText })
+  const mapped = mappingResultData(results)
+  return mapped
 };
 
 module.exports = {
-  getProductData
+  searchProduct
 }
