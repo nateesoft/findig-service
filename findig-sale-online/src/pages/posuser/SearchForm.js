@@ -6,7 +6,6 @@ const SearchForm = ({
   searchCriteria,
   setSearchCriteria,
   filteredSales,
-  draftSale,
   resetSearch,
   handleSearch
 }) => {
@@ -82,7 +81,7 @@ const SearchForm = ({
               currentTheme
             )} flex items-center`}
           >
-            พบข้อมูล {filteredSales.length} รายการ จากทั้งหมด {draftSale.length}{" "}
+            พบข้อมูล {filteredSales.length} รายการ จากทั้งหมด {filteredSales.length}{" "}
             รายการ
           </div>
           <div className="flex space-x-2">

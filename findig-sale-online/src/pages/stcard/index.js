@@ -3,13 +3,15 @@ import { Search } from 'lucide-react';
 
 import { getThemeClasses } from '../../utils/themes';
 import { AppContext } from '../../contexts';
-import { loadStcardInfo } from '../../api/stcardApi';
+import { loadStcardInfo, searchData } from '../../api/stcardApi';
 import SearchForm from './SearchForm';
 import DataTable from './DataTable';
 import { Modal } from '../../components/Modals';
+import { loadAllBranch } from '../../api/branchApi';
 
 const Sales = () => {
   const [activeModal, setActiveModal] = useState(null);
+  const [branchFile, setBranchFile] = useState([])
 
   const { appData } = useContext(AppContext)
   const { currentTheme, branchCode } = appData
@@ -34,16 +36,15 @@ const Sales = () => {
     S_PCode: ''
   });
 
-  const initLoadData = async () => {
-    setIsLoading(true);
+  const handleSearch = async () => {
     try {
-      const { data, error } = await loadStcardInfo({
-        branchCode: branchCode
-      })
+      setIsLoading(true)
+      const { data, error } = await searchData(searchCriteria)
+      if(data){
+        setFilteredSales(data);
+      }
 
-      if(data) {
-        setDraftSale(data)
-      }else {
+      if(error){
         setActiveModal({
           type: 'error',
           title: 'ไม่สามารถแสดงข้อมูลได้',
@@ -57,62 +58,8 @@ const Sales = () => {
         });
       }
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  }
-  
-  const handleSearch = () => {
-    let filtered = [...draftSale];
-
-    if (searchCriteria.S_No.trim()) {
-      filtered = filtered.filter(item => 
-        (item.S_No || '').toString().toLowerCase().includes(searchCriteria.S_No.toLowerCase().trim())
-      );
-    }
-
-    if (searchCriteria.S_Date_Start) {
-      filtered = filtered.filter(item => 
-        new Date(item.S_Date) >= new Date(searchCriteria.S_Date_Start)
-      );
-    }
-
-    if (searchCriteria.S_Date_End) {
-      filtered = filtered.filter(item => 
-        new Date(item.S_Date) <= new Date(searchCriteria.S_Date_End)
-      );
-    }
-
-    if (searchCriteria.S_Bran) {
-      filtered = filtered.filter(item => 
-        item.S_Bran === searchCriteria.S_Bran
-      );
-    }
-
-    if (searchCriteria.S_User.trim()) {
-      filtered = filtered.filter(item => 
-        item.S_User.toLowerCase().includes(searchCriteria.S_User.toLowerCase())
-      );
-    }
-
-    if (searchCriteria.Data_Sync) {
-      filtered = filtered.filter(item => 
-        item.Data_Sync === searchCriteria.Data_Sync
-      );
-    }
-
-    if (searchCriteria.S_Stk) {
-      filtered = filtered.filter(item => 
-        item.S_Stk === searchCriteria.S_Stk
-      );
-    }
-
-    if (searchCriteria.S_PCode) {
-      filtered = filtered.filter(item => 
-        item.S_PCode === searchCriteria.S_PCode
-      );
-    }
-
-    setFilteredSales(filtered);
   };
 
   // ล้างการค้นหา
@@ -150,21 +97,28 @@ const Sales = () => {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [showSaleModal, showReviewModal, showPostModal]);
 
-  if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <h1 className={`text-2xl font-bold ${getThemeClasses('textPrimary', currentTheme)}`}>ข้อมูลตาราง STCARD</h1>
-        </div>
-        <div className="flex items-center justify-center py-20">
-          <div className="flex flex-col items-center space-y-4">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            <p className={`text-lg ${getThemeClasses('textSecondary', currentTheme)}`}>กำลังโหลดข้อมูล...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  useEffect(()=> {
+    const initLoadAllbranch = async () => {
+      const { data, error } = await loadAllBranch()
+      if(data) {
+        setBranchFile(data)
+      }
+      if(error) {
+        setActiveModal({
+          type: 'error',
+          title: 'แสดงข้อมูลสาขาทั้งหมด',
+          message: error || 'พบปัญหาในการแสดงรายการสาขาทั้งหมด',
+          actions: [
+            {
+              label: 'ตกลง',
+              onClick: () => setActiveModal(null)
+            }
+          ]
+        });
+      }
+    }
+    initLoadAllbranch()
+  }, [])
 
   return (
     <div className="space-y-6">
@@ -191,6 +145,7 @@ const Sales = () => {
           draftSale={draftSale}
           resetSearch={resetSearch}
           handleSearch={handleSearch}
+          branchFile={branchFile}
         />
       )}
 
@@ -200,6 +155,7 @@ const Sales = () => {
         filteredSales={filteredSales}
         searchCriteria={searchCriteria}
         resetSearch={resetSearch}
+        isLoading={isLoading}
       />
 
       {activeModal && (

@@ -41,6 +41,12 @@ const getAllSTCard = async ({ repository, db }) => {
   }
 }
 
+const searchStCardData = async ({ repository, db, payload }) => {
+  const results = await repository.searchData({db, payload })
+  const mapped = mappingResultData(results)
+  return mapped
+}
+
 const processStock = async ({ payload, repository, db }) => {
   const { billInfo, sale_items } = payload
   for (const [index, item] of sale_items.entries()) {
@@ -88,5 +94,6 @@ const processStock = async ({ payload, repository, db }) => {
 module.exports = {
   getSTCard,
   getAllSTCard,
-  processStock
+  processStock,
+  searchStCardData
 }

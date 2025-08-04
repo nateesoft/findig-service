@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Search } from 'lucide-react';
 
 import { getThemeClasses } from '../../utils/themes';
-import { loadPosUserAll } from '../../api/userLoginApi';
+import { searchData } from '../../api/posuserApi';
 import { Modal } from '../../components/Modals';
 import SearchForm from './SearchForm';
 import DataTable from './DataTable';
@@ -10,7 +10,6 @@ import DataTable from './DataTable';
 const UserGroups = ({ currentTheme }) => {
   const [activeModal, setActiveModal] = useState(null);
 
-  const [userList, setUserList] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage] = useState(10)
   const [showSearchForm, setShowSearchForm] = useState(true);
@@ -22,25 +21,6 @@ const UserGroups = ({ currentTheme }) => {
     Name: ''
   });
 
-  const handleSearch = () => {
-    let filtered = [...currentUsers];
-
-    if (searchCriteria.UserName.trim()) {
-      console.log('condition1:', searchCriteria.UserName)
-      filtered = filtered.filter(item => 
-        item.UserName.toLowerCase().includes(searchCriteria.UserName.toLowerCase())
-      );
-    }
-
-    if (searchCriteria.Name) {
-      console.log('condition2:', searchCriteria.UserName)
-      filtered = filtered.filter(item => 
-        item.Name === searchCriteria.Name
-      );
-    }
-    setFilteredSales(filtered);
-  };
-
   const resetSearch = () => {
     setSearchCriteria({
       UserName: '',
@@ -49,13 +29,16 @@ const UserGroups = ({ currentTheme }) => {
     setFilteredSales(currentUsers);
   };
 
-  const initLoadData = async () => {
+  const handleSearch = async () => {
     try {
       setIsLoading(true);
 
-      const { data, error } = await loadPosUserAll()
+      const { data, error } = await searchData({
+        UserName: searchCriteria.UserName,
+        Name: searchCriteria.Name
+      })
       if(data) {
-        setUserList(data)
+        setFilteredSales(data)
       }else{
         setActiveModal({
           type: 'error',
@@ -88,9 +71,9 @@ const UserGroups = ({ currentTheme }) => {
 
   const indexOfLastItem = currentPage * itemsPerPage
   const indexOfFirstItem = indexOfLastItem - itemsPerPage
-  const currentUsers = userList.slice(indexOfFirstItem, indexOfLastItem)
+  const currentUsers = filteredSales.slice(indexOfFirstItem, indexOfLastItem)
 
-  const totalPages = Math.ceil(userList.length / itemsPerPage)
+  const totalPages = Math.ceil(filteredSales.length / itemsPerPage)
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber)
@@ -124,22 +107,6 @@ const UserGroups = ({ currentTheme }) => {
     return pageNumbers
   }
 
-  if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <h1 className={`text-2xl font-bold ${getThemeClasses('textPrimary', currentTheme)}`}>กำหนดรหัสกลุ่มผู้ใช้งาน</h1>
-        </div>
-        <div className="flex items-center justify-center py-20">
-          <div className="flex flex-col items-center space-y-4">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            <p className={`text-lg ${getThemeClasses('textSecondary', currentTheme)}`}>กำลังโหลดข้อมูล...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
@@ -162,7 +129,6 @@ const UserGroups = ({ currentTheme }) => {
           searchCriteria={searchCriteria}
           setSearchCriteria={setSearchCriteria}
           filteredSales={filteredSales}
-          draftSale={currentUsers}
           resetSearch={resetSearch}
           handleSearch={handleSearch}
         />
@@ -174,62 +140,8 @@ const UserGroups = ({ currentTheme }) => {
         filteredSales={filteredSales}
         searchCriteria={searchCriteria}
         resetSearch={resetSearch}
+        isLoading={isLoading}
       />
-
-      {totalPages > 1 && (
-        <div className={`px-6 py-3 border-t ${getThemeClasses('cardBorder', currentTheme)}`}>
-          <div className="flex items-center justify-between">
-            {/* ข้อมูลการแสดงผล */}
-            <div className={`text-sm ${getThemeClasses('textMuted', currentTheme)}`}>
-              แสดง {indexOfFirstItem + 1} - {Math.min(indexOfLastItem, userList.length)} จาก {userList.length} รายการ
-            </div>
-            
-            {/* ปุ่ม Pagination */}
-            <div className="flex items-center space-x-2">
-              {/* ปุ่มย้อนกลับ */}
-              <button
-                onClick={handlePrevious}
-                disabled={currentPage === 1}
-                className={`px-3 py-1 rounded-md text-sm ${
-                  currentPage === 1
-                    ? `${getThemeClasses('textMuted', currentTheme)} cursor-not-allowed`
-                    : `${getThemeClasses('textPrimary', currentTheme)} hover:${getThemeClasses('cardBg', currentTheme)} border ${getThemeClasses('cardBorder', currentTheme)}`
-                }`}
-              >
-                ก่อนหน้า
-              </button>
-
-              {/* หมายเลขหน้า */}
-              {getPageNumbers().map((pageNumber) => (
-                <button
-                  key={pageNumber}
-                  onClick={() => handlePageChange(pageNumber)}
-                  className={`px-3 py-1 rounded-md text-sm ${
-                    currentPage === pageNumber
-                      ? `bg-blue-500 text-white`
-                      : `${getThemeClasses('textPrimary', currentTheme)} hover:${getThemeClasses('cardBg', currentTheme)} border ${getThemeClasses('cardBorder', currentTheme)}`
-                  }`}
-                >
-                  {pageNumber}
-                </button>
-              ))}
-
-              {/* ปุ่มถัดไป */}
-              <button
-                onClick={handleNext}
-                disabled={currentPage === totalPages}
-                className={`px-3 py-1 rounded-md text-sm ${
-                  currentPage === totalPages
-                    ? `${getThemeClasses('textMuted', currentTheme)} cursor-not-allowed`
-                    : `${getThemeClasses('textPrimary', currentTheme)} hover:${getThemeClasses('cardBg', currentTheme)} border ${getThemeClasses('cardBorder', currentTheme)}`
-                }`}
-              >
-                ถัดไป
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {activeModal && (
         <Modal

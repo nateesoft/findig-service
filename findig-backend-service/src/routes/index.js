@@ -16,6 +16,7 @@ router.get('/api/branch/list', BranchController.findAllBranch);
 router.get('/api/branch/:branchCode', BranchController.getBranchByCode);
 
 router.get('/api/stcard', STCardController.getAllSTCard);
+router.post('/api/stcard/search', STCardController.searchStCardData);
 router.get('/api/stcard/:branchCode', STCardController.getAllSTCardByCode);
 router.post('/api/stcard', STCardController.processStock);
 
@@ -24,6 +25,7 @@ router.get('/api/stkfile/:branchCode', STKFileController.getAllSTKFileByCode);
 router.post('/api/stkfile', STKFileController.processStock);
 
 router.get('/api/posuser', PosUserController.getAllUser);
+router.post('/api/posuser/search', PosUserController.searchUserData);
 router.post('/api/posuser/login', PosUserController.validateLogin);
 router.patch('/api/posuser/logout', PosUserController.processLogout);
 

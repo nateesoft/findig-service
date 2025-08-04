@@ -11,6 +11,36 @@ const getData = async ({ payload, db }) => {
   return results
 }
 
+const searchData = async ({ payload, db }) => {
+  const { S_No, S_Date_Start, S_Date_End, S_Bran, S_User, Data_Sync, S_Stk, S_PCode  } = payload
+  let sql = `select * from stcard where 1=1 `
+  if (S_No) {
+    sql += `and S_No like '%${S_No}%' `
+  }
+  if (S_Date_Start && S_Date_End) {
+    sql += `and S_Date_Start >= '${S_Date_Start}' and S_Date_End <= '%${S_Date_End}%' `
+  }
+  if (S_User) {
+    sql += `and S_User like '%${S_User}%' `
+  }
+  if (S_Bran) {
+    sql += `and S_Bran = '${S_Bran}' `
+  }
+  if (Data_Sync) {
+    sql += `and Data_Sync = '${Data_Sync}' `
+  }
+  if (S_Stk) {
+    sql += `and S_Stk = '${S_Stk}' `
+  }
+  if (S_PCode) {
+    sql += `and S_PCode like '%${S_PCode}%' `
+  }
+  sql += `order by S_Date`
+
+  const results = await db.pos?.query(sql, [S_Bran])
+  return results
+}
+
 const getDataByBillNoPCode = async ({ payload, db }) => {
   const { S_Bran, S_No, S_PCode } = payload
   const sql = `select * from stcard where S_Bran=? AND S_No=? AND S_PCode=?`
@@ -64,5 +94,6 @@ module.exports = {
   createStcard,
   updateStcard,
   findByBillNoPCode,
-  getDataByBillNoPCode
+  getDataByBillNoPCode,
+  searchData
 }

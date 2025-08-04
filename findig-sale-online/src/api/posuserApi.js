@@ -1,8 +1,8 @@
 import apiClient from "../httpRequest"
 
-export const validateLogin = async (payload) => {
+export const loadPosUserAll = async () => {
   try {
-    const response = await apiClient.post(`/api/posuser/login`, payload)
+    const response = await apiClient.get(`/api/posuser`)
     return { data: response.data, error: null }
   } catch (error) {
     if (error.response) {
@@ -18,11 +18,9 @@ export const validateLogin = async (payload) => {
   }
 }
 
-export const sendToLogout = async (payload) => {
-  const { UserName } = payload
+export const searchData = async (payload) => {
   try {
-    const payload = { username: UserName }
-    const response = await apiClient.patch(`/api/posuser/logout`, payload)
+    const response = await apiClient.post(`/api/posuser/search`, payload)
     return { data: response.data, error: null }
   } catch (error) {
     if (error.response) {

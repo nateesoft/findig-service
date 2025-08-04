@@ -8,7 +8,8 @@ const SearchForm = ({
   filteredSales,
   draftSale,
   resetSearch,
-  handleSearch
+  handleSearch,
+  branchFile
 }) => {
   return (
     <div
@@ -118,8 +119,9 @@ const SearchForm = ({
               )}`}
             >
               <option value="">ทุกสาขา</option>
-              <option value="909">909 - สำนักงานใหญ่ ICS</option>
-              <option value="TST">TST - สาขาทดสอบระบบ</option>
+              {branchFile && branchFile.map(item=>
+                <option key={item.Code} value={item.Code}>{item.Code}-{item.Name}</option>
+              )}
             </select>
           </div>
           <div>

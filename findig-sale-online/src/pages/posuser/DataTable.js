@@ -1,7 +1,4 @@
 import { 
-  Eye, 
-  Edit,
-  FileText,
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
@@ -10,7 +7,6 @@ import {
   ArrowUp,
   ArrowDown
 } from 'lucide-react';
-import moment from 'moment';
 import { useState, useEffect } from 'react';
 
 const DataTable = ({
@@ -18,7 +14,8 @@ const DataTable = ({
   currentTheme,
   filteredSales,
   searchCriteria,
-  resetSearch
+  resetSearch,
+  isLoading
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortField, setSortField] = useState('');
@@ -125,6 +122,22 @@ const DataTable = ({
     
     return pages;
   };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+          <h1 className={`text-2xl font-bold ${getThemeClasses('textPrimary', currentTheme)}`}>ข้อมูลกลุ่มผู้ใช้งาน</h1>
+        </div>
+        <div className="flex items-center justify-center py-20">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <p className={`text-lg ${getThemeClasses('textSecondary', currentTheme)}`}>กำลังโหลดข้อมูล...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div

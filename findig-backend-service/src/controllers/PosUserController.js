@@ -46,8 +46,23 @@ const getAllUser = async (req, res, next) => {
   }
 };
 
+const searchUserData = async (req, res, next) => {
+  try {
+    const { UserName, Name } = req.body
+    const result = await PosUserService.searchUserData({
+      payload: { UserName, Name },
+      repository: PosUserRepository,
+      db: req.db
+    })
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   validateLogin,
   processLogout,
-  getAllUser
+  getAllUser,
+  searchUserData
 }

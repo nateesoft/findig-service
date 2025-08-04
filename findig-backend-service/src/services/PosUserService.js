@@ -1,5 +1,6 @@
 
 const { mappingResultData } = require('../utils/ConvertThai')
+const { Unicode2ASCII } = require('../utils/StringUtil')
 
 const checkLogin = async ({ payload, repository, db }) => {
     const results = await repository.checkLogin({ payload, db })
@@ -20,8 +21,19 @@ const getAllUser = async ({ payload, repository, db }) => {
   return mappingResultData(results)
 };
 
+const searchUserData = async ({ payload, repository, db }) => {
+  const { UserName, Name } = payload
+
+  const results = await repository.searchUser({ db, payload: {
+    UserName: UserName,
+    Name: Unicode2ASCII(Name)
+  } })
+  return mappingResultData(results)
+};
+
 module.exports = {
     checkLogin,
     processLogout,
-    getAllUser
+    getAllUser,
+    searchUserData
 }

@@ -18,9 +18,23 @@ const listAllUser = async ({ db }) => {
   return results
 };
 
+const searchUser = async ({ db, payload }) => {
+  const { UserName, Name } = payload
+  let sql = `SELECT * FROM posuser where 1=1 `
+  if (UserName) {
+    sql += `and Username like '%${UserName}%' `
+  }
+  if (Name) {
+    sql += ` and Name like '%${Name}%' `
+  }
+  sql += `order by Username `
+  const results = await db.pos?.query(sql)
+  return results
+};
 
 module.exports = {
     checkLogin,
     updateUserLogout,
-    listAllUser
+    listAllUser,
+    searchUser
 }

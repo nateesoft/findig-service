@@ -40,8 +40,24 @@ const processStock = async (req, res, next) => {
   }
 }
 
+const searchStCardData = async (req, res, next) => {
+  try {
+    const payload = req.body
+    const stcardInfo = await StcardService.searchStCardData({
+      repository: StcardRepository,
+      db: req.db,
+      payload
+    })
+    res.json(stcardInfo)
+  } catch (error) {
+    next(error)
+  }
+}
+
+
 module.exports = {
   getAllSTCard,
   processStock,
-  getAllSTCardByCode
+  getAllSTCardByCode,
+  searchStCardData
 }
