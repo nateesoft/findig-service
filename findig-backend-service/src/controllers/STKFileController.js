@@ -39,9 +39,23 @@ const processStock = async (req, res, next) => {
   }
 }
 
+const searchStkFileData = async (req, res, next) => {
+  try {
+    const payload = req.body
+    const stkfileInfo = await STKFileService.searchStkFileData({
+      repository: StkfileRepository,
+      db: req.db,
+      payload
+    })
+    res.json(stkfileInfo)
+  } catch (error) {
+    next(error)
+  }
+}
 
 module.exports = {
   getAllSTKFile,
   processStock,
-  getAllSTKFileByCode
+  getAllSTKFileByCode,
+  searchStkFileData
 }

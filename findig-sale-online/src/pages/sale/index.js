@@ -14,9 +14,11 @@ import CreateEditModal from './CreateEditModal'
 import SearchForm from './SearchForm';
 import DataTable from './DataTable';
 import { Modal } from '../../components/Modals';
+import { loadAllBranch } from '../../api/branchApi';
 
 const Sales = () => {
   const [activeModal, setActiveModal] = useState(null);
+  const [branchFile, setBranchFile] = useState([])
 
   const { appData } = useContext(AppContext)
   const { currentTheme, branchCode, userInfo } = appData
@@ -40,7 +42,7 @@ const Sales = () => {
     billNo: '',
     dateFrom: '',
     dateTo: '',
-    branchCode: '',
+    branchCode: branchCode || '',
     empCode: '',
     postStatus: ''
   });
@@ -586,7 +588,7 @@ const Sales = () => {
       billNo: '',
       dateFrom: '',
       dateTo: '',
-      branchCode: '',
+      branchCode: branchCode || '',
       empCode: '',
       postStatus: ''
     });
@@ -620,21 +622,28 @@ const Sales = () => {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [showSaleModal, showReviewModal, showPostModal, currentItem]);
 
-  if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <h1 className={`text-2xl font-bold ${getThemeClasses('textPrimary', currentTheme)}`}>เมนูบันทึกการขาย</h1>
-        </div>
-        <div className="flex items-center justify-center py-20">
-          <div className="flex flex-col items-center space-y-4">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            <p className={`text-lg ${getThemeClasses('textSecondary', currentTheme)}`}>กำลังโหลดข้อมูล...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  useEffect(()=> {
+      const initLoadAllbranch = async () => {
+        const { data, error } = await loadAllBranch()
+        if(data) {
+          setBranchFile(data)
+        }
+        if(error) {
+          setActiveModal({
+            type: 'error',
+            title: 'แสดงข้อมูลสาขาทั้งหมด',
+            message: error || 'พบปัญหาในการแสดงรายการสาขาทั้งหมด',
+            actions: [
+              {
+                label: 'ตกลง',
+                onClick: () => setActiveModal(null)
+              }
+            ]
+          });
+        }
+      }
+      initLoadAllbranch()
+    }, [])
 
   return (
     <div className="space-y-6">
@@ -673,6 +682,7 @@ const Sales = () => {
           draftSale={draftSale}
           resetSearch={resetSearch}
           handleSearch={handleSearch}
+          branchFile={branchFile}
         />
       )}
 
@@ -684,6 +694,7 @@ const Sales = () => {
         handleEditSale={handleEditSale}
         searchCriteria={searchCriteria}
         resetSearch={resetSearch}
+        isLoading={isLoading}
       />
 
       {showPostModal && (

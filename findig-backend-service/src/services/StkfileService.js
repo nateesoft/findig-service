@@ -45,6 +45,12 @@ const getAllSTKFile = async ({ repository, db }) => {
 
 }
 
+const searchStkFileData = async ({ repository, db, payload }) => {
+  const results = await repository.searchData({ db, payload })
+  const mapped = mappingResultData(results)
+  return mapped
+}
+
 const getAllSTKFileByCode = async ({ repository, db, payload }) => {
   const { branchCode } = payload
   const cacheKey = 'getAllSTKFile_'+getMoment().format('YYYY-MM-DD')
@@ -159,5 +165,6 @@ module.exports = {
   getSTKFile,
   getAllSTKFile,
   processStock,
-  getAllSTKFileByCode
+  getAllSTKFileByCode,
+  searchStkFileData
 }

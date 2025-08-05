@@ -1,4 +1,6 @@
-import { 
+import { useState, useEffect } from 'react';
+import {
+  FileText,
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
@@ -7,7 +9,6 @@ import {
   ArrowUp,
   ArrowDown
 } from 'lucide-react';
-import { useState, useEffect } from 'react';
 
 const DataTable = ({
   getThemeClasses,
@@ -228,7 +229,8 @@ const DataTable = ({
               currentTheme
             )} divide-y ${getThemeClasses("tableBorder", currentTheme)}`}
           >
-            {filteredSales && filteredSales.map((user, index) => (
+            {currentItems.length > 0 ? (
+              currentItems.map((user, index) => (
                 <tr
                   key={index}
                   className={getThemeClasses("tableRow", currentTheme)}
@@ -265,7 +267,33 @@ const DataTable = ({
                     </span>
                   </td>
                 </tr>
-              ))}
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan="9"
+                  className={`px-6 py-8 text-center text-sm ${getThemeClasses(
+                    "textMuted",
+                    currentTheme
+                  )}`}
+                >
+                  <div className="flex flex-col items-center justify-center space-y-2">
+                    <FileText className="w-12 h-12 text-gray-300" />
+                    <p>ไม่พบข้อมูลการขายที่ตรงกับเงื่อนไขการค้นหา</p>
+                    {Object.values(searchCriteria).some(
+                      (value) => value.trim() !== ""
+                    ) && (
+                      <button
+                        onClick={resetSearch}
+                        className={`text-blue-500 hover:text-blue-700 text-sm underline`}
+                      >
+                        ล้างการค้นหา
+                      </button>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

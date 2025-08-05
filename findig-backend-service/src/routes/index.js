@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router();
 
 const ProductController = require('../controllers/ProductController')
+const GroupfileController = require('../controllers/GroupfileController')
 
 const BranchController = require('../controllers/BranchController')
 const STCardController = require('../controllers/STCardController')
@@ -21,6 +22,7 @@ router.get('/api/stcard/:branchCode', STCardController.getAllSTCardByCode);
 router.post('/api/stcard', STCardController.processStock);
 
 router.get('/api/stkfile', STKFileController.getAllSTKFile);
+router.post('/api/stkfile/search', STKFileController.searchStkFileData);
 router.get('/api/stkfile/:branchCode', STKFileController.getAllSTKFileByCode);
 router.post('/api/stkfile', STKFileController.processStock);
 
@@ -44,5 +46,7 @@ router.put('/api/draftsale_detail/:id', DraftSaleDetailsController.updateData)
 router.delete('/api/draftsale_detail/:id', DraftSaleDetailsController.deleteData)
 
 router.post('/api/product', ProductController.getProductData);
+
+router.get('/api/groupfile/list', GroupfileController.getAllGroupfile);
 
 module.exports = router

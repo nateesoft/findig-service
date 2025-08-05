@@ -15,7 +15,8 @@ const SaleTable = ({
     currentTheme,
     filteredSales,
     searchCriteria,
-    resetSearch
+    resetSearch,
+    isLoading
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortField, setSortField] = useState('');
@@ -38,23 +39,11 @@ const SaleTable = ({
     
     let aValue = a[sortField];
     let bValue = b[sortField];
-    
-    // จัดการกับข้อมูลวันที่
-    if (sortField === 'document_date') {
-      aValue = new Date(aValue);
-      bValue = new Date(bValue);
-    }
-    
-    // จัดการกับข้อมูลตัวเลข
-    if (sortField === 'total_item') {
-      aValue = Number(aValue);
-      bValue = Number(bValue);
-    }
-    
+
     // จัดการกับข้อมูลข้อความ
     if (typeof aValue === 'string') {
-      aValue = aValue.toLowerCase();
-      bValue = bValue.toLowerCase();
+      aValue = aValue;
+      bValue = bValue;
     }
     
     if (aValue < bValue) {
@@ -135,6 +124,23 @@ const SaleTable = ({
     return pages;
   };
 
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+          <h1 className={`text-2xl font-bold ${getThemeClasses('textPrimary', currentTheme)}`}>ข้อมูลตาราง STKFILE</h1>
+        </div>
+        <div className="flex items-center justify-center py-20">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <p className={`text-lg ${getThemeClasses('textSecondary', currentTheme)}`}>กำลังโหลดข้อมูล...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+
   return (
     <div
       className={`${getThemeClasses(
@@ -157,7 +163,7 @@ const SaleTable = ({
             currentTheme
           )}`}
         >
-          ข้อมูล STKFile
+          ข้อมูลสินค้าคงเหลือ
         </h3>
         {sortedSales.length > 0 && (
           <p className={`text-sm ${getThemeClasses("textMuted", currentTheme)} mt-2`}>
@@ -193,11 +199,41 @@ const SaleTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
+                onClick={() => handleSort('GroupName')}
+              >
+                <div className="flex items-center justify-center">
+                  กลุ่ม
+                  {getSortIcon('GroupName')}
+                </div>
+              </th>
+              <th
+                className={`px-6 py-3 text-center text-xs font-medium ${getThemeClasses(
+                  "textMuted",
+                  currentTheme
+                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
+                  "textPrimary",
+                  currentTheme
+                )} ${getThemeClasses("transition", currentTheme)}`}
                 onClick={() => handleSort('BPCode')}
               >
                 <div className="flex items-center justify-center">
-                  สินค้า
+                  รหัสสินค้า
                   {getSortIcon('BPCode')}
+                </div>
+              </th>
+              <th
+                className={`px-6 py-3 text-center text-xs font-medium ${getThemeClasses(
+                  "textMuted",
+                  currentTheme
+                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
+                  "textPrimary",
+                  currentTheme
+                )} ${getThemeClasses("transition", currentTheme)}`}
+                onClick={() => handleSort('PDesc')}
+              >
+                <div className="flex items-center justify-center">
+                  ชื่อสินค้า
+                  {getSortIcon('PDesc')}
                 </div>
               </th>
               <th
@@ -433,12 +469,28 @@ const SaleTable = ({
                     {draft_sale.Branch}
                   </td>
                   <td
+                    className={`px-6 py-4 whitespace-nowrap text-left text-sm ${getThemeClasses(
+                      "textPrimary",
+                      currentTheme
+                    )}`}
+                  >
+                    {draft_sale.GroupName}
+                  </td>
+                  <td
                     className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
                       "textPrimary",
                       currentTheme
                     )}`}
                   >
                     {draft_sale.BPCode}
+                  </td>
+                  <td
+                    className={`px-6 py-4 whitespace-nowrap text-left text-sm ${getThemeClasses(
+                      "textPrimary",
+                      currentTheme
+                    )}`}
+                  >
+                    {draft_sale.PDesc}
                   </td>
                   <td
                     className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
@@ -583,7 +635,7 @@ const SaleTable = ({
                         onClick={resetSearch}
                         className={`text-blue-500 hover:text-blue-700 text-sm underline`}
                       >
-                        ล้างการค้นหาเพื่อดูข้อมูลทั้งหมด
+                        ล้างการค้นหา
                       </button>
                     )}
                   </div>

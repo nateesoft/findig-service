@@ -6,10 +6,10 @@ const SearchForm = ({
   searchCriteria,
   setSearchCriteria,
   filteredSales,
-  draftSale,
   resetSearch,
   handleSearch,
-  branchFile
+  branchFile,
+  groupFile
 }) => {
   return (
     <div
@@ -209,6 +209,34 @@ const SearchForm = ({
                 currentTheme
               )} mb-2`}
             >
+              กลุ่มสินค้า
+            </label>
+            <select
+              value={searchCriteria.GroupCode}
+              onChange={(e) =>
+                setSearchCriteria({
+                  ...searchCriteria,
+                  GroupCode: e.target.value
+                })
+              }
+              className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
+                "input",
+                currentTheme
+              )}`}
+            >
+              <option value="">ทุกกลุ่มสินค้า</option>
+              {groupFile && groupFile.map(item=>
+                <option key={item.GroupCode} value={item.GroupCode}>{item.GroupCode}-{item.GroupName}</option>
+              )}
+            </select>
+          </div>
+          <div>
+            <label
+              className={`block text-sm font-medium ${getThemeClasses(
+                "textSecondary",
+                currentTheme
+              )} mb-2`}
+            >
               รหัสสินค้า
             </label>
             <input
@@ -237,8 +265,7 @@ const SearchForm = ({
               currentTheme
             )} flex items-center`}
           >
-            พบข้อมูล {filteredSales.length} รายการ จากทั้งหมด {draftSale.length}{" "}
-            รายการ
+            พบข้อมูล {filteredSales.length} รายการ
           </div>
           <div className="flex space-x-2">
             <button

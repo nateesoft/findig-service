@@ -3,20 +3,21 @@ import { Search } from 'lucide-react';
 
 import { getThemeClasses } from '../../utils/themes';
 import { AppContext } from '../../contexts';
-import { loadStcardInfo, searchData } from '../../api/stcardApi';
+import { searchData } from '../../api/stcardApi';
 import SearchForm from './SearchForm';
 import DataTable from './DataTable';
 import { Modal } from '../../components/Modals';
 import { loadAllBranch } from '../../api/branchApi';
+import { loadAllGroupfile } from '../../api/groupfileApi';
 
 const Sales = () => {
   const [activeModal, setActiveModal] = useState(null);
   const [branchFile, setBranchFile] = useState([])
+  const [groupFile, setGroupFile] = useState([])
 
   const { appData } = useContext(AppContext)
   const { currentTheme, branchCode } = appData
 
-  const [draftSale, setDraftSale] = useState([])
   const [filteredSales, setFilteredSales] = useState([])
   const [showSaleModal, setShowSaleModal] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
@@ -29,7 +30,7 @@ const Sales = () => {
     S_No: '',
     S_Date_Start: '',
     S_Date_End: '',
-    S_Bran: '',
+    S_Bran: branchCode || '',
     S_User: '',
     Data_Sync: '',
     S_Stk: '',
@@ -74,13 +75,8 @@ const Sales = () => {
       S_Stk: '',
       S_PCode: ''
     });
-    setFilteredSales(draftSale);
+    setFilteredSales(filteredSales);
   };
-
-  // อัปเดต filteredSales เมื่อ draftSale เปลี่ยน
-  useEffect(() => {
-    setFilteredSales(draftSale);
-  }, [draftSale]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -117,7 +113,27 @@ const Sales = () => {
         });
       }
     }
+    const initLoadAllGroupfile = async () => {
+      const { data, error } = await loadAllGroupfile()
+      if(data) {
+        setGroupFile(data)
+      }
+      if(error) {
+        setActiveModal({
+          type: 'error',
+          title: 'แสดงข้อมูลสาขาทั้งหมด',
+          message: error || 'พบปัญหาในการแสดงรายการสาขาทั้งหมด',
+          actions: [
+            {
+              label: 'ตกลง',
+              onClick: () => setActiveModal(null)
+            }
+          ]
+        });
+      }
+    }
     initLoadAllbranch()
+    initLoadAllGroupfile()
   }, [])
 
   return (
@@ -142,10 +158,10 @@ const Sales = () => {
           searchCriteria={searchCriteria}
           setSearchCriteria={setSearchCriteria}
           filteredSales={filteredSales}
-          draftSale={draftSale}
           resetSearch={resetSearch}
           handleSearch={handleSearch}
           branchFile={branchFile}
+          groupFile={groupFile}
         />
       )}
 

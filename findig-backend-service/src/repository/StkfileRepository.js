@@ -11,6 +11,34 @@ const getAllData = async ({ db }) => {
   return results
 }
 
+const searchData = async ({ db, payload }) => {
+  const { Branch, BPCode, BStk, SendToPOS, GroupCode } = payload
+  let sql = `select p.PCode, p.PDesc, p.PGroup, g.GroupName  , st.* 
+    from stkfile st 
+    left join product p on st.BPCode =p.PCode 
+    left join groupfile g on p.PGroup=g.GroupCode 
+    where 1=1 `
+  if (BPCode) {
+    sql += `and st.BPCode like '%${BPCode}%' `
+  }
+  if (Branch) {
+    sql += `and st.Branch = '${Branch}' `
+  }
+  if (BStk) {
+    sql += `and st.BStk = '${BStk}' `
+  }
+  if (SendToPOS) {
+    sql += `and st.SendToPOS = '${SendToPOS}' `
+  }
+  if (GroupCode) {
+    sql += `and g.GroupCode = '${GroupCode}' `
+  }
+  sql += `order by st.Branch, st.BPCode`
+
+  const results = await db.pos?.query(sql)
+  return results
+}
+
 const findByProductStockCode = async ({ payload, db }) => {
   const { Branch, BPCode, BStk } = payload
   const sql = `select * from stkfile where Branch=? and BPCode=? and BStk=?`
@@ -79,5 +107,6 @@ module.exports = {
   getAllData,
   createStkFile,
   updateStkFile,
-  findByProductStockCode
+  findByProductStockCode,
+  searchData
 }

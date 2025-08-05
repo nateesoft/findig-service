@@ -3,18 +3,21 @@ import { Search } from 'lucide-react';
 
 import { getThemeClasses } from '../../utils/themes';
 import { AppContext } from '../../contexts';
-import { loadStfileInfo } from '../../api/stkfileApi';
+import { searchData } from '../../api/stkfileApi';
 import SearchForm from './SearchForm';
 import DataTable from './DataTable';
 import { Modal } from '../../components/Modals';
+import { loadAllBranch } from '../../api/branchApi';
+import { loadAllGroupfile } from '../../api/groupfileApi';
 
 const Sales = () => {
   const [activeModal, setActiveModal] = useState(null);
+  const [branchFile, setBranchFile] = useState([])
+  const [groupFile, setGroupFile] = useState([])
 
   const { appData } = useContext(AppContext)
   const { currentTheme, branchCode } = appData
 
-  const [draftSale, setDraftSale] = useState([])
   const [filteredSales, setFilteredSales] = useState([])
   const [showSaleModal, setShowSaleModal] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
@@ -24,23 +27,21 @@ const Sales = () => {
   
   // Search criteria state
   const [searchCriteria, setSearchCriteria] = useState({
-    Branch: '',
+    Branch: branchCode || '',
     BPCode: '',
     BStk: '',
-    SendToPOS: ''
+    SendToPOS: '',
+    GroupCode: ''
   });
 
-
-  const initLoadData = async () => {
-    setIsLoading(true);
-    try{
-      const { data, error } = await loadStfileInfo({
-        branchCode: branchCode
-      })
-
-      if(data) {
-        setDraftSale(data)
-      }else {
+  const handleSearch = async () => {
+    try {
+      setIsLoading(true)
+      const { data, error } = await searchData(searchCriteria)
+      if(data){
+        setFilteredSales(data);
+      }
+      if(error){
         setActiveModal({
           type: 'error',
           title: 'ไม่สามารถแสดงข้อมูลได้',
@@ -56,37 +57,6 @@ const Sales = () => {
     } finally {
       setIsLoading(false)
     }
-    
-  }
-  
-  const handleSearch = () => {
-    let filtered = [...draftSale];
-
-    if (searchCriteria.Branch.trim()) {
-      filtered = filtered.filter(item => 
-        item.Branch.toLowerCase().includes(searchCriteria.Branch.toLowerCase())
-      );
-    }
-
-    if (searchCriteria.BPCode) {
-      filtered = filtered.filter(item => 
-        item.BPCode === searchCriteria.BPCode
-      );
-    }
-
-    if (searchCriteria.BStk.trim()) {
-      filtered = filtered.filter(item => 
-        item.BStk.toLowerCase().includes(searchCriteria.BStk.toLowerCase())
-      );
-    }
-
-    if (searchCriteria.SendToPOS) {
-      filtered = filtered.filter(item => 
-        item.SendToPOS === searchCriteria.SendToPOS
-      );
-    }
-
-    setFilteredSales(filtered);
   };
 
   const resetSearch = () => {
@@ -94,14 +64,11 @@ const Sales = () => {
       Branch: '',
       BPCode: '',
       BStk: '',
-      SendToPOS: ''
+      SendToPOS: '',
+      GroupCode: ''
     });
-    setFilteredSales(draftSale);
+    setFilteredSales(filteredSales);
   };
-
-  useEffect(() => {
-    setFilteredSales(draftSale);
-  }, [draftSale]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -118,21 +85,48 @@ const Sales = () => {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [showSaleModal, showReviewModal, showPostModal]);
 
-  if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <h1 className={`text-2xl font-bold ${getThemeClasses('textPrimary', currentTheme)}`}>ข้อมูลตาราง STKFILE</h1>
-        </div>
-        <div className="flex items-center justify-center py-20">
-          <div className="flex flex-col items-center space-y-4">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            <p className={`text-lg ${getThemeClasses('textSecondary', currentTheme)}`}>กำลังโหลดข้อมูล...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  useEffect(()=> {
+    const initLoadAllbranch = async () => {
+      const { data, error } = await loadAllBranch()
+      if(data) {
+        setBranchFile(data)
+      }
+      if(error) {
+        setActiveModal({
+          type: 'error',
+          title: 'แสดงข้อมูลสาขาทั้งหมด',
+          message: error || 'พบปัญหาในการแสดงรายการสาขาทั้งหมด',
+          actions: [
+            {
+              label: 'ตกลง',
+              onClick: () => setActiveModal(null)
+            }
+          ]
+        });
+      }
+    }
+    const initLoadAllGroupfile = async () => {
+      const { data, error } = await loadAllGroupfile()
+      if(data) {
+        setGroupFile(data)
+      }
+      if(error) {
+        setActiveModal({
+          type: 'error',
+          title: 'แสดงข้อมูลสาขาทั้งหมด',
+          message: error || 'พบปัญหาในการแสดงรายการสาขาทั้งหมด',
+          actions: [
+            {
+              label: 'ตกลง',
+              onClick: () => setActiveModal(null)
+            }
+          ]
+        });
+      }
+    }
+    initLoadAllbranch()
+    initLoadAllGroupfile()
+  }, [])
 
   return (
     <div className="space-y-6">
@@ -156,9 +150,10 @@ const Sales = () => {
           searchCriteria={searchCriteria}
           setSearchCriteria={setSearchCriteria}
           filteredSales={filteredSales}
-          draftSale={draftSale}
           resetSearch={resetSearch}
           handleSearch={handleSearch}
+          branchFile={branchFile}
+          groupFile={groupFile}
         />
       )}
 
@@ -168,6 +163,7 @@ const Sales = () => {
         filteredSales={filteredSales}
         searchCriteria={searchCriteria}
         resetSearch={resetSearch}
+        isLoading={isLoading}
       />
 
       {activeModal && (

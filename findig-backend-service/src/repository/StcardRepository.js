@@ -12,30 +12,37 @@ const getData = async ({ payload, db }) => {
 }
 
 const searchData = async ({ payload, db }) => {
-  const { S_No, S_Date_Start, S_Date_End, S_Bran, S_User, Data_Sync, S_Stk, S_PCode  } = payload
-  let sql = `select * from stcard where 1=1 `
+  const { S_No, S_Date_Start, S_Date_End, S_Bran, S_User, Data_Sync, S_Stk, S_PCode, GroupCode  } = payload
+  let sql = `select p.PCode, p.PDesc, p.PGroup, g.GroupName  , st.* 
+    from stcard st 
+    left join product p on st.S_PCode=p.PCode 
+    left join groupfile g on p.PGroup=g.GroupCode 
+    where 1=1 `
   if (S_No) {
-    sql += `and S_No like '%${S_No}%' `
+    sql += `and st.S_No like '%${S_No}%' `
   }
   if (S_Date_Start && S_Date_End) {
-    sql += `and S_Date_Start >= '${S_Date_Start}' and S_Date_End <= '%${S_Date_End}%' `
+    sql += `and st.S_Date_Start >= '${S_Date_Start}' and st.S_Date_End <= '%${S_Date_End}%' `
   }
   if (S_User) {
-    sql += `and S_User like '%${S_User}%' `
+    sql += `and st.S_User like '%${S_User}%' `
   }
   if (S_Bran) {
-    sql += `and S_Bran = '${S_Bran}' `
+    sql += `and st.S_Bran = '${S_Bran}' `
   }
   if (Data_Sync) {
-    sql += `and Data_Sync = '${Data_Sync}' `
+    sql += `and st.Data_Sync = '${Data_Sync}' `
   }
   if (S_Stk) {
-    sql += `and S_Stk = '${S_Stk}' `
+    sql += `and st.S_Stk = '${S_Stk}' `
+  }
+  if (GroupCode) {
+    sql += `and g.GroupCode = '${GroupCode}' `
   }
   if (S_PCode) {
-    sql += `and S_PCode like '%${S_PCode}%' `
+    sql += `and st.S_PCode like '%${S_PCode}%' `
   }
-  sql += `order by S_Date`
+  sql += `order by st.S_Date, st.S_Bran, st.S_PCode`
 
   const results = await db.pos?.query(sql, [S_Bran])
   return results

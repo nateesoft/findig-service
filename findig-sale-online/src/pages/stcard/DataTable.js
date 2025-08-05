@@ -55,8 +55,8 @@ const DataTable = ({
     
     // จัดการกับข้อมูลข้อความ
     if (typeof aValue === 'string') {
-      aValue = aValue.toLowerCase();
-      bValue = bValue.toLowerCase();
+      aValue = aValue;
+      bValue = bValue;
     }
     
     if (aValue < bValue) {
@@ -176,7 +176,7 @@ const DataTable = ({
             currentTheme
           )}`}
         >
-          ข้อมูล STCard
+          ข้อมูลความเคลื่อนไหวสินค้า
         </h3>
         {sortedSales.length > 0 && (
           <p className={`text-sm ${getThemeClasses("textMuted", currentTheme)} mt-2`}>
@@ -242,11 +242,41 @@ const DataTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
+                onClick={() => handleSort('GroupName')}
+              >
+                <div className="flex items-center">
+                  กลุ่มสินค้า
+                  {getSortIcon('GroupName')}
+                </div>
+              </th>
+              <th
+                className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
+                  "textMuted",
+                  currentTheme
+                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
+                  "textPrimary",
+                  currentTheme
+                )} ${getThemeClasses("transition", currentTheme)}`}
                 onClick={() => handleSort('S_PCode')}
               >
                 <div className="flex items-center">
-                  สินค้า
+                  รหัสสินค้า
                   {getSortIcon('S_PCode')}
+                </div>
+              </th>
+              <th
+                className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
+                  "textMuted",
+                  currentTheme
+                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
+                  "textPrimary",
+                  currentTheme
+                )} ${getThemeClasses("transition", currentTheme)}`}
+                onClick={() => handleSort('PDesc')}
+              >
+                <div className="flex items-center">
+                  ชื่อสินค้า
+                  {getSortIcon('PDesc')}
                 </div>
               </th>
               <th
@@ -324,7 +354,7 @@ const DataTable = ({
                   className={getThemeClasses("tableRow", currentTheme)}
                 >
                   <td
-                    className={`px-6 py-4 whitespace-nowrap text-center text-sm font-medium ${getThemeClasses(
+                    className={`px-6 py-4 whitespace-nowrap text-left text-sm font-medium ${getThemeClasses(
                       "textPrimary",
                       currentTheme
                     )}`}
@@ -342,7 +372,7 @@ const DataTable = ({
                     )}
                   </td>
                   <td
-                    className={`px-6 py-4 whitespace-nowrap text-right text-sm ${getThemeClasses(
+                    className={`px-6 py-4 whitespace-nowrap text-left text-sm ${getThemeClasses(
                       "textSecondary",
                       currentTheme
                     )}`}
@@ -350,12 +380,28 @@ const DataTable = ({
                     {draft_sale.S_No}
                   </td>
                   <td
-                    className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
+                    className={`px-6 py-4 whitespace-nowrap text-left text-sm ${getThemeClasses(
+                      "textPrimary",
+                      currentTheme
+                    )}`}
+                  >
+                    {draft_sale.GroupName}
+                  </td>
+                  <td
+                    className={`px-6 py-4 whitespace-nowrap text-left text-sm ${getThemeClasses(
                       "textPrimary",
                       currentTheme
                     )}`}
                   >
                     {draft_sale.S_PCode}
+                  </td>
+                  <td
+                    className={`px-6 py-4 whitespace-nowrap text-left text-sm ${getThemeClasses(
+                      "textPrimary",
+                      currentTheme
+                    )}`}
+                  >
+                    {draft_sale.PDesc}
                   </td>
                   <td
                     className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
