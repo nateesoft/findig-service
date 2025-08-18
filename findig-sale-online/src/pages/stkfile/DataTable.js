@@ -7,7 +7,9 @@ import {
   ChevronsRight,
   ArrowUpDown,
   ArrowUp,
-  ArrowDown
+  ArrowDown,
+  Printer,
+  Download
 } from 'lucide-react';
 
 const SaleTable = ({
@@ -67,6 +69,139 @@ const SaleTable = ({
   useEffect(() => {
     setCurrentPage(1);
   }, [filteredSales]);
+
+  // ฟังก์ชันสำหรับพิมพ์เอกสาร
+  const handlePrint = () => {
+    const printWindow = window.open('', '_blank');
+    const printContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>ข้อมูลสินค้าคงเหลือ</title>
+        <meta charset="utf-8">
+        <style>
+          body { font-family: 'Sarabun', Arial, sans-serif; margin: 20px; }
+          h1 { text-align: center; margin-bottom: 20px; font-size: 18px; }
+          table { width: 100%; border-collapse: collapse; font-size: 12px; }
+          th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+          th { background-color: #f5f5f5; font-weight: bold; }
+          .text-center { text-align: center; }
+          .print-date { text-align: right; margin-bottom: 10px; font-size: 12px; }
+          @media print {
+            body { margin: 0; }
+            .no-print { display: none; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="print-date">วันที่พิมพ์: ${new Date().toLocaleDateString('th-TH')}</div>
+        <h1>ข้อมูลสินค้าคงเหลือ</h1>
+        <table>
+          <thead>
+            <tr>
+              <th>สาขา</th>
+              <th>กลุ่ม</th>
+              <th class="text-center">รหัสสินค้า</th>
+              <th>ชื่อสินค้า</th>
+              <th class="text-center">M24</th>
+              <th class="text-center">คลัง</th>
+              <th class="text-center">M13</th>
+              <th class="text-center">M14</th>
+              <th class="text-center">M15</th>
+              <th class="text-center">M16</th>
+              <th class="text-center">M17</th>
+              <th class="text-center">M18</th>
+              <th class="text-center">M19</th>
+              <th class="text-center">M20</th>
+              <th class="text-center">M21</th>
+              <th class="text-center">M22</th>
+              <th class="text-center">M23</th>
+              <th class="text-center">Sync Data</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${sortedSales.map(item => `
+              <tr>
+                <td>${item.Branch || ''}</td>
+                <td>${item.GroupName || ''}</td>
+                <td class="text-center">${item.BPCode || ''}</td>
+                <td>${item.PDesc || ''}</td>
+                <td class="text-center">${item.BQty24 || ''}</td>
+                <td class="text-center">${item.BStk || ''}</td>
+                <td class="text-center">${item.BQty13 || ''}</td>
+                <td class="text-center">${item.BQty14 || ''}</td>
+                <td class="text-center">${item.BQty15 || ''}</td>
+                <td class="text-center">${item.BQty16 || ''}</td>
+                <td class="text-center">${item.BQty17 || ''}</td>
+                <td class="text-center">${item.BQty18 || ''}</td>
+                <td class="text-center">${item.BQty19 || ''}</td>
+                <td class="text-center">${item.BQty20 || ''}</td>
+                <td class="text-center">${item.BQty21 || ''}</td>
+                <td class="text-center">${item.BQty22 || ''}</td>
+                <td class="text-center">${item.BQty23 || ''}</td>
+                <td class="text-center">${item.SendToPOS || ''}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+        <div style="margin-top: 20px; text-align: center; font-size: 12px;">
+          จำนวนรายการทั้งหมด: ${sortedSales.length} รายการ
+        </div>
+      </body>
+      </html>
+    `;
+    
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+    printWindow.close();
+  };
+
+  // ฟังก์ชันสำหรับ export Excel
+  const handleExportExcel = () => {
+    // สร้างข้อมูล CSV
+    const headers = [
+      'สาขา', 'กลุ่ม', 'รหัสสินค้า', 'ชื่อสินค้า', 'M24', 'คลัง', 'M13', 'M14', 'M15', 'M16', 'M17', 'M18', 'M19', 'M20', 'M21', 'M22', 'M23', 'Sync Data'
+    ];
+    
+    const csvContent = [
+      headers.join(','),
+      ...sortedSales.map(item => [
+        item.Branch || '',
+        item.GroupName || '',
+        item.BPCode || '',
+        `"${item.PDesc || ''}"`,
+        item.BQty24 || '',
+        item.BStk || '',
+        item.BQty13 || '',
+        item.BQty14 || '',
+        item.BQty15 || '',
+        item.BQty16 || '',
+        item.BQty17 || '',
+        item.BQty18 || '',
+        item.BQty19 || '',
+        item.BQty20 || '',
+        item.BQty21 || '',
+        item.BQty22 || '',
+        item.BQty23 || '',
+        item.SendToPOS || ''
+      ].join(','))
+    ].join('\n');
+
+    // สร้างไฟล์และดาวน์โหลด
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `ข้อมูลสินค้าคงเหลือ_${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
 
   // ฟังก์ชันสำหรับแสดงไอคอน sort
   const getSortIcon = (field) => {
@@ -157,19 +292,58 @@ const SaleTable = ({
           currentTheme
         )}`}
       >
-        <h3
-          className={`text-lg font-semibold ${getThemeClasses(
-            "textPrimary",
-            currentTheme
-          )}`}
-        >
-          ข้อมูลสินค้าคงเหลือ
-        </h3>
-        {sortedSales.length > 0 && (
-          <p className={`text-sm ${getThemeClasses("textMuted", currentTheme)} mt-2`}>
-            แสดงรายการ {startIndex + 1}-{Math.min(endIndex, sortedSales.length)} จากทั้งหมด {sortedSales.length} รายการ
-          </p>
-        )}
+        <div className="flex justify-between items-center">
+          <div>
+            <h3
+              className={`text-lg font-semibold ${getThemeClasses(
+                "textPrimary",
+                currentTheme
+              )}`}
+            >
+              ข้อมูลสินค้าคงเหลือ
+            </h3>
+            {sortedSales.length > 0 && (
+              <p className={`text-sm ${getThemeClasses("textMuted", currentTheme)} mt-2`}>
+                แสดงรายการ {startIndex + 1}-{Math.min(endIndex, sortedSales.length)} จากทั้งหมด {sortedSales.length} รายการ
+              </p>
+            )}
+          </div>
+          
+          {/* ปุ่มพิมพ์และ Export */}
+          <div className="flex space-x-2">
+            <button
+              onClick={handlePrint}
+              className={`flex items-center px-4 py-2 rounded-lg ${getThemeClasses(
+                "cardBg",
+                currentTheme
+              )} border ${getThemeClasses(
+                "cardBorder",
+                currentTheme
+              )} hover:bg-gray-50 dark:hover:bg-gray-700 ${getThemeClasses(
+                "transition",
+                currentTheme
+              )}`}
+              title="พิมพ์เอกสาร"
+            >
+              <Printer className="w-4 h-4 mr-2" />
+              <span className={`text-sm ${getThemeClasses("textPrimary", currentTheme)}`}>
+                พิมพ์
+              </span>
+            </button>
+            
+            <button
+              onClick={handleExportExcel}
+              className={`flex items-center px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white ${getThemeClasses(
+                "transition",
+                currentTheme
+              )}`}
+              title="Export Excel"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              <span className="text-sm">Export Excel</span>
+            </button>
+          </div>
+        </div>
       </div>
       
       <div className="overflow-x-auto">
@@ -234,6 +408,21 @@ const SaleTable = ({
                 <div className="flex items-center justify-center">
                   ชื่อสินค้า
                   {getSortIcon('PDesc')}
+                </div>
+              </th>
+              <th
+                className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
+                  "textMuted",
+                  currentTheme
+                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
+                  "textPrimary",
+                  currentTheme
+                )} ${getThemeClasses("transition", currentTheme)}`}
+                onClick={() => handleSort('BQty24')}
+              >
+                <div className="flex items-center">
+                  M24
+                  {getSortIcon('BQty24')}
                 </div>
               </th>
               <th
@@ -414,21 +603,6 @@ const SaleTable = ({
                 <div className="flex items-center">
                   M23
                   {getSortIcon('BQty23')}
-                </div>
-              </th>
-              <th
-                className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
-                  "textMuted",
-                  currentTheme
-                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
-                  "textPrimary",
-                  currentTheme
-                )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('BQty24')}
-              >
-                <div className="flex items-center">
-                  M24
-                  {getSortIcon('BQty24')}
                 </div>
               </th>
               <th

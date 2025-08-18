@@ -8,7 +8,9 @@ import {
   ChevronsRight,
   ArrowUpDown,
   ArrowUp,
-  ArrowDown
+  ArrowDown,
+  Printer,
+  Download
 } from 'lucide-react';
 import moment from 'moment';
 import { useState, useEffect } from 'react';
@@ -84,6 +86,112 @@ const DataTable = ({
   useEffect(() => {
     setCurrentPage(1);
   }, [filteredSales]);
+
+  // ฟังก์ชันสำหรับพิมพ์เอกสาร
+  const handlePrint = () => {
+    const printWindow = window.open('', '_blank');
+    const printContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>รายการข้อมูลการขาย</title>
+        <meta charset="utf-8">
+        <style>
+          body { font-family: 'Sarabun', Arial, sans-serif; margin: 20px; }
+          h1 { text-align: center; margin-bottom: 20px; font-size: 18px; }
+          table { width: 100%; border-collapse: collapse; font-size: 12px; }
+          th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+          th { background-color: #f5f5f5; font-weight: bold; }
+          .text-center { text-align: center; }
+          .text-right { text-align: right; }
+          .print-date { text-align: right; margin-bottom: 10px; font-size: 12px; }
+          .status-y { background-color: #dcfce7; color: #166534; padding: 2px 8px; border-radius: 12px; }
+          .status-n { background-color: #fef3c7; color: #92400e; padding: 2px 8px; border-radius: 12px; }
+          .status-other { background-color: #fee2e2; color: #dc2626; padding: 2px 8px; border-radius: 12px; }
+          @media print {
+            body { margin: 0; }
+            .no-print { display: none; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="print-date">วันที่พิมพ์: ${new Date().toLocaleDateString('th-TH')}</div>
+        <h1>รายการข้อมูลการขาย</h1>
+        <table>
+          <thead>
+            <tr>
+              <th>เลขที่ใบเสร็จ</th>
+              <th class="text-center">วันที่สร้างเอกสาร</th>
+              <th class="text-right">จำนวนสินค้า</th>
+              <th class="text-center">พนักงานทำรายการ</th>
+              <th class="text-center">สาขา</th>
+              <th class="text-center">สถานะ POST</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${sortedSales.map(item => `
+              <tr>
+                <td>${item.billno || ''}</td>
+                <td class="text-center">${moment(item.document_date).format('DD/MM/YYYY HH:mm:ss')}</td>
+                <td class="text-right">${item.total_item || ''}</td>
+                <td class="text-center">${item.emp_code || ''}</td>
+                <td class="text-center">${item.branch_code || ''}</td>
+                <td class="text-center">
+                  <span class="${
+                    item.post_status === 'Y' ? 'status-y' : 
+                    item.post_status === 'N' ? 'status-n' : 'status-other'
+                  }">${item.post_status || ''}</span>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+        <div style="margin-top: 20px; text-align: center; font-size: 12px;">
+          จำนวนรายการทั้งหมด: ${sortedSales.length} รายการ
+        </div>
+      </body>
+      </html>
+    `;
+    
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+    printWindow.close();
+  };
+
+  // ฟังก์ชันสำหรับ export Excel
+  const handleExportExcel = () => {
+    // สร้างข้อมูล CSV
+    const headers = [
+      'เลขที่ใบเสร็จ', 'วันที่สร้างเอกสาร', 'จำนวนสินค้า', 'พนักงานทำรายการ', 'สาขา', 'สถานะ POST'
+    ];
+    
+    const csvContent = [
+      headers.join(','),
+      ...sortedSales.map(item => [
+        item.billno || '',
+        moment(item.document_date).format('DD/MM/YYYY HH:mm:ss'),
+        item.total_item || '',
+        item.emp_code || '',
+        item.branch_code || '',
+        item.post_status || ''
+      ].join(','))
+    ].join('\n');
+
+    // สร้างไฟล์และดาวน์โหลด
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `รายการข้อมูลการขาย_${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
 
   // ฟังก์ชันสำหรับแสดงไอคอน sort
   const getSortIcon = (field) => {
@@ -173,19 +281,58 @@ const DataTable = ({
           currentTheme
         )}`}
       >
-        <h3
-          className={`text-lg font-semibold ${getThemeClasses(
-            "textPrimary",
-            currentTheme
-          )}`}
-        >
-          รายการข้อมูลการขาย
-        </h3>
-        {sortedSales.length > 0 && (
-          <p className={`text-sm ${getThemeClasses("textMuted", currentTheme)} mt-2`}>
-            แสดงรายการ {startIndex + 1}-{Math.min(endIndex, sortedSales.length)} จากทั้งหมด {sortedSales.length} รายการ
-          </p>
-        )}
+        <div className="flex justify-between items-center">
+          <div>
+            <h3
+              className={`text-lg font-semibold ${getThemeClasses(
+                "textPrimary",
+                currentTheme
+              )}`}
+            >
+              รายการข้อมูลการขาย
+            </h3>
+            {sortedSales.length > 0 && (
+              <p className={`text-sm ${getThemeClasses("textMuted", currentTheme)} mt-2`}>
+                แสดงรายการ {startIndex + 1}-{Math.min(endIndex, sortedSales.length)} จากทั้งหมด {sortedSales.length} รายการ
+              </p>
+            )}
+          </div>
+          
+          {/* ปุ่มพิมพ์และ Export */}
+          <div className="flex space-x-2">
+            <button
+              onClick={handlePrint}
+              className={`flex items-center px-4 py-2 rounded-lg ${getThemeClasses(
+                "cardBg",
+                currentTheme
+              )} border ${getThemeClasses(
+                "cardBorder",
+                currentTheme
+              )} hover:bg-gray-50 dark:hover:bg-gray-700 ${getThemeClasses(
+                "transition",
+                currentTheme
+              )}`}
+              title="พิมพ์เอกสาร"
+            >
+              <Printer className="w-4 h-4 mr-2" />
+              <span className={`text-sm ${getThemeClasses("textPrimary", currentTheme)}`}>
+                พิมพ์
+              </span>
+            </button>
+            
+            <button
+              onClick={handleExportExcel}
+              className={`flex items-center px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white ${getThemeClasses(
+                "transition",
+                currentTheme
+              )}`}
+              title="Export Excel"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              <span className="text-sm">Export Excel</span>
+            </button>
+          </div>
+        </div>
       </div>
       
       <div className="overflow-x-auto">
