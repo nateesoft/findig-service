@@ -572,7 +572,7 @@ const DataTable = ({
                         onClick={resetSearch}
                         className={`text-blue-500 hover:text-blue-700 text-sm underline`}
                       >
-                        ล้างการค้นหาเพื่อดูข้อมูลทั้งหมด
+                        ล้างการค้นหา
                       </button>
                     )}
                   </div>

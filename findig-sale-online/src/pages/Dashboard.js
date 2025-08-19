@@ -48,13 +48,14 @@ const Dashboard = ({ currentTheme }) => {
   }, [])
   
   return (
-    <div className="space-y-6">
+  <div className={`space-y-6 min-h-screen pb-10 ${getThemeClasses('mainBg', currentTheme)}`}> 
       {/* Recent Sales */}
-      <div className={`${getThemeClasses('cardBg', currentTheme)} rounded-lg shadow-sm border ${getThemeClasses('cardBorder', currentTheme)}`}>
-        <div className={`p-6 border-b ${getThemeClasses('cardBorder', currentTheme)}`}>
+      <div className={`relative rounded-xl border ${getThemeClasses('cardBorder', currentTheme)} overflow-hidden ${getThemeClasses('cardBg', currentTheme)}`} style={{boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.10)'}}>
+        <div className="relative">
+          <div className={`p-6 border-b ${getThemeClasses('cardBorder', currentTheme)}`}> 
           <h3 className={`text-lg font-semibold ${getThemeClasses('textPrimary', currentTheme)}`}>ข้อมูลบันทึกล่าสุด (10 รายการ)</h3>
         </div>
-        <div className="overflow-x-auto">
+  <div className="overflow-x-auto relative">
           <table className="w-full">
             <thead className={getThemeClasses('tableHeader', currentTheme)}>
               <tr>
@@ -76,27 +77,34 @@ const Dashboard = ({ currentTheme }) => {
               </tr>
             </thead>
             <tbody className={`${getThemeClasses('cardBg', currentTheme)} divide-y ${getThemeClasses('tableBorder', currentTheme)}`}>
-              {lastDraftSale && lastDraftSale.map((sale, index) => (
-                <tr key={sale.billno} className={getThemeClasses('tableRow', currentTheme)}>
-                  <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${getThemeClasses('textPrimary', currentTheme)}`}>
-                    {sale.billno}
-                  </td>
-                  <td className={`px-6 py-4 whitespace-nowrap text-sm ${getThemeClasses('textPrimary', currentTheme)}`}>
-                    {moment(sale.document_date).format("DD/MM/YYYY HH:mm:ss")}
-                  </td>
-                  <td className={`px-6 py-4 whitespace-nowrap text-sm ${getThemeClasses('textSecondary', currentTheme)}`}>
-                    {sale.total_item}
-                  </td>
-                  <td className={`px-6 py-4 whitespace-nowrap text-sm ${getThemeClasses('textPrimary', currentTheme)}`}>
-                    {sale.emp_code}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {sale.branch_code}
-                  </td>
-                </tr>
-              ))}
+                {lastDraftSale && lastDraftSale.length > 0 ? (
+                  lastDraftSale.map((sale, index) => (
+                    <tr key={sale.billno} className={getThemeClasses('tableRow', currentTheme)}>
+                      <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${getThemeClasses('textPrimary', currentTheme)}`}>
+                        {sale.billno}
+                      </td>
+                      <td className={`px-6 py-4 whitespace-nowrap text-sm ${getThemeClasses('textPrimary', currentTheme)}`}>
+                        {moment(sale.document_date).format("DD/MM/YYYY HH:mm:ss")}
+                      </td>
+                      <td className={`px-6 py-4 whitespace-nowrap text-sm ${getThemeClasses('textSecondary', currentTheme)}`}>
+                        {sale.total_item}
+                      </td>
+                      <td className={`px-6 py-4 whitespace-nowrap text-sm ${getThemeClasses('textPrimary', currentTheme)}`}>
+                        {sale.emp_code}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {sale.branch_code}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="px-6 py-4 text-center text-sm text-gray-500">ไม่พบข้อมูล</td>
+                  </tr>
+                )}
             </tbody>
           </table>
+        </div>
         </div>
       </div>
 

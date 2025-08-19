@@ -672,6 +672,14 @@ const SaleTable = ({
                       currentTheme
                     )}`}
                   >
+                    {draft_sale.BQty24}
+                  </td>
+                  <td
+                    className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
+                      "textSecondary",
+                      currentTheme
+                    )}`}
+                  >
                     {draft_sale.BStk}
                   </td>
                   <td
@@ -761,14 +769,6 @@ const SaleTable = ({
                     )}`}
                   >
                     {draft_sale.BQty23}
-                  </td>
-                  <td
-                    className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
-                      "textSecondary",
-                      currentTheme
-                    )}`}
-                  >
-                    {draft_sale.BQty24}
                   </td>
                   <td
                     className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
