@@ -22,6 +22,7 @@ import Dashboard from "./pages/Dashboard"
 
 import Sales from "./pages/sale"
 import StcardPage from "./pages/stcard"
+import StockCardPage from "./pages/stock-card"
 import StkfilePage from "./pages/stkfile"
 
 import UserGroups from "./pages/posuser"
@@ -444,6 +445,33 @@ const AppContent = () => {
                 sidebarOpen={sidebarOpen}
               >
                 <BranchInfo currentTheme={currentTheme} />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/stock-card"
+          element={
+            <ProtectedRoute user={user}>
+              <AppLayout
+                user={user}
+                currentTheme={currentTheme}
+                setSidebarOpen={setSidebarOpen}
+                setShowLogoutConfirm={setShowLogoutConfirm}
+                expandedMenus={expandedMenus}
+                setExpandedMenus={setExpandedMenus}
+                sidebarOpen={sidebarOpen}
+              >
+                <StockCardPage
+                  currentTheme={currentTheme}
+                  searchTerm={searchTerm}
+                  setSearchTerm={setSearchTerm}
+                  selectedCustomer={selectedCustomer}
+                  setSelectedCustomer={setSelectedCustomer}
+                  cart={cart}
+                  setCart={setCart}
+                />
               </AppLayout>
             </ProtectedRoute>
           }

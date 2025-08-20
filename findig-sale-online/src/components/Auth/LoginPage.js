@@ -10,6 +10,7 @@ import { loadAllBranch } from '../../api/branchApi';
 const LoginPage = ( { onLogin, setUser }) => {
   const [activeModal, setActiveModal] = useState(null);
   const [branchFile, setBranchFile] = useState([])
+  const passwordRef = React.useRef(null);
 
   const { appData, setAppData } = useContext(AppContext)
   const { currentTheme, branchCode } = appData
@@ -204,7 +205,12 @@ const LoginPage = ( { onLogin, setUser }) => {
               )} ${getThemeClasses("transition", currentTheme)}`}
               placeholder="admin"
               autoComplete="new-user"
-              onKeyPress={(e) => e.key === "Enter" && handleLogin(e)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  if (passwordRef.current) passwordRef.current.focus();
+                }
+              }}
             />
           </div>
 
@@ -220,6 +226,7 @@ const LoginPage = ( { onLogin, setUser }) => {
             <input
               type="password"
               id="txtFormPass"
+              ref={passwordRef}
               value={loginData.password}
               onChange={(e) =>
                 setLoginData({ ...loginData, password: e.target.value })
@@ -230,7 +237,12 @@ const LoginPage = ( { onLogin, setUser }) => {
               )} ${getThemeClasses("transition", currentTheme)}`}
               placeholder="password"
               autoComplete="new-password"
-              onKeyPress={(e) => e.key === "Enter" && handleLogin(e)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  handleLogin(e);
+                }
+              }}
             />
           </div>
 

@@ -18,6 +18,13 @@ export const MENU_GROUPS = [
     ]
   },
   {
+    id: 'reports',
+    label: 'รายงานต่างๆ',
+    items: [
+      { id: 'stock-card', label: 'รายงานความเคลื่อนไหวสินค้า', page: 'stock-card' }
+    ]
+  },
+  {
     id: 'settings',
     label: 'ตั้งค่าระบบ',
     items: [
