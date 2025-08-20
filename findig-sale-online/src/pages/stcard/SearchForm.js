@@ -1,4 +1,5 @@
 import { Calendar, FileText, Search, RefreshCw } from "lucide-react"
+import Select from "react-select"
 
 const SearchForm = ({
   getThemeClasses,
@@ -105,24 +106,39 @@ const SearchForm = ({
             >
               รหัสสาขา
             </label>
-            <select
-              value={searchCriteria.S_Bran}
-              onChange={(e) =>
+            <Select
+              options={branchFile?.map(item => ({
+                value: item.Code,
+                label: `${item.Code}-${item.Name}`
+              }))}
+              value={branchFile?.find(item => item.Code === searchCriteria.S_Bran) ? {
+                value: searchCriteria.S_Bran,
+                label: `${searchCriteria.S_Bran}-${branchFile.find(item => item.Code === searchCriteria.S_Bran)?.Name}`
+              } : null}
+              onChange={option =>
                 setSearchCriteria({
                   ...searchCriteria,
-                  S_Bran: e.target.value
+                  S_Bran: option ? option.value : ""
                 })
               }
-              className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
-                "input",
-                currentTheme
-              )}`}
-            >
-              <option value="">ทุกสาขา</option>
-              {branchFile && branchFile.map(item=>
-                <option key={item.Code} value={item.Code}>{item.Code}-{item.Name}</option>
-              )}
-            </select>
+              isClearable
+              placeholder="ทุกสาขา"
+              classNamePrefix="react-select"
+              styles={{
+                control: (base) => ({
+                  ...base,
+                  borderRadius: '0.5rem',
+                  minHeight: '40px',
+                  borderColor: getThemeClasses("input", currentTheme),
+                  boxShadow: 'none',
+                  fontSize: '1rem'
+                }),
+                menu: (base) => ({
+                  ...base,
+                  zIndex: 20
+                })
+              }}
+            />
           </div>
           <div>
             <label
@@ -185,22 +201,37 @@ const SearchForm = ({
             >
               คลังสินค้า
             </label>
-            <select
-              value={searchCriteria.S_Stk}
-              onChange={(e) =>
+            <Select
+              options={[{ value: "", label: "ทุกคลัง" }, { value: "A1", label: "คลังสินค้าหลัก" }]}
+              value={(() => {
+                if (searchCriteria.S_Stk === "") return { value: "", label: "ทุกคลัง" };
+                if (searchCriteria.S_Stk === "A1") return { value: "A1", label: "คลังสินค้าหลัก" };
+                return null;
+              })()}
+              onChange={option =>
                 setSearchCriteria({
                   ...searchCriteria,
-                  S_Stk: e.target.value
+                  S_Stk: option ? option.value : ""
                 })
               }
-              className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
-                "input",
-                currentTheme
-              )}`}
-            >
-              <option value="">ทุกคลัง</option>
-              <option value="A1">คลังสินค้าหลัก</option>
-            </select>
+              isClearable
+              placeholder="ทุกคลัง"
+              classNamePrefix="react-select"
+              styles={{
+                control: (base) => ({
+                  ...base,
+                  borderRadius: '0.5rem',
+                  minHeight: '40px',
+                  borderColor: getThemeClasses("input", currentTheme),
+                  boxShadow: 'none',
+                  fontSize: '1rem'
+                }),
+                menu: (base) => ({
+                  ...base,
+                  zIndex: 20
+                })
+              }}
+            />
           </div>
           <div>
             <label
@@ -211,24 +242,43 @@ const SearchForm = ({
             >
               กลุ่มสินค้า
             </label>
-            <select
-              value={searchCriteria.GroupCode}
-              onChange={(e) =>
+            <Select
+              options={[
+                { value: "", label: "ทุกกลุ่มสินค้า" },
+                ...(groupFile ? groupFile.map(item => ({
+                  value: item.GroupCode,
+                  label: `${item.GroupCode}-${item.GroupName}`
+                })) : [])
+              ]}
+              value={(() => {
+                if (searchCriteria.GroupCode === "") return { value: "", label: "ทุกกลุ่มสินค้า" };
+                const found = groupFile?.find(item => item.GroupCode === searchCriteria.GroupCode);
+                return found ? { value: found.GroupCode, label: `${found.GroupCode}-${found.GroupName}` } : null;
+              })()}
+              onChange={option =>
                 setSearchCriteria({
                   ...searchCriteria,
-                  GroupCode: e.target.value
+                  GroupCode: option ? option.value : ""
                 })
               }
-              className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
-                "input",
-                currentTheme
-              )}`}
-            >
-              <option value="">ทุกกลุ่มสินค้า</option>
-              {groupFile && groupFile.map(item=>
-                <option key={item.GroupCode} value={item.GroupCode}>{item.GroupCode}-{item.GroupName}</option>
-              )}
-            </select>
+              isClearable
+              placeholder="ทุกกลุ่มสินค้า"
+              classNamePrefix="react-select"
+              styles={{
+                control: (base) => ({
+                  ...base,
+                  borderRadius: '0.5rem',
+                  minHeight: '40px',
+                  borderColor: getThemeClasses("input", currentTheme),
+                  boxShadow: 'none',
+                  fontSize: '1rem'
+                }),
+                menu: (base) => ({
+                  ...base,
+                  zIndex: 20
+                })
+              }}
+            />
           </div>
           <div>
             <label

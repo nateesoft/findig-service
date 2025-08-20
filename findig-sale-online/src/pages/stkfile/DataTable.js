@@ -509,6 +509,16 @@ const SaleTable = ({
               </tr>
             )}
           </tbody>
+          {/* Footer summary for คงเหลือ */}
+          <tfoot>
+            <tr className={getThemeClasses("tableHeader", currentTheme)}>
+              <td colSpan="4" className="px-6 py-3 text-right font-semibold">รวมคงเหลือ</td>
+              <td className="px-6 py-3 text-center font-bold text-blue-600">
+                {sortedSales.reduce((sum, item) => sum + (Number(item.BQty24) || 0), 0).toLocaleString()}
+              </td>
+              <td></td>
+            </tr>
+          </tfoot>
         </table>
       </div>
       
