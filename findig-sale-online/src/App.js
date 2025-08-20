@@ -25,10 +25,6 @@ import StcardPage from "./pages/stcard"
 import StkfilePage from "./pages/stkfile"
 
 import UserGroups from "./pages/posuser"
-import Products from "./pages/Products"
-import Customers from "./pages/Customers"
-import Reports from "./pages/Reports"
-import InventoryReport from "./pages/InventoryReport"
 import SystemSettings from "./pages/SystemSettings"
 import BranchInfo from "./pages/BranchInfo"
 
@@ -408,90 +404,6 @@ const AppContent = () => {
                 sidebarOpen={sidebarOpen}
               >
                 <UserGroups currentTheme={currentTheme} />
-              </AppLayout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/products"
-          element={
-            <ProtectedRoute user={user}>
-              <AppLayout
-                user={user}
-                currentTheme={currentTheme}
-                setSidebarOpen={setSidebarOpen}
-                setShowLogoutConfirm={setShowLogoutConfirm}
-                expandedMenus={expandedMenus}
-                setExpandedMenus={setExpandedMenus}
-                sidebarOpen={sidebarOpen}
-              >
-                <Products
-                  currentTheme={currentTheme}
-                  searchTerm={searchTerm}
-                  setSearchTerm={setSearchTerm}
-                />
-              </AppLayout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/customers"
-          element={
-            <ProtectedRoute user={user}>
-              <AppLayout
-                user={user}
-                currentTheme={currentTheme}
-                setSidebarOpen={setSidebarOpen}
-                setShowLogoutConfirm={setShowLogoutConfirm}
-                expandedMenus={expandedMenus}
-                setExpandedMenus={setExpandedMenus}
-                sidebarOpen={sidebarOpen}
-              >
-                <Customers
-                  currentTheme={currentTheme}
-                  searchTerm={searchTerm}
-                  setSearchTerm={setSearchTerm}
-                />
-              </AppLayout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/reports"
-          element={
-            <ProtectedRoute user={user}>
-              <AppLayout
-                user={user}
-                currentTheme={currentTheme}
-                setSidebarOpen={setSidebarOpen}
-                setShowLogoutConfirm={setShowLogoutConfirm}
-                expandedMenus={expandedMenus}
-                setExpandedMenus={setExpandedMenus}
-                sidebarOpen={sidebarOpen}
-              >
-                <Reports currentTheme={currentTheme} />
-              </AppLayout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/inventory-report"
-          element={
-            <ProtectedRoute user={user}>
-              <AppLayout
-                user={user}
-                currentTheme={currentTheme}
-                setSidebarOpen={setSidebarOpen}
-                setShowLogoutConfirm={setShowLogoutConfirm}
-                expandedMenus={expandedMenus}
-                setExpandedMenus={setExpandedMenus}
-                sidebarOpen={sidebarOpen}
-              >
-                <InventoryReport currentTheme={currentTheme} />
               </AppLayout>
             </ProtectedRoute>
           }

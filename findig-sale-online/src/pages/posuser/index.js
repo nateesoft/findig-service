@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Search } from 'lucide-react';
 
 import { getThemeClasses } from '../../utils/themes';
@@ -72,40 +72,6 @@ const UserGroups = ({ currentTheme }) => {
   const indexOfLastItem = currentPage * itemsPerPage
   const indexOfFirstItem = indexOfLastItem - itemsPerPage
   const currentUsers = filteredSales.slice(indexOfFirstItem, indexOfLastItem)
-
-  const totalPages = Math.ceil(filteredSales.length / itemsPerPage)
-
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber)
-  }
-
-  const handlePrevious = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1)
-    }
-  }
-
-  const handleNext = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1)
-    }
-  }
-
-  const getPageNumbers = () => {
-    const pageNumbers = []
-    const maxPagesToShow = 5
-    let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2))
-    let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1)
-
-    if (endPage - startPage + 1 < maxPagesToShow) {
-      startPage = Math.max(1, endPage - maxPagesToShow + 1)
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
-      pageNumbers.push(i)
-    }
-    return pageNumbers
-  }
 
   return (
     <div className="space-y-6">
