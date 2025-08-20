@@ -252,7 +252,7 @@ const DataTable = ({
     return (
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <h1 className={`text-2xl font-bold ${getThemeClasses('textPrimary', currentTheme)}`}>ข้อมูลตาราง STCARD</h1>
+          <h1 className={`text-2xl font-bold ${getThemeClasses('textPrimary', currentTheme)}`}>ข้อมูลความเคลื่อนไหว</h1>
         </div>
         <div className="flex items-center justify-center py-20">
           <div className="flex flex-col items-center space-y-4">

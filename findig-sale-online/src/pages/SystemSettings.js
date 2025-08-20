@@ -179,7 +179,7 @@ const SystemSettings = ({ currentTheme, setCurrentTheme }) => {
                     ออกจากระบบอัตโนมัติ
                   </p>
                   <p className={`text-xs mt-1 ${currentTheme === 'dark' ? 'text-blue-300' : 'text-blue-700'}`}>
-                    ระบบจะออกจากระบบอัตโนมัติหลังไม่มีการใช้งาน 5 นาที
+                    ระบบจะออกจากระบบอัตโนมัติหลังไม่มีการใช้งาน 40 นาที
                   </p>
                   <div className={`mt-2 text-xs ${currentTheme === 'dark' ? 'text-blue-300' : 'text-blue-600'} space-y-1`}>
                     <div>• เตือนล่วงหน้า 1 นาทีก่อนออกจากระบบ</div>

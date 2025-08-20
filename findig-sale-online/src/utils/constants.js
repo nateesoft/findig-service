@@ -1,4 +1,4 @@
-export const SESSION_TIMEOUT = 5 * 60 * 1000;
+export const SESSION_TIMEOUT = 40 * 60 * 1000;
 export const WARNING_TIME = 60 * 1000;
 
 // Menu configuration
@@ -13,8 +13,8 @@ export const MENU_GROUPS = [
     label: 'กลุ่มเมนูการขาย',
     items: [
       { id: 'sales-record', label: 'ข้อมูลการขาย', page: 'sales' },
-      { id: 'stcard', label: 'ข้อมูล stcard', page: 'stcard' },
-      { id: 'stkfile', label: 'ข้อมูล stkfile', page: 'stkfile' }
+      { id: 'stcard', label: 'ข้อมูลความเคลื่อนไหว', page: 'stcard' },
+      { id: 'stkfile', label: 'ข้อมูลสินค้าคงเหลือ', page: 'stkfile' }
     ]
   },
   {

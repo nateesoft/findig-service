@@ -22,7 +22,7 @@ const searchData = async ({ payload, db }) => {
     sql += `and st.S_No like '%${S_No}%' `
   }
   if (S_Date_Start && S_Date_End) {
-    sql += `and st.S_Date_Start >= '${S_Date_Start}' and st.S_Date_End <= '%${S_Date_End}%' `
+    sql += `and st.S_Date >= '${S_Date_Start}' and st.S_Date <= '%${S_Date_End}%' `
   }
   if (S_User) {
     sql += `and st.S_User like '%${S_User}%' `
