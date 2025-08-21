@@ -550,15 +550,23 @@ const Sales = () => {
       );
     }
 
+    // เปรียบเทียบวันที่โดยไม่สนใจเวลา
+    const formatDate = (dateStr) => {
+      if (!dateStr) return '';
+      return new Date(dateStr).toISOString().split('T')[0];
+    };
+
     if (searchCriteria.dateFrom) {
+      const fromDate = formatDate(searchCriteria.dateFrom);
       filtered = filtered.filter(item => 
-        new Date(item.document_date) >= new Date(searchCriteria.dateFrom)
+        formatDate(item.document_date) >= fromDate
       );
     }
 
     if (searchCriteria.dateTo) {
+      const toDate = formatDate(searchCriteria.dateTo);
       filtered = filtered.filter(item => 
-        new Date(item.document_date) <= new Date(searchCriteria.dateTo)
+        formatDate(item.document_date) <= toDate
       );
     }
 
