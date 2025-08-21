@@ -22,8 +22,13 @@ import Dashboard from "./pages/Dashboard"
 
 import Sales from "./pages/sale"
 import StcardPage from "./pages/stcard"
-import StockCardPage from "./pages/stock-card"
 import StkfilePage from "./pages/stkfile"
+
+/* REPORTS */
+import ReportSales from "./pages/report-sales"
+import ReportStcard from "./pages/report-stcard"
+import ReportStkfile from "./pages/report-stkfile"
+import ReportSummary from "./pages/report-summary"
 
 import UserGroups from "./pages/posuser"
 import SystemSettings from "./pages/SystemSettings"
@@ -451,7 +456,7 @@ const AppContent = () => {
         />
 
         <Route
-          path="/stock-card"
+          path="/report-summary"
           element={
             <ProtectedRoute user={user}>
               <AppLayout
@@ -463,7 +468,88 @@ const AppContent = () => {
                 setExpandedMenus={setExpandedMenus}
                 sidebarOpen={sidebarOpen}
               >
-                <StockCardPage
+                <ReportSummary
+                  currentTheme={currentTheme}
+                  searchTerm={searchTerm}
+                  setSearchTerm={setSearchTerm}
+                  selectedCustomer={selectedCustomer}
+                  setSelectedCustomer={setSelectedCustomer}
+                  cart={cart}
+                  setCart={setCart}
+                />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/report-stkfile"
+          element={
+            <ProtectedRoute user={user}>
+              <AppLayout
+                user={user}
+                currentTheme={currentTheme}
+                setSidebarOpen={setSidebarOpen}
+                setShowLogoutConfirm={setShowLogoutConfirm}
+                expandedMenus={expandedMenus}
+                setExpandedMenus={setExpandedMenus}
+                sidebarOpen={sidebarOpen}
+              >
+                <ReportStkfile
+                  currentTheme={currentTheme}
+                  searchTerm={searchTerm}
+                  setSearchTerm={setSearchTerm}
+                  selectedCustomer={selectedCustomer}
+                  setSelectedCustomer={setSelectedCustomer}
+                  cart={cart}
+                  setCart={setCart}
+                />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/report-sales"
+          element={
+            <ProtectedRoute user={user}>
+              <AppLayout
+                user={user}
+                currentTheme={currentTheme}
+                setSidebarOpen={setSidebarOpen}
+                setShowLogoutConfirm={setShowLogoutConfirm}
+                expandedMenus={expandedMenus}
+                setExpandedMenus={setExpandedMenus}
+                sidebarOpen={sidebarOpen}
+              >
+                <ReportSales
+                  currentTheme={currentTheme}
+                  searchTerm={searchTerm}
+                  setSearchTerm={setSearchTerm}
+                  selectedCustomer={selectedCustomer}
+                  setSelectedCustomer={setSelectedCustomer}
+                  cart={cart}
+                  setCart={setCart}
+                />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/report-stcard"
+          element={
+            <ProtectedRoute user={user}>
+              <AppLayout
+                user={user}
+                currentTheme={currentTheme}
+                setSidebarOpen={setSidebarOpen}
+                setShowLogoutConfirm={setShowLogoutConfirm}
+                expandedMenus={expandedMenus}
+                setExpandedMenus={setExpandedMenus}
+                sidebarOpen={sidebarOpen}
+              >
+                <ReportStcard
                   currentTheme={currentTheme}
                   searchTerm={searchTerm}
                   setSearchTerm={setSearchTerm}

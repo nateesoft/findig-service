@@ -47,7 +47,10 @@ const Sidebar = ({
     'sales': '/sales',
     'stcard': '/stcard',
     'stkfile': '/stkfile',
-    'stock-card': '/stock-card',
+    'report-sales': '/report-sales',
+    'report-stcard': '/report-stcard',
+    'report-stkfile': '/report-stkfile',
+    'report-summary': '/report-summary',
     'user-groups': '/user-groups',
     'system-settings': '/system-settings',
     'branch-info': '/branch-info'

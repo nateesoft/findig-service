@@ -9,8 +9,10 @@ import { Modal } from '../components/Modals';
 const Dashboard = ({ currentTheme }) => {
   const [activeModal, setActiveModal] = useState(null);
   const [lastDraftSale, setLastDraftSale] = useState([])
+  const [isLoading, setIsLoading] = useState(false);
 
   const initLoadLastDraftSale = async () => {
+    setIsLoading(true);
     try {
       const { data, error } = await loadDraftSaleDashboard()
       if(data) {
@@ -40,6 +42,8 @@ const Dashboard = ({ currentTheme }) => {
           }
         ]
       });
+    } finally {
+      setIsLoading(false);
     }
   }
   
@@ -77,7 +81,16 @@ const Dashboard = ({ currentTheme }) => {
               </tr>
             </thead>
             <tbody className={`${getThemeClasses('cardBg', currentTheme)} divide-y ${getThemeClasses('tableBorder', currentTheme)}`}>
-                {lastDraftSale && lastDraftSale.length > 0 ? (
+                {isLoading ? (
+                  <tr>
+                    <td colSpan="5" className="py-12 text-center">
+                      <div className="flex flex-col items-center space-y-4">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                        <span className={`text-lg ${getThemeClasses('textSecondary', currentTheme)}`}>กำลังโหลดข้อมูล...</span>
+                      </div>
+                    </td>
+                  </tr>
+                ) : lastDraftSale && lastDraftSale.length > 0 ? (
                   lastDraftSale.map((sale, index) => (
                     <tr key={sale.billno} className={getThemeClasses('tableRow', currentTheme)}>
                       <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${getThemeClasses('textPrimary', currentTheme)}`}>
