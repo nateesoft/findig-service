@@ -16,7 +16,8 @@ import moment from 'moment';
 const DataTable = ({
     getThemeClasses,
     currentTheme,
-    filteredSales,
+  filteredSales,
+  showStockRemain,
     searchCriteria,
     resetSearch,
     isLoading
@@ -347,26 +348,11 @@ const DataTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('S_Bran')}
+                onClick={() => handleSort('S_PCode')}
               >
                 <div className="flex items-center">
-                  สาขา
-                  {getSortIcon('S_Bran')}
-                </div>
-              </th>
-              <th
-                className={`px-6 py-3 text-center text-xs font-medium ${getThemeClasses(
-                  "textMuted",
-                  currentTheme
-                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
-                  "textPrimary",
-                  currentTheme
-                )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('S_Date')}
-              >
-                <div className="flex items-center justify-center">
-                  วันที่สร้าง
-                  {getSortIcon('S_Date')}
+                  รหัสสินค้า
+                  {getSortIcon('S_PCode')}
                 </div>
               </th>
               <th
@@ -377,11 +363,11 @@ const DataTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('S_No')}
+                onClick={() => handleSort('PDesc')}
               >
                 <div className="flex items-center">
-                  เลขที่บิล
-                  {getSortIcon('S_No')}
+                  ชื่อสินค้า
+                  {getSortIcon('PDesc')}
                 </div>
               </th>
               <th
@@ -407,11 +393,11 @@ const DataTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('S_PCode')}
+                onClick={() => handleSort('S_Bran')}
               >
                 <div className="flex items-center">
-                  รหัสสินค้า
-                  {getSortIcon('S_PCode')}
+                  สาขา
+                  {getSortIcon('S_Bran')}
                 </div>
               </th>
               <th
@@ -422,11 +408,26 @@ const DataTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('PDesc')}
+                onClick={() => handleSort('S_Rem')}
               >
                 <div className="flex items-center">
-                  ชื่อสินค้า
-                  {getSortIcon('PDesc')}
+                  ประเภท
+                  {getSortIcon('S_Rem')}
+                </div>
+              </th>
+              <th
+                className={`px-6 py-3 text-center text-xs font-medium ${getThemeClasses(
+                  "textMuted",
+                  currentTheme
+                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
+                  "textPrimary",
+                  currentTheme
+                )} ${getThemeClasses("transition", currentTheme)}`}
+                onClick={() => handleSort('S_Date')}
+              >
+                <div className="flex items-center justify-center">
+                  วันที่สร้าง
+                  {getSortIcon('S_Date')}
                 </div>
               </th>
               <th
@@ -459,6 +460,21 @@ const DataTable = ({
                   {getSortIcon('S_Stk')}
                 </div>
               </th>
+              {showStockRemain && (
+                <th
+                  className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
+                    "textMuted",
+                    currentTheme
+                  )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
+                    "textPrimary",
+                    currentTheme
+                  )} ${getThemeClasses("transition", currentTheme)}`}
+                >
+                  <div className="flex items-center">
+                    คงเหลือล่าสุด
+                  </div>
+                </th>
+              )}
               <th
                 className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
                   "textMuted",
@@ -467,26 +483,11 @@ const DataTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('S_Rem')}
+                onClick={() => handleSort('S_No')}
               >
                 <div className="flex items-center">
-                  ประเภท
-                  {getSortIcon('S_Rem')}
-                </div>
-              </th>
-              <th
-                className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
-                  "textMuted",
-                  currentTheme
-                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
-                  "textPrimary",
-                  currentTheme
-                )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('Data_Sync')}
-              >
-                <div className="flex items-center">
-                  Sync Data
-                  {getSortIcon('Data_Sync')}
+                  เลขที่บิล
+                  {getSortIcon('S_No')}
                 </div>
               </th>
             </tr>
@@ -504,40 +505,6 @@ const DataTable = ({
                   className={getThemeClasses("tableRow", currentTheme)}
                 >
                   <td
-                    className={`px-6 py-4 whitespace-nowrap text-left text-sm font-medium ${getThemeClasses(
-                      "textPrimary",
-                      currentTheme
-                    )}`}
-                  >
-                    {draft_sale.S_Bran}
-                  </td>
-                  <td
-                    className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
-                      "textPrimary",
-                      currentTheme
-                    )}`}
-                  >
-                    {moment(draft_sale.S_Date).format(
-                      "DD/MM/YYYY"
-                    )}
-                  </td>
-                  <td
-                    className={`px-6 py-4 whitespace-nowrap text-left text-sm ${getThemeClasses(
-                      "textSecondary",
-                      currentTheme
-                    )}`}
-                  >
-                    {draft_sale.S_No}
-                  </td>
-                  <td
-                    className={`px-6 py-4 whitespace-nowrap text-left text-sm ${getThemeClasses(
-                      "textPrimary",
-                      currentTheme
-                    )}`}
-                  >
-                    {draft_sale.GroupName}
-                  </td>
-                  <td
                     className={`px-6 py-4 whitespace-nowrap text-left text-sm ${getThemeClasses(
                       "textPrimary",
                       currentTheme
@@ -552,6 +519,40 @@ const DataTable = ({
                     )}`}
                   >
                     {draft_sale.PDesc}
+                  </td>
+                  <td
+                    className={`px-6 py-4 whitespace-nowrap text-left text-sm ${getThemeClasses(
+                      "textPrimary",
+                      currentTheme
+                    )}`}
+                  >
+                    {draft_sale.GroupName}
+                  </td>
+                  <td
+                    className={`px-6 py-4 whitespace-nowrap text-left text-sm font-medium ${getThemeClasses(
+                      "textPrimary",
+                      currentTheme
+                    )}`}
+                  >
+                    {draft_sale.S_Bran}
+                  </td>
+                  <td
+                    className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
+                      "textPrimary",
+                      currentTheme
+                    )}`}
+                  >
+                    {draft_sale.S_Rem}
+                  </td>
+                  <td
+                    className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
+                      "textPrimary",
+                      currentTheme
+                    )}`}
+                  >
+                    {moment(draft_sale.S_Date).format(
+                      "DD/MM/YYYY"
+                    )}
                   </td>
                   <td
                     className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
@@ -569,31 +570,23 @@ const DataTable = ({
                   >
                     {draft_sale.S_Stk}
                   </td>
-                  <td
-                    className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
-                      "textPrimary",
-                      currentTheme
-                    )}`}
-                  >
-                    {draft_sale.S_Rem}
-                  </td>
-                  <td
-                    className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
-                      "textPrimary",
-                      currentTheme
-                    )}`}
-                  >
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        draft_sale.Data_Sync === "Y"
-                          ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                          : draft_sale.Data_Sync === "N"
-                          ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
-                          : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-                      }`}
+                  {showStockRemain && (
+                    <td
+                      className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
+                        "textPrimary",
+                        currentTheme
+                      )}`}
                     >
-                      {draft_sale.Data_Sync}
-                    </span>
+                      {draft_sale.StockRemain}
+                    </td>
+                  )}
+                  <td
+                    className={`px-6 py-4 whitespace-nowrap text-left text-sm ${getThemeClasses(
+                      "textSecondary",
+                      currentTheme
+                    )}`}
+                  >
+                    {draft_sale.S_No}
                   </td>
                 </tr>
               ))

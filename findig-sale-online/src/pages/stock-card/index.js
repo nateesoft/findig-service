@@ -6,6 +6,7 @@ import { AppContext } from '../../contexts';
 import { searchData } from '../../api/stcardApi';
 import SearchForm from './SearchForm';
 import DataTable from './DataTable';
+import StockBarChart from './StockBarChart';
 import { Modal } from '../../components/Modals';
 import { loadAllBranch } from '../../api/branchApi';
 import { loadAllGroupfile } from '../../api/groupfileApi';
@@ -18,7 +19,44 @@ const Sales = () => {
   const { appData } = useContext(AppContext)
   const { currentTheme, branchCode } = appData
 
-  const [filteredSales, setFilteredSales] = useState([])
+  // Mock data สำหรับความเคลื่อนไหวสินค้า
+  const mockStockMovements = [
+    {
+      S_Bran: 'สาขากรุงเทพ',
+      S_Date: '2025-08-01',
+      S_PCode: 'P001',
+      PDesc: 'น้ำดื่ม 500ml',
+      GroupName: 'เครื่องดื่ม',
+      S_Stk: 'คลังหลัก',
+      S_Que: 120,
+      S_Rem: 'รับเข้า',
+      StockRemain: 80,
+    },
+    {
+      S_Bran: 'สาขาเชียงใหม่',
+      S_Date: '2025-08-05',
+      S_PCode: 'P002',
+      PDesc: 'ขนมปัง',
+      GroupName: 'เบเกอรี่',
+      S_Stk: 'คลังรอง',
+      S_Que: 50,
+      S_Rem: 'รับเข้า',
+      StockRemain: 50,
+    },
+    {
+      S_Bran: 'สาขากรุงเทพ',
+      S_Date: '2025-08-10',
+      S_PCode: 'P001',
+      PDesc: 'น้ำดื่ม 500ml',
+      GroupName: 'เครื่องดื่ม',
+      S_Stk: 'คลังหลัก',
+      S_Que: -40,
+      S_Rem: 'ขายออก',
+      StockRemain: 40,
+    },
+  ];
+
+  const [filteredSales, setFilteredSales] = useState(mockStockMovements)
   const [showSaleModal, setShowSaleModal] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [showSearchForm, setShowSearchForm] = useState(true);
@@ -165,6 +203,12 @@ const Sales = () => {
         />
       )}
 
+      {/* กราฟแท่งคงเหลือสินค้า */}
+      <div className="mt-8">
+        <h2 className={`text-xl font-bold mb-4 ${getThemeClasses('textPrimary', currentTheme)}`}>กราฟแท่งคงเหลือสินค้า (ตัวอย่าง 3-5 รายการล่าสุด)</h2>
+        <StockBarChart data={filteredSales} productCode={''} />
+      </div>
+
       <DataTable
         getThemeClasses={getThemeClasses}
         currentTheme={currentTheme}
@@ -172,6 +216,7 @@ const Sales = () => {
         searchCriteria={searchCriteria}
         resetSearch={resetSearch}
         isLoading={isLoading}
+        showStockRemain={true} // ส่ง prop เพื่อบอกให้แสดงคงเหลือล่าสุด
       />
 
       {activeModal && (
