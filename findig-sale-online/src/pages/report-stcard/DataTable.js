@@ -411,10 +411,7 @@ const DataTable = ({
             
             <button
               onClick={handleExportExcel}
-              className={`flex items-center px-4 py-2 rounded-lg ${getThemeClasses(
-                "primaryBtn",
-                currentTheme
-              )} ${getThemeClasses(
+              className={`flex items-center px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white ${getThemeClasses(
                 "transition",
                 currentTheme
               )}`}

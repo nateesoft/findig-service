@@ -12,6 +12,19 @@ const getAllSTKFile = async (req, res, next) => {
     next(error)
   }
 }
+
+const getReportStkfile = async (req, res, next) => {
+  try {
+    const stkfileInfo = await STKFileService.getReportStkfile({
+      repository: StkfileRepository,
+      db: req.db
+    })
+    res.json(stkfileInfo)
+  } catch (error) {
+    next(error)
+  }
+}
+
 const getAllSTKFileByCode = async (req, res, next) => {
   const { branchCode } = req.params
   try {
@@ -57,5 +70,6 @@ module.exports = {
   getAllSTKFile,
   processStock,
   getAllSTKFileByCode,
-  searchStkFileData
+  searchStkFileData,
+  getReportStkfile
 }

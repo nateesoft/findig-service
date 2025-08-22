@@ -12,6 +12,8 @@ const PosUserController = require('../controllers/PosUserController')
 const DraftSaleController = require('../controllers/DraftSaleController')
 const DraftSaleDetailsController = require('../controllers/DraftSaleDetailsController')
 
+const ReportController = require('../controllers/ReportController')
+
 router.get('/api/branch', BranchController.getBranchData);
 router.get('/api/branch/list', BranchController.findAllBranch);
 router.get('/api/branch/:branchCode', BranchController.getBranchByCode);
@@ -20,6 +22,12 @@ router.get('/api/stcard', STCardController.getAllSTCard);
 router.post('/api/stcard/search', STCardController.searchStCardData);
 router.get('/api/stcard/:branchCode', STCardController.getAllSTCardByCode);
 router.post('/api/stcard', STCardController.processStock);
+
+/* for reports */
+router.post('/api/report/summary', ReportController.searchSummaryReport);
+router.post('/api/report/sale', ReportController.searchReportSale)
+router.post('/api/report/stcard', ReportController.searchReportStcard);
+router.post('/api/report/stkfile', ReportController.getReportStkfile);
 
 router.get('/api/stkfile', STKFileController.getAllSTKFile);
 router.post('/api/stkfile/search', STKFileController.searchStkFileData);
@@ -32,7 +40,6 @@ router.post('/api/posuser/login', PosUserController.validateLogin);
 router.patch('/api/posuser/logout', PosUserController.processLogout);
 
 router.get('/api/draftsale', DraftSaleController.getData)
-router.get('/api/draftsale/all', DraftSaleController.getAllData)
 router.get('/api/draftsale/dashboard', DraftSaleController.getDataForDashboard)
 router.get('/api/draftsale/dashboard', DraftSaleController.getDataForDashboard)
 router.get('/api/draftsale/:id', DraftSaleController.getDataById)

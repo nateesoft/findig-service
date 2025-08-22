@@ -19,10 +19,10 @@ const getData = async (req, res, next) => {
   }
 }
 
-const getAllData = async (req, res, next) => {
+const getReportSales = async (req, res, next) => {
   try {
-    const dataInfo = await DraftSaleService.getAllData({
-      payload: {},
+    const dataInfo = await DraftSaleService.getReportSales({
+      payload: req.body,
       repository: DraftSaleRepository,
       db: req.db
     })
@@ -134,5 +134,5 @@ module.exports = {
   deleteData,
   processStockFromSale,
   getDataForDashboard,
-  getAllData
+  getReportSales
 }

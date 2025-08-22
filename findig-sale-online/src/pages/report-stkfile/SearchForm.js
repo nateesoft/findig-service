@@ -211,6 +211,47 @@ const SearchForm = ({
                 currentTheme
               )} mb-2`}
             >
+              คลังสินค้า
+            </label>
+            <Select
+              options={[{ value: "", label: "ทุกคลัง" }, { value: "A1", label: "คลังสินค้าหลัก" }]}
+              value={(() => {
+                if (searchCriteria.S_Stk === "") return { value: "", label: "ทุกคลัง" };
+                if (searchCriteria.S_Stk === "A1") return { value: "A1", label: "คลังสินค้าหลัก" };
+                return null;
+              })()}
+              onChange={option =>
+                setSearchCriteria({
+                  ...searchCriteria,
+                  S_Stk: option ? option.value : ""
+                })
+              }
+              isClearable
+              placeholder="ทุกคลัง"
+              classNamePrefix="react-select"
+              styles={{
+                control: (base) => ({
+                  ...base,
+                  borderRadius: '0.5rem',
+                  minHeight: '40px',
+                  borderColor: getThemeClasses("input", currentTheme),
+                  boxShadow: 'none',
+                  fontSize: '1rem'
+                }),
+                menu: (base) => ({
+                  ...base,
+                  zIndex: 20
+                })
+              }}
+            />
+          </div>
+          <div>
+            <label
+              className={`block text-sm font-medium ${getThemeClasses(
+                "textSecondary",
+                currentTheme
+              )} mb-2`}
+            >
               รหัสสินค้า
             </label>
             <input

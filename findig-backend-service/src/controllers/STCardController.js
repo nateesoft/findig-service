@@ -13,6 +13,18 @@ const getAllSTCard = async (req, res, next) => {
   }
 }
 
+const getReportStcard = async (req, res, next) => {
+  try {
+    const stcardInfo = await StcardService.getReportStcard({
+      repository: StcardRepository,
+      db: req.db
+    })
+    res.json(stcardInfo)
+  } catch (error) {
+    next(error)
+  }
+}
+
 const getAllSTCardByCode = async (req, res, next) => {
   const { branchCode } = req.params
   try {
@@ -59,5 +71,6 @@ module.exports = {
   getAllSTCard,
   processStock,
   getAllSTCardByCode,
-  searchStCardData
+  searchStCardData,
+  getReportStcard
 }

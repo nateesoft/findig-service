@@ -424,17 +424,14 @@ const SaleTable = ({
             
             <button
               onClick={handleExportExcel}
-              className={`flex items-center px-4 py-2 rounded-lg ${getThemeClasses(
-                "primaryBtn",
-                currentTheme
-              )} ${getThemeClasses(
+              className={`flex items-center px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white ${getThemeClasses(
                 "transition",
                 currentTheme
               )}`}
               title="Export Excel"
             >
               <Download className="w-4 h-4 mr-2" />
-              <span className={`text-sm ${getThemeClasses("textPrimary", currentTheme)}`}>Export Excel</span>
+              <span className="text-sm">Export Excel</span>
             </button>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import { Calendar, FileText, Search, RefreshCw } from "lucide-react"
+import { Search, RefreshCw } from "lucide-react"
 import Select from "react-select"
 
 const SearchForm = ({
@@ -166,21 +166,64 @@ const SearchForm = ({
                 currentTheme
               )} mb-2`}
             >
-              รหัสสาขา
+              รหัสสาขาเริ่มต้น
             </label>
             <Select
               options={branchFile?.map(item => ({
                 value: item.Code,
                 label: `${item.Code}-${item.Name}`
               }))}
-              value={branchFile?.find(item => item.Code === searchCriteria.S_Bran) ? {
-                value: searchCriteria.S_Bran,
-                label: `${searchCriteria.S_Bran}-${branchFile.find(item => item.Code === searchCriteria.S_Bran)?.Name}`
+              value={branchFile?.find(item => item.Code === searchCriteria.S_Bran_Start) ? {
+                value: searchCriteria.S_Bran_Start,
+                label: `${searchCriteria.S_Bran_Start}-${branchFile.find(item => item.Code === searchCriteria.S_Bran_Start)?.Name}`
               } : null}
               onChange={option =>
                 setSearchCriteria({
                   ...searchCriteria,
-                  S_Bran: option ? option.value : ""
+                  S_Bran_Start: option ? option.value : ""
+                })
+              }
+              isClearable
+              placeholder="ทุกสาขา"
+              classNamePrefix="react-select"
+              styles={{
+                control: (base) => ({
+                  ...base,
+                  borderRadius: '0.5rem',
+                  minHeight: '40px',
+                  borderColor: getThemeClasses("input", currentTheme),
+                  boxShadow: 'none',
+                  fontSize: '1rem'
+                }),
+                menu: (base) => ({
+                  ...base,
+                  zIndex: 20
+                })
+              }}
+            />
+          </div>
+          <div>
+            <label
+              className={`block text-sm font-medium ${getThemeClasses(
+                "textSecondary",
+                currentTheme
+              )} mb-2`}
+            >
+              รหัสสาขาสิ้นสุด
+            </label>
+            <Select
+              options={branchFile?.map(item => ({
+                value: item.Code,
+                label: `${item.Code}-${item.Name}`
+              }))}
+              value={branchFile?.find(item => item.Code === searchCriteria.S_Bran_End) ? {
+                value: searchCriteria.S_Bran_End,
+                label: `${searchCriteria.S_Bran_End}-${branchFile.find(item => item.Code === searchCriteria.S_Bran_End)?.Name}`
+              } : null}
+              onChange={option =>
+                setSearchCriteria({
+                  ...searchCriteria,
+                  S_Bran_End: option ? option.value : ""
                 })
               }
               isClearable

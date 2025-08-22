@@ -109,6 +109,32 @@ const SearchForm = ({
                 currentTheme
               )} mb-2`}
             >
+              รหัสพนักงาน
+            </label>
+            <input
+              type="text"
+              value={searchCriteria.empCode}
+              onChange={(e) =>
+                setSearchCriteria({
+                  ...searchCriteria,
+                  empCode: e.target.value
+                })
+              }
+              className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
+                "input",
+                currentTheme
+              )}`}
+              placeholder="ค้นหารหัสพนักงาน"
+            />
+          </div>
+
+          <div>
+            <label
+              className={`block text-sm font-medium ${getThemeClasses(
+                "textSecondary",
+                currentTheme
+              )} mb-2`}
+            >
               <Filter className="w-4 h-4 inline mr-2" />
               สาขาเริ่มต้น
             </label>
@@ -160,32 +186,6 @@ const SearchForm = ({
                 <option key={item.Code} value={item.Code}>{item.Code}-{item.Name}</option>
               )}
             </select>
-          </div>
-
-          <div>
-            <label
-              className={`block text-sm font-medium ${getThemeClasses(
-                "textSecondary",
-                currentTheme
-              )} mb-2`}
-            >
-              รหัสพนักงาน
-            </label>
-            <input
-              type="text"
-              value={searchCriteria.empCode}
-              onChange={(e) =>
-                setSearchCriteria({
-                  ...searchCriteria,
-                  empCode: e.target.value
-                })
-              }
-              className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
-                "input",
-                currentTheme
-              )}`}
-              placeholder="ค้นหารหัสพนักงาน"
-            />
           </div>
         </div>
 

@@ -1,6 +1,6 @@
 const cache = require('../utils/cache')
 
-const { mappingResultData } = require("../utils/ConvertThai")
+const { mappingResultData, mappingResultDataList } = require("../utils/ConvertThai")
 const { getMoment } = require("../utils/MomentUtil")
 
 const getSTCard = async ({ branchCode, repository, db }) => {
@@ -35,6 +35,24 @@ const getAllSTCard = async ({ repository, db }) => {
   
     const results = await repository.getAllData({db })
     const mapped = mappingResultData(results)
+  
+    cache.set(cacheKey, mapped, 60);
+    return mapped
+  }
+}
+
+const getReportStcard = async ({ repository, db }) => {
+  const cacheKey = 'getReportStcard_'+getMoment().format('YYYY-MM-DD')
+
+  const cached = cache.get(cacheKey)
+  if (cached) {
+    console.log('🔄 Cache hit')
+    return cached;
+  } else {
+    console.log('🚀 Cache miss, querying DB')
+  
+    const results = await repository.getReportStcard({db })
+    const mapped = mappingResultDataList(results)
   
     cache.set(cacheKey, mapped, 60);
     return mapped
@@ -95,5 +113,6 @@ module.exports = {
   getSTCard,
   getAllSTCard,
   processStock,
-  searchStCardData
+  searchStCardData,
+  getReportStcard
 }
