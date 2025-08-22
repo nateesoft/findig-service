@@ -1,54 +1,151 @@
+const cache = require('../utils/cache')
 const { mappingResultData } = require("../utils/ConvertThai")
 const { getMoment } = require("../utils/MomentUtil")
 const { generateUUID, Unicode2ASCII } = require("../utils/StringUtil")
 
+const validatePayload = (payload, requiredFields = []) => {
+  if (!payload || typeof payload !== 'object') {
+    throw new Error('Invalid payload: payload must be an object')
+  }
+  
+  for (const field of requiredFields) {
+    if (!payload[field]) {
+      throw new Error(`Missing required field: ${field}`)
+    }
+  }
+}
+
+const generateCacheKey = (functionName, payload) => {
+  const date = getMoment().format('YYYY-MM-DD')
+  const payloadHash = JSON.stringify(payload)
+  return `${functionName}_${date}_${Buffer.from(payloadHash).toString('base64').slice(0, 10)}`
+}
+
 const getData = async ({ payload, repository, db }) => {
-  const results = await repository.getData({ payload, db })
-  return mappingResultData(results)
+  try {
+    validatePayload(payload)
+    
+    const cacheKey = generateCacheKey('getData', payload)
+    const cached = cache.get(cacheKey)
+    if (cached) {
+      console.log('🔄 Cache hit for getData')
+      return cached
+    }
+
+    console.log('🚀 Cache miss, querying DB for getData')
+    
+    const results = await repository.getData({ payload, db })
+    const mapped = mappingResultData(results)
+    
+    cache.set(cacheKey, mapped, 300) // 5 minutes TTL
+    return mapped
+  } catch (error) {
+    throw new Error(`Service error in getData: ${error.message}`)
+  }
 }
 
 const getDataById = async ({ payload, repository, db }) => {
-  const results = await repository.getData({ payload, db })
-  return mappingResultData(results)
+  try {
+    validatePayload(payload)
+    
+    const cacheKey = generateCacheKey('getDataById', payload)
+    const cached = cache.get(cacheKey)
+    if (cached) {
+      console.log('🔄 Cache hit for getDataById')
+      return cached
+    }
+
+    console.log('🚀 Cache miss, querying DB for getDataById')
+    
+    const results = await repository.getData({ payload, db })
+    const mapped = mappingResultData(results)
+    
+    cache.set(cacheKey, mapped, 300) // 5 minutes TTL
+    return mapped
+  } catch (error) {
+    throw new Error(`Service error in getDataById: ${error.message}`)
+  }
 }
 
 const getSaleDetailsByBillNo = async ({ payload, repository, db }) => {
-  const results = await repository.getDataByBillNo({ payload, db })
-  return mappingResultData(results)
+  try {
+    validatePayload(payload)
+    
+    const cacheKey = generateCacheKey('getSaleDetailsByBillNo', payload)
+    const cached = cache.get(cacheKey)
+    if (cached) {
+      console.log('🔄 Cache hit for getSaleDetailsByBillNo')
+      return cached
+    }
+
+    console.log('🚀 Cache miss, querying DB for getSaleDetailsByBillNo')
+    
+    const results = await repository.getDataByBillNo({ payload, db })
+    const mapped = mappingResultData(results)
+    
+    cache.set(cacheKey, mapped, 300) // 5 minutes TTL
+    return mapped
+  } catch (error) {
+    throw new Error(`Service error in getSaleDetailsByBillNo: ${error.message}`)
+  }
 }
 
 const saveData = async ({ payload, repository, db }) => {
-  const { product_name } = payload
-  const mappingPayload = {
-    ...payload,
-    id: generateUUID(),
-    product_name: Unicode2ASCII(product_name),
-    create_date: getMoment().format('YYYY-MM-DD HH:mm:ss'),
-    update_date: getMoment().format('YYYY-MM-DD HH:mm:ss')
+  try {
+    validatePayload(payload, ['product_name'])
+    
+    const { product_name } = payload
+    const mappingPayload = {
+      ...payload,
+      id: generateUUID(),
+      product_name: Unicode2ASCII(product_name),
+      create_date: getMoment().format('YYYY-MM-DD HH:mm:ss'),
+      update_date: getMoment().format('YYYY-MM-DD HH:mm:ss')
+    }
+    const results = await repository.saveData({ payload: mappingPayload, db })
+    return results
+  } catch (error) {
+    throw new Error(`Service error in saveData: ${error.message}`)
   }
-  const results = await repository.saveData({ payload: mappingPayload, db })
-  return results
 }
 
 const updateData = async ({ payload, repository, db }) => {
-  const { product_name } = payload
-  const mappingPayload = {
-    ...payload,
-    product_name: Unicode2ASCII(product_name),
-    update_date: getMoment().format('YYYY-MM-DD HH:mm:ss')
+  try {
+    validatePayload(payload, ['product_name'])
+    
+    const { product_name } = payload
+    const mappingPayload = {
+      ...payload,
+      product_name: Unicode2ASCII(product_name),
+      update_date: getMoment().format('YYYY-MM-DD HH:mm:ss')
+    }
+    const results = await repository.updateData({ payload: mappingPayload, db })
+    return results
+  } catch (error) {
+    throw new Error(`Service error in updateData: ${error.message}`)
   }
-  const results = await repository.updateData({ payload: mappingPayload, db })
-  return results
 }
 
 const deleteData = async ({ payload, repository, db }) => {
-  const results = await repository.deleteData({ payload, db })
-  return results
+  try {
+    validatePayload(payload)
+    
+    const results = await repository.deleteData({ payload, db })
+    return results
+  } catch (error) {
+    throw new Error(`Service error in deleteData: ${error.message}`)
+  }
 }
 
 const deleteDataByBillNo = async ({ payload, repository, db }) => {
-  const results = await repository.deleteDataByBillNo({ payload, db })
-  return results
+  try {
+    validatePayload(payload)
+    
+    const results = await repository.deleteDataByBillNo({ payload, db })
+    return results
+  } catch (error) {
+    throw new Error(`Service error in deleteDataByBillNo: ${error.message}`)
+  }
 }
 
 module.exports = {
