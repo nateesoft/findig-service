@@ -1,16 +1,12 @@
 require("dotenv").config()
 
-let mysqlConnectionPOS = null
-
-if (process.env.IS_OLD_MYSQL5_POS === "Y") {
-  mysqlConnectionPOS = require("mysql")
-  console.log('old db use mysql5')
-} else {
-  mysqlConnectionPOS = require("mysql2")
-  console.log('new db use mysql8')
-}
-
 const util = require('util')
+
+const mysqlConnectionPOS = process.env.IS_OLD_MYSQL5_POS === "Y" 
+  ? require("mysql") 
+  : require("mysql2")
+
+console.log(process.env.IS_OLD_MYSQL5_POS === "Y" ? 'POS: Using MySQL 5' : 'POS: Using MySQL 8')
 
 const configDb = {
   host: process.env.MYSQL5_DB_HOST,
@@ -21,26 +17,28 @@ const configDb = {
   waitForConnections: true,
   connectionLimit: 50,
   queueLimit: 0,
-  connectTimeout: 10000,
+  connectTimeout: 30000,
+  acquireTimeout: 60000,
+  timeout: 60000,
+  reconnect: true,
   maxIdle: 3,
   idleTimeout: 60000,
   enableKeepAlive: true,
   keepAliveInitialDelay: 0
 }
-// const poolPOS = mysqlConnectionPOS.createConnection(configDb);
-const poolPOS = mysqlConnectionPOS.createPool(configDb);
-console.log('MySqlConnect config:', configDb, configDb.database)
 
-poolPOS.query("SELECT 5+0 AS solution", function (error, results, fields) {
-  if (error) {
-    console.log('pos-restaurant connection error:', error)
-    throw error
-  }
-  console.log("Connect old mysql ip: ", configDb.host)
-  console.log("Connect old mysql version: ", results[0].solution)
-  console.log('##### ##### #####')
-})
-
+const poolPOS = mysqlConnectionPOS.createPool(configDb)
 poolPOS.query = util.promisify(poolPOS.query)
+
+const testConnection = async () => {
+  try {
+    await poolPOS.query("SELECT 1 as connected")
+    console.log(`POS Database connected successfully to: ${configDb.host}:${configDb.port}/${configDb.database}`)
+  } catch (error) {
+    console.error('POS Database connection failed:', error.message)
+  }
+}
+
+testConnection()
 
 module.exports = poolPOS
