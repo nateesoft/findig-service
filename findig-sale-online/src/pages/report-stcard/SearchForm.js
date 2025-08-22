@@ -270,14 +270,14 @@ const SearchForm = ({
                 value: item.Code,
                 label: `${item.Code}-${item.Name}`
               }))}
-              value={branchFile?.find(item => item.Code === searchCriteria.S_Bran) ? {
-                value: searchCriteria.S_Bran,
-                label: `${searchCriteria.S_Bran}-${branchFile.find(item => item.Code === searchCriteria.S_Bran)?.Name}`
+              value={branchFile?.find(item => item.Code === searchCriteria.S_Bran_End) ? {
+                value: searchCriteria.S_Bran_End,
+                label: `${searchCriteria.S_Bran_End}-${branchFile.find(item => item.Code === searchCriteria.S_Bran_End)?.Name}`
               } : null}
               onChange={option =>
                 setSearchCriteria({
                   ...searchCriteria,
-                  S_Bran: option ? option.value : ""
+                  S_Bran_End: option ? option.value : ""
                 })
               }
               isClearable

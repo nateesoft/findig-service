@@ -9,9 +9,14 @@ import {
   ArrowUp,
   ArrowDown,
   Printer,
-  Download
+  Download,
+  ChevronDown,
+  ChevronUp,
+  Package,
+  Layers
 } from 'lucide-react';
 import moment from 'moment';
+import React from 'react';
 
 const DataTable = ({
     getThemeClasses,
@@ -24,7 +29,74 @@ const DataTable = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [sortField, setSortField] = useState('');
   const [sortDirection, setSortDirection] = useState('asc');
+  const [expandedBranches, setExpandedBranches] = useState(new Set());
+  const [expandedGroups, setExpandedGroups] = useState(new Set());
   const itemsPerPage = 10;
+  
+  // ฟังก์ชันจัดกลุ่มข้อมูลตามสาขา
+  const groupByBranch = (sales) => {
+    const grouped = sales.reduce((acc, item) => {
+      const branchCode = item.S_Bran || 'ไม่ระบุสาขา';
+      if (!acc[branchCode]) {
+        acc[branchCode] = {
+          branchCode: branchCode,
+          items: [],
+          totalItems: 0,
+          totalQty: 0
+        };
+      }
+      acc[branchCode].items.push(item);
+      acc[branchCode].totalItems += 1;
+      acc[branchCode].totalQty += Number(item.S_Que || 0);
+      return acc;
+    }, {});
+    
+    return Object.values(grouped).sort((a, b) => a.branchCode.localeCompare(b.branchCode));
+  };
+
+  // ฟังก์ชันจัดกลุ่มข้อมูลตามกลุ่มสินค้าภายในสาขา
+  const groupByProductGroup = (items) => {
+    const grouped = items.reduce((acc, item) => {
+      const groupName = item.GroupName || 'ไม่ระบุกลุ่ม';
+      if (!acc[groupName]) {
+        acc[groupName] = {
+          groupName: groupName,
+          items: [],
+          totalItems: 0,
+          totalQty: 0
+        };
+      }
+      acc[groupName].items.push(item);
+      acc[groupName].totalItems += 1;
+      acc[groupName].totalQty += Number(item.S_Que || 0);
+      return acc;
+    }, {});
+    
+    return Object.values(grouped).sort((a, b) => a.groupName.localeCompare(b.groupName));
+  };
+
+  // ฟังก์ชันสำหรับ toggle การแสดงรายละเอียดของสาขา
+  const toggleBranchExpansion = (branchCode) => {
+    const newExpanded = new Set(expandedBranches);
+    if (newExpanded.has(branchCode)) {
+      newExpanded.delete(branchCode);
+    } else {
+      newExpanded.add(branchCode);
+    }
+    setExpandedBranches(newExpanded);
+  };
+
+  // ฟังก์ชันสำหรับ toggle การแสดงรายละเอียดของกลุ่มสินค้า
+  const toggleGroupExpansion = (branchCode, groupName) => {
+    const key = `${branchCode}-${groupName}`;
+    const newExpanded = new Set(expandedGroups);
+    if (newExpanded.has(key)) {
+      newExpanded.delete(key);
+    } else {
+      newExpanded.add(key);
+    }
+    setExpandedGroups(newExpanded);
+  };
   
   // ฟังก์ชันสำหรับการจัดเรียงข้อมูล
   const handleSort = (field) => {
@@ -36,29 +108,39 @@ const DataTable = ({
     }
   };
 
-  // จัดเรียงข้อมูล
-  const sortedSales = [...filteredSales].sort((a, b) => {
+  // จัดกลุ่มข้อมูลตามสาขา
+  const groupedData = groupByBranch(filteredSales);
+  
+  // จัดเรียงข้อมูลกลุ่มตามฟิลด์ที่เลือก
+  const sortedGroups = [...groupedData].sort((a, b) => {
     if (!sortField) return 0;
     
-    let aValue = a[sortField];
-    let bValue = b[sortField];
+    let aValue, bValue;
     
-    // จัดการกับข้อมูลวันที่
-    if (sortField === 'S_Date') {
-      aValue = new Date(aValue);
-      bValue = new Date(bValue);
+    if (sortField === 'branchCode') {
+      aValue = a.branchCode;
+      bValue = b.branchCode;
+    } else if (sortField === 'totalItems') {
+      aValue = a.totalItems;
+      bValue = b.totalItems;
+    } else if (sortField === 'totalQty') {
+      aValue = a.totalQty;
+      bValue = b.totalQty;
+    } else {
+      return 0;
     }
     
     // จัดการกับข้อมูลตัวเลข
-    if (sortField === 'S_Que') {
-      aValue = Number(aValue);
-      bValue = Number(bValue);
+    if (typeof aValue === 'number') {
+      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
     }
     
     // จัดการกับข้อมูลข้อความ
     if (typeof aValue === 'string') {
-      aValue = aValue;
-      bValue = bValue;
+      aValue = aValue.toLowerCase();
+      bValue = bValue.toLowerCase();
     }
     
     if (aValue < bValue) {
@@ -71,12 +153,12 @@ const DataTable = ({
   });
 
   // คำนวณจำนวนหน้าทั้งหมด
-  const totalPages = Math.ceil(sortedSales.length / itemsPerPage);
+  const totalPages = Math.ceil(sortedGroups.length / itemsPerPage);
   
   // คำนวณ index เริ่มต้นและสิ้นสุดสำหรับหน้าปัจจุบัน
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentItems = sortedSales.slice(startIndex, endIndex);
+  const currentGroups = sortedGroups.slice(startIndex, endIndex);
   
   // Reset หน้าเมื่อข้อมูลเปลี่ยน
   useEffect(() => {
@@ -124,23 +206,30 @@ const DataTable = ({
             </tr>
           </thead>
           <tbody>
-            ${sortedSales.map(item => `
-              <tr>
-                <td>${item.S_Bran || ''}</td>
-                <td class="text-center">${moment(item.S_Date).format('DD/MM/YYYY')}</td>
-                <td>${item.S_No || ''}</td>
-                <td>${item.GroupName || ''}</td>
-                <td>${item.S_PCode || ''}</td>
-                <td>${item.PDesc || ''}</td>
-                <td class="text-center">${item.S_Que || ''}</td>
-                <td class="text-center">${item.S_Stk || ''}</td>
-                <td class="text-center">${item.S_Rem || ''}</td>
+            ${sortedGroups.map(group => `
+              <tr style="background-color: #f8fafc; font-weight: bold;">
+                <td colspan="9" style="padding: 12px;">
+                  สาขา: ${group.branchCode} (${group.totalItems} รายการ, รวม ${group.totalQty} ชิ้น)
+                </td>
               </tr>
+              ${group.items.map(item => `
+                <tr>
+                  <td style="padding-left: 20px;">${item.S_Bran || ''}</td>
+                  <td class="text-center">${moment(item.S_Date).format('DD/MM/YYYY')}</td>
+                  <td>${item.S_No || ''}</td>
+                  <td>${item.GroupName || ''}</td>
+                  <td>${item.S_PCode || ''}</td>
+                  <td>${item.PDesc || ''}</td>
+                  <td class="text-center">${item.S_Que || ''}</td>
+                  <td class="text-center">${item.S_Stk || ''}</td>
+                  <td class="text-center">${item.S_Rem || ''}</td>
+                </tr>
+              `).join('')}
             `).join('')}
           </tbody>
         </table>
         <div style="margin-top: 20px; text-align: center; font-size: 12px;">
-          จำนวนรายการทั้งหมด: ${sortedSales.length} รายการ
+          จำนวนสาขาทั้งหมด: ${sortedGroups.length} สาขา, จำนวนรายการทั้งหมด: ${filteredSales.length} รายการ
         </div>
       </body>
       </html>
@@ -162,17 +251,20 @@ const DataTable = ({
     
     const csvContent = [
       headers.join(','),
-      ...sortedSales.map(item => [
-        item.S_Bran || '',
-        moment(item.S_Date).format('DD/MM/YYYY'),
-        item.S_No || '',
-        item.GroupName || '',
-        item.S_PCode || '',
-        `"${item.PDesc || ''}"`,
-        item.S_Que || '',
-        item.S_Stk || '',
-        item.S_Rem || ''
-      ].join(','))
+      ...sortedGroups.flatMap(group => [
+        [`สาขา: ${group.branchCode}`, `${group.totalItems} รายการ`, `รวม ${group.totalQty} ชิ้น`, '', '', '', '', '', ''].join(','),
+        ...group.items.map(item => [
+          item.S_Bran || '',
+          moment(item.S_Date).format('DD/MM/YYYY'),
+          item.S_No || '',
+          item.GroupName || '',
+          item.S_PCode || '',
+          `"${item.PDesc || ''}"`,
+          item.S_Que || '',
+          item.S_Stk || '',
+          item.S_Rem || ''
+        ].join(','))
+      ])
     ].join('\n');
 
     // สร้างไฟล์และดาวน์โหลด
@@ -288,9 +380,9 @@ const DataTable = ({
             >
               รายงานความเคลื่อนไหวสินค้าสินค้า
             </h3>
-            {sortedSales.length > 0 && (
+            {sortedGroups.length > 0 && (
               <p className={`text-sm ${getThemeClasses("textMuted", currentTheme)} mt-2`}>
-                แสดงรายการ {startIndex + 1}-{Math.min(endIndex, sortedSales.length)} จากทั้งหมด {sortedSales.length} รายการ
+                แสดงสาขา {startIndex + 1}-{Math.min(endIndex, sortedGroups.length)} จากทั้งหมด {sortedGroups.length} สาขา ({filteredSales.length} รายการ)
               </p>
             )}
           </div>
@@ -305,7 +397,7 @@ const DataTable = ({
               )} border ${getThemeClasses(
                 "cardBorder",
                 currentTheme
-              )} hover:bg-gray-50 dark:hover:bg-gray-700 ${getThemeClasses(
+              )} ${getThemeClasses("hover", currentTheme)} ${getThemeClasses(
                 "transition",
                 currentTheme
               )}`}
@@ -319,7 +411,10 @@ const DataTable = ({
             
             <button
               onClick={handleExportExcel}
-              className={`flex items-center px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white ${getThemeClasses(
+              className={`flex items-center px-4 py-2 rounded-lg ${getThemeClasses(
+                "primaryBtn",
+                currentTheme
+              )} ${getThemeClasses(
                 "transition",
                 currentTheme
               )}`}
@@ -344,11 +439,11 @@ const DataTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('S_Bran')}
+                onClick={() => handleSort('branchCode')}
               >
                 <div className="flex items-center">
                   สาขา
-                  {getSortIcon('S_Bran')}
+                  {getSortIcon('branchCode')}
                 </div>
               </th>
               <th
@@ -359,117 +454,35 @@ const DataTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('S_Date')}
+                onClick={() => handleSort('totalItems')}
               >
                 <div className="flex items-center justify-center">
-                  วันที่สร้าง
-                  {getSortIcon('S_Date')}
+                  จำนวนรายการ
+                  {getSortIcon('totalItems')}
                 </div>
               </th>
               <th
-                className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
+                className={`px-6 py-3 text-center text-xs font-medium ${getThemeClasses(
                   "textMuted",
                   currentTheme
                 )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('S_No')}
+                onClick={() => handleSort('totalQty')}
               >
-                <div className="flex items-center">
-                  เลขที่บิล
-                  {getSortIcon('S_No')}
+                <div className="flex items-center justify-center">
+                  รวมจำนวน
+                  {getSortIcon('totalQty')}
                 </div>
               </th>
               <th
-                className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
+                className={`px-6 py-3 text-center text-xs font-medium ${getThemeClasses(
                   "textMuted",
                   currentTheme
-                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
-                  "textPrimary",
-                  currentTheme
-                )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('GroupName')}
+                )} uppercase tracking-wider`}
               >
-                <div className="flex items-center">
-                  กลุ่มสินค้า
-                  {getSortIcon('GroupName')}
-                </div>
-              </th>
-              <th
-                className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
-                  "textMuted",
-                  currentTheme
-                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
-                  "textPrimary",
-                  currentTheme
-                )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('S_PCode')}
-              >
-                <div className="flex items-center">
-                  รหัสสินค้า
-                  {getSortIcon('S_PCode')}
-                </div>
-              </th>
-              <th
-                className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
-                  "textMuted",
-                  currentTheme
-                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
-                  "textPrimary",
-                  currentTheme
-                )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('PDesc')}
-              >
-                <div className="flex items-center">
-                  ชื่อสินค้า
-                  {getSortIcon('PDesc')}
-                </div>
-              </th>
-              <th
-                className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
-                  "textMuted",
-                  currentTheme
-                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
-                  "textPrimary",
-                  currentTheme
-                )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('S_Que')}
-              >
-                <div className="flex items-center">
-                  จำนวน
-                  {getSortIcon('S_Que')}
-                </div>
-              </th>
-              <th
-                className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
-                  "textMuted",
-                  currentTheme
-                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
-                  "textPrimary",
-                  currentTheme
-                )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('S_Stk')}
-              >
-                <div className="flex items-center">
-                  คลัง
-                  {getSortIcon('S_Stk')}
-                </div>
-              </th>
-              <th
-                className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
-                  "textMuted",
-                  currentTheme
-                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
-                  "textPrimary",
-                  currentTheme
-                )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('S_Rem')}
-              >
-                <div className="flex items-center">
-                  ประเภท
-                  {getSortIcon('S_Rem')}
-                </div>
+                รายละเอียด
               </th>
             </tr>
           </thead>
@@ -479,92 +492,179 @@ const DataTable = ({
               currentTheme
             )} divide-y ${getThemeClasses("tableBorder", currentTheme)}`}
           >
-            {currentItems.length > 0 ? (
-              currentItems.map((draft_sale, index) => (
-                <tr
-                  key={draft_sale.S_No + (index+1)}
-                  className={getThemeClasses("tableRow", currentTheme)}
-                >
-                  <td
-                    className={`px-6 py-4 whitespace-nowrap text-left text-sm font-medium ${getThemeClasses(
-                      "textPrimary",
-                      currentTheme
-                    )}`}
-                  >
-                    {draft_sale.S_Bran}
-                  </td>
-                  <td
-                    className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
-                      "textPrimary",
-                      currentTheme
-                    )}`}
-                  >
-                    {moment(draft_sale.S_Date).format(
-                      "DD/MM/YYYY"
-                    )}
-                  </td>
-                  <td
-                    className={`px-6 py-4 whitespace-nowrap text-left text-sm ${getThemeClasses(
-                      "textSecondary",
-                      currentTheme
-                    )}`}
-                  >
-                    {draft_sale.S_No}
-                  </td>
-                  <td
-                    className={`px-6 py-4 whitespace-nowrap text-left text-sm ${getThemeClasses(
-                      "textPrimary",
-                      currentTheme
-                    )}`}
-                  >
-                    {draft_sale.GroupName}
-                  </td>
-                  <td
-                    className={`px-6 py-4 whitespace-nowrap text-left text-sm ${getThemeClasses(
-                      "textPrimary",
-                      currentTheme
-                    )}`}
-                  >
-                    {draft_sale.S_PCode}
-                  </td>
-                  <td
-                    className={`px-6 py-4 whitespace-nowrap text-left text-sm ${getThemeClasses(
-                      "textPrimary",
-                      currentTheme
-                    )}`}
-                  >
-                    {draft_sale.PDesc}
-                  </td>
-                  <td
-                    className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
-                      "textPrimary",
-                      currentTheme
-                    )}`}
-                  >
-                    {draft_sale.S_Que}
-                  </td>
-                  <td
-                    className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
-                      "textPrimary",
-                      currentTheme
-                    )}`}
-                  >
-                    {draft_sale.S_Stk}
-                  </td>
-                  <td
-                    className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
-                      "textPrimary",
-                      currentTheme
-                    )}`}
-                  >
-                    {draft_sale.S_Rem}
-                  </td>
-                </tr>
+            {currentGroups.length > 0 ? (
+              currentGroups.map((branchGroup) => (
+                <React.Fragment key={branchGroup.branchCode}>
+                  {/* สรุปข้อมูลแต่ละสาขา */}
+                  <tr className={`${getThemeClasses("tableRow", currentTheme)} ${getThemeClasses("tableHeader", currentTheme)}`}>
+                    <td
+                      className={`px-6 py-4 text-sm font-semibold ${getThemeClasses(
+                        "textPrimary",
+                        currentTheme
+                      )}`}
+                    >
+                      <div className="flex items-center">
+                        <Package className={`w-4 h-4 mr-2 ${getThemeClasses("accent", currentTheme)}`} />
+                        {branchGroup.branchCode}
+                      </div>
+                    </td>
+                    <td
+                      className={`px-6 py-4 text-center text-sm font-medium ${getThemeClasses(
+                        "textPrimary",
+                        currentTheme
+                      )}`}
+                    >
+                      {branchGroup.totalItems.toLocaleString()} รายการ
+                    </td>
+                    <td
+                      className={`px-6 py-4 text-center text-sm font-medium ${getThemeClasses(
+                        "textPrimary",
+                        currentTheme
+                      )}`}
+                    >
+                      {branchGroup.totalQty.toLocaleString()} ชิ้น
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <button
+                        onClick={() => toggleBranchExpansion(branchGroup.branchCode)}
+                        className={`p-2 rounded-full ${getThemeClasses(
+                          "cardBg",
+                          currentTheme
+                        )} border ${getThemeClasses(
+                          "cardBorder",
+                          currentTheme
+                        )} ${getThemeClasses("hover", currentTheme)} ${getThemeClasses(
+                          "transition",
+                          currentTheme
+                        )}`}
+                        title={expandedBranches.has(branchGroup.branchCode) ? "ซ่อนรายละเอียด" : "แสดงรายละเอียด"}
+                      >
+                        {expandedBranches.has(branchGroup.branchCode) ? (
+                          <ChevronUp className="w-4 h-4" />
+                        ) : (
+                          <ChevronDown className="w-4 h-4" />
+                        )}
+                      </button>
+                    </td>
+                  </tr>
+                  
+                  {/* รายละเอียดกลุ่มสินค้าในแต่ละสาขา */}
+                  {expandedBranches.has(branchGroup.branchCode) && (
+                    <>
+                      {groupByProductGroup(branchGroup.items).map((productGroup) => (
+                        <React.Fragment key={`${branchGroup.branchCode}-${productGroup.groupName}`}>
+                          {/* สรุปข้อมูลแต่ละกลุ่มสินค้า */}
+                          <tr className={`${getThemeClasses("tableRow", currentTheme)} ${getThemeClasses("secondaryBg", currentTheme)}`}>
+                            <td
+                              className={`px-6 py-3 text-sm font-medium ${getThemeClasses(
+                                "textPrimary",
+                                currentTheme
+                              )} pl-12`}
+                            >
+                              <div className="flex items-center">
+                                <Layers className={`w-4 h-4 mr-2 ${getThemeClasses("secondary", currentTheme)}`} />
+                                {productGroup.groupName}
+                              </div>
+                            </td>
+                            <td
+                              className={`px-6 py-3 text-center text-sm ${getThemeClasses(
+                                "textSecondary",
+                                currentTheme
+                              )}`}
+                            >
+                              {productGroup.totalItems.toLocaleString()} รายการ
+                            </td>
+                            <td
+                              className={`px-6 py-3 text-center text-sm ${getThemeClasses(
+                                "textSecondary",
+                                currentTheme
+                              )}`}
+                            >
+                              {productGroup.totalQty.toLocaleString()} ชิ้น
+                            </td>
+                            <td className="px-6 py-3 text-center">
+                              <button
+                                onClick={() => toggleGroupExpansion(branchGroup.branchCode, productGroup.groupName)}
+                                className={`p-1 rounded-full ${getThemeClasses(
+                                  "cardBg",
+                                  currentTheme
+                                )} border ${getThemeClasses(
+                                  "cardBorder",
+                                  currentTheme
+                                )} ${getThemeClasses("hover", currentTheme)} ${getThemeClasses(
+                                  "transition",
+                                  currentTheme
+                                )}`}
+                                title={expandedGroups.has(`${branchGroup.branchCode}-${productGroup.groupName}`) ? "ซ่อนรายละเอียด" : "แสดงรายละเอียด"}
+                              >
+                                {expandedGroups.has(`${branchGroup.branchCode}-${productGroup.groupName}`) ? (
+                                  <ChevronUp className="w-3 h-3" />
+                                ) : (
+                                  <ChevronDown className="w-3 h-3" />
+                                )}
+                              </button>
+                            </td>
+                          </tr>
+                          
+                          {/* รายละเอียดสินค้าในแต่ละกลุ่ม */}
+                          {expandedGroups.has(`${branchGroup.branchCode}-${productGroup.groupName}`) && (
+                            <>
+                              {/* Header สำหรับรายละเอียดสินค้า */}
+                              <tr className={`${getThemeClasses("tableHeader", currentTheme)}`}>
+                                <td
+                                  colSpan="4"
+                                  className={`px-6 py-2 text-xs font-medium ${getThemeClasses(
+                                    "textMuted",
+                                    currentTheme
+                                  )} uppercase tracking-wider pl-16`}
+                                >
+                                  <div className="grid grid-cols-6 gap-4">
+                                    <span>วันที่</span>
+                                    <span>เลขที่บิล</span>
+                                    <span>รหัสสินค้า</span>
+                                    <span>ชื่อสินค้า</span>
+                                    <span>จำนวน</span>
+                                    <span>คลัง</span>
+                                  </div>
+                                </td>
+                              </tr>
+                              
+                              {/* รายการสินค้าในกลุ่ม */}
+                              {productGroup.items.map((item, index) => (
+                                <tr
+                                  key={`${item.S_No}-${index}`}
+                                  className={`${getThemeClasses("tableRow", currentTheme)}`}
+                                >
+                                  <td
+                                    colSpan="4"
+                                    className={`px-6 py-2 text-sm ${getThemeClasses(
+                                      "textSecondary",
+                                      currentTheme
+                                    )} pl-16`}
+                                  >
+                                    <div className="grid grid-cols-6 gap-4">
+                                      <span>{moment(item.S_Date).format("DD/MM/YYYY")}</span>
+                                      <span>{item.S_No}</span>
+                                      <span>{item.S_PCode}</span>
+                                      <span className="truncate" title={item.PDesc}>{item.PDesc}</span>
+                                      <span>{item.S_Que}</span>
+                                      <span>{item.S_Stk}</span>
+                                    </div>
+                                  </td>
+                                </tr>
+                              ))}
+                            </>
+                          )}
+                        </React.Fragment>
+                      ))}
+                    </>
+                  )}
+                </React.Fragment>
               ))
             ) : (
               <tr>
                 <td
-                  colSpan="9"
+                  colSpan="4"
                   className={`px-6 py-8 text-center text-sm ${getThemeClasses(
                     "textMuted",
                     currentTheme
@@ -592,7 +692,7 @@ const DataTable = ({
       </div>
       
       {/* Pagination */}
-      {sortedSales.length > itemsPerPage && (
+      {sortedGroups.length > itemsPerPage && (
         <div className={`px-6 py-4 border-t ${getThemeClasses("cardBorder", currentTheme)}`}>
           <div className="flex items-center justify-between">
             <div className={`text-sm ${getThemeClasses("textMuted", currentTheme)}`}>
@@ -607,7 +707,7 @@ const DataTable = ({
                 className={`p-2 rounded-lg ${
                   currentPage === 1 
                     ? `${getThemeClasses("textMuted", currentTheme)} cursor-not-allowed` 
-                    : `${getThemeClasses("textSecondary", currentTheme)} hover:${getThemeClasses("textPrimary", currentTheme)} hover:bg-gray-50 dark:hover:bg-gray-800`
+                    : `${getThemeClasses("textSecondary", currentTheme)} hover:${getThemeClasses("textPrimary", currentTheme)} ${getThemeClasses("hover", currentTheme)}`
                 } ${getThemeClasses("transition", currentTheme)}`}
                 title="หน้าแรก"
               >
@@ -621,7 +721,7 @@ const DataTable = ({
                 className={`p-2 rounded-lg ${
                   currentPage === 1 
                     ? `${getThemeClasses("textMuted", currentTheme)} cursor-not-allowed` 
-                    : `${getThemeClasses("textSecondary", currentTheme)} hover:${getThemeClasses("textPrimary", currentTheme)} hover:bg-gray-50 dark:hover:bg-gray-800`
+                    : `${getThemeClasses("textSecondary", currentTheme)} hover:${getThemeClasses("textPrimary", currentTheme)} ${getThemeClasses("hover", currentTheme)}`
                 } ${getThemeClasses("transition", currentTheme)}`}
                 title="หน้าก่อนหน้า"
               >
@@ -641,8 +741,8 @@ const DataTable = ({
                         onClick={() => goToPage(page)}
                         className={`px-3 py-2 text-sm rounded-lg ${getThemeClasses("transition", currentTheme)} ${
                           currentPage === page
-                            ? `bg-blue-600 text-white font-medium`
-                            : `${getThemeClasses("textSecondary", currentTheme)} hover:${getThemeClasses("textPrimary", currentTheme)} hover:bg-gray-50 dark:hover:bg-gray-800`
+                            ? `${getThemeClasses("primaryBtn", currentTheme)}`
+                            : `${getThemeClasses("textSecondary", currentTheme)} hover:${getThemeClasses("textPrimary", currentTheme)} ${getThemeClasses("hover", currentTheme)}`
                         }`}
                       >
                         {page}
@@ -659,7 +759,7 @@ const DataTable = ({
                 className={`p-2 rounded-lg ${
                   currentPage === totalPages 
                     ? `${getThemeClasses("textMuted", currentTheme)} cursor-not-allowed` 
-                    : `${getThemeClasses("textSecondary", currentTheme)} hover:${getThemeClasses("textPrimary", currentTheme)} hover:bg-gray-50 dark:hover:bg-gray-800`
+                    : `${getThemeClasses("textSecondary", currentTheme)} hover:${getThemeClasses("textPrimary", currentTheme)} ${getThemeClasses("hover", currentTheme)}`
                 } ${getThemeClasses("transition", currentTheme)}`}
                 title="หน้าถัดไป"
               >
@@ -673,7 +773,7 @@ const DataTable = ({
                 className={`p-2 rounded-lg ${
                   currentPage === totalPages 
                     ? `${getThemeClasses("textMuted", currentTheme)} cursor-not-allowed` 
-                    : `${getThemeClasses("textSecondary", currentTheme)} hover:${getThemeClasses("textPrimary", currentTheme)} hover:bg-gray-50 dark:hover:bg-gray-800`
+                    : `${getThemeClasses("textSecondary", currentTheme)} hover:${getThemeClasses("textPrimary", currentTheme)} ${getThemeClasses("hover", currentTheme)}`
                 } ${getThemeClasses("transition", currentTheme)}`}
                 title="หน้าสุดท้าย"
               >
