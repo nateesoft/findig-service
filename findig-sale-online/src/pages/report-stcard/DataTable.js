@@ -121,7 +121,6 @@ const DataTable = ({
               <th class="text-center">จำนวน</th>
               <th class="text-center">คลัง</th>
               <th class="text-center">ประเภท</th>
-              <th class="text-center">Sync Data</th>
             </tr>
           </thead>
           <tbody>
@@ -136,7 +135,6 @@ const DataTable = ({
                 <td class="text-center">${item.S_Que || ''}</td>
                 <td class="text-center">${item.S_Stk || ''}</td>
                 <td class="text-center">${item.S_Rem || ''}</td>
-                <td class="text-center">${item.Data_Sync || ''}</td>
               </tr>
             `).join('')}
           </tbody>
@@ -159,7 +157,7 @@ const DataTable = ({
   const handleExportExcel = () => {
     // สร้างข้อมูล CSV
     const headers = [
-      'สาขา', 'วันที่สร้าง', 'เลขที่บิล', 'กลุ่มสินค้า', 'รหัสสินค้า', 'ชื่อสินค้า', 'จำนวน', 'คลัง', 'ประเภท', 'Sync Data'
+      'สาขา', 'วันที่สร้าง', 'เลขที่บิล', 'กลุ่มสินค้า', 'รหัสสินค้า', 'ชื่อสินค้า', 'จำนวน', 'คลัง', 'ประเภท'
     ];
     
     const csvContent = [
@@ -173,8 +171,7 @@ const DataTable = ({
         `"${item.PDesc || ''}"`,
         item.S_Que || '',
         item.S_Stk || '',
-        item.S_Rem || '',
-        item.Data_Sync || ''
+        item.S_Rem || ''
       ].join(','))
     ].join('\n');
 
@@ -474,21 +471,6 @@ const DataTable = ({
                   {getSortIcon('S_Rem')}
                 </div>
               </th>
-              <th
-                className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
-                  "textMuted",
-                  currentTheme
-                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
-                  "textPrimary",
-                  currentTheme
-                )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('Data_Sync')}
-              >
-                <div className="flex items-center">
-                  Sync Data
-                  {getSortIcon('Data_Sync')}
-                </div>
-              </th>
             </tr>
           </thead>
           <tbody
@@ -576,24 +558,6 @@ const DataTable = ({
                     )}`}
                   >
                     {draft_sale.S_Rem}
-                  </td>
-                  <td
-                    className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
-                      "textPrimary",
-                      currentTheme
-                    )}`}
-                  >
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        draft_sale.Data_Sync === "Y"
-                          ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                          : draft_sale.Data_Sync === "N"
-                          ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
-                          : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-                      }`}
-                    >
-                      {draft_sale.Data_Sync}
-                    </span>
                   </td>
                 </tr>
               ))

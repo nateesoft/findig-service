@@ -32,7 +32,7 @@ const Sales = () => {
     S_Date_End: '',
     S_Bran: branchCode || '',
     S_User: '',
-    Data_Sync: '',
+    S_Rem: '',
     S_Stk: '',
     S_PCode: ''
   });
@@ -71,7 +71,7 @@ const Sales = () => {
       S_Date_End: '',
       S_Bran: '',
       S_User: '',
-      Data_Sync: '',
+      S_Rem: '',
       S_Stk: '',
       S_PCode: ''
     });

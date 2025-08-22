@@ -31,215 +31,6 @@ const SearchForm = ({
                 currentTheme
               )} mb-2`}
             >
-              <FileText className="w-4 h-4 inline mr-2" />
-              เลขที่บิล
-            </label>
-            <input
-              type="text"
-              value={searchCriteria.S_No}
-              onChange={(e) =>
-                setSearchCriteria({ ...searchCriteria, S_No: e.target.value })
-              }
-              className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
-                "input",
-                currentTheme
-              )}`}
-              placeholder="ค้นหาเลขที่บิล"
-            />
-          </div>
-          <div>
-            <label
-              className={`block text-sm font-medium ${getThemeClasses(
-                "textSecondary",
-                currentTheme
-              )} mb-2`}
-            >
-              <Calendar className="w-4 h-4 inline mr-2" />
-              วันที่เริ่มต้น
-            </label>
-            <input
-              type="date"
-              value={searchCriteria.S_Date_Start}
-              onChange={(e) =>
-                setSearchCriteria({
-                  ...searchCriteria,
-                  S_Date_Start: e.target.value
-                })
-              }
-              className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
-                "input",
-                currentTheme
-              )}`}
-            />
-          </div>
-          <div>
-            <label
-              className={`block text-sm font-medium ${getThemeClasses(
-                "textSecondary",
-                currentTheme
-              )} mb-2`}
-            >
-              <Calendar className="w-4 h-4 inline mr-2" />
-              วันที่สิ้นสุด
-            </label>
-            <input
-              type="date"
-              value={searchCriteria.S_Date_End}
-              onChange={(e) =>
-                setSearchCriteria({
-                  ...searchCriteria,
-                  S_Date_End: e.target.value
-                })
-              }
-              className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
-                "input",
-                currentTheme
-              )}`}
-            />
-          </div>
-          <div>
-            <label
-              className={`block text-sm font-medium ${getThemeClasses(
-                "textSecondary",
-                currentTheme
-              )} mb-2`}
-            >
-              รหัสสาขา
-            </label>
-            <Select
-              options={branchFile?.map(item => ({
-                value: item.Code,
-                label: `${item.Code}-${item.Name}`
-              }))}
-              value={branchFile?.find(item => item.Code === searchCriteria.S_Bran) ? {
-                value: searchCriteria.S_Bran,
-                label: `${searchCriteria.S_Bran}-${branchFile.find(item => item.Code === searchCriteria.S_Bran)?.Name}`
-              } : null}
-              onChange={option =>
-                setSearchCriteria({
-                  ...searchCriteria,
-                  S_Bran: option ? option.value : ""
-                })
-              }
-              isClearable
-              placeholder="ทุกสาขา"
-              classNamePrefix="react-select"
-              styles={{
-                control: (base) => ({
-                  ...base,
-                  borderRadius: '0.5rem',
-                  minHeight: '40px',
-                  borderColor: getThemeClasses("input", currentTheme),
-                  boxShadow: 'none',
-                  fontSize: '1rem'
-                }),
-                menu: (base) => ({
-                  ...base,
-                  zIndex: 20
-                })
-              }}
-            />
-          </div>
-          <div>
-            <label
-              className={`block text-sm font-medium ${getThemeClasses(
-                "textSecondary",
-                currentTheme
-              )} mb-2`}
-            >
-              รหัสพนักงาน
-            </label>
-            <input
-              type="text"
-              value={searchCriteria.S_User}
-              onChange={(e) =>
-                setSearchCriteria({
-                  ...searchCriteria,
-                  S_User: e.target.value
-                })
-              }
-              className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
-                "input",
-                currentTheme
-              )}`}
-              placeholder="ค้นหารหัสพนักงาน"
-            />
-          </div>
-          <div>
-            <label
-              className={`block text-sm font-medium ${getThemeClasses(
-                "textSecondary",
-                currentTheme
-              )} mb-2`}
-            >
-              Sync Data
-            </label>
-            <select
-              value={searchCriteria.Data_Sync}
-              onChange={(e) =>
-                setSearchCriteria({
-                  ...searchCriteria,
-                  Data_Sync: e.target.value
-                })
-              }
-              className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
-                "input",
-                currentTheme
-              )}`}
-            >
-              <option value="">ทุกสถานะ</option>
-              <option value="N">WAIT</option>
-              <option value="Y">SUCCESS</option>
-            </select>
-          </div>
-          <div>
-            <label
-              className={`block text-sm font-medium ${getThemeClasses(
-                "textSecondary",
-                currentTheme
-              )} mb-2`}
-            >
-              คลังสินค้า
-            </label>
-            <Select
-              options={[{ value: "", label: "ทุกคลัง" }, { value: "A1", label: "คลังสินค้าหลัก" }]}
-              value={(() => {
-                if (searchCriteria.S_Stk === "") return { value: "", label: "ทุกคลัง" };
-                if (searchCriteria.S_Stk === "A1") return { value: "A1", label: "คลังสินค้าหลัก" };
-                return null;
-              })()}
-              onChange={option =>
-                setSearchCriteria({
-                  ...searchCriteria,
-                  S_Stk: option ? option.value : ""
-                })
-              }
-              isClearable
-              placeholder="ทุกคลัง"
-              classNamePrefix="react-select"
-              styles={{
-                control: (base) => ({
-                  ...base,
-                  borderRadius: '0.5rem',
-                  minHeight: '40px',
-                  borderColor: getThemeClasses("input", currentTheme),
-                  boxShadow: 'none',
-                  fontSize: '1rem'
-                }),
-                menu: (base) => ({
-                  ...base,
-                  zIndex: 20
-                })
-              }}
-            />
-          </div>
-          <div>
-            <label
-              className={`block text-sm font-medium ${getThemeClasses(
-                "textSecondary",
-                currentTheme
-              )} mb-2`}
-            >
               กลุ่มสินค้า
             </label>
             <Select
@@ -305,6 +96,210 @@ const SearchForm = ({
               placeholder="ค้นหารหัสสินค้า"
             />
           </div>
+          <div>
+            <label
+              className={`block text-sm font-medium ${getThemeClasses(
+                "textSecondary",
+                currentTheme
+              )} mb-2`}
+            >
+              คลังสินค้า
+            </label>
+            <Select
+              options={[{ value: "", label: "ทุกคลัง" }, { value: "A1", label: "คลังสินค้าหลัก" }]}
+              value={(() => {
+                if (searchCriteria.S_Stk === "") return { value: "", label: "ทุกคลัง" };
+                if (searchCriteria.S_Stk === "A1") return { value: "A1", label: "คลังสินค้าหลัก" };
+                return null;
+              })()}
+              onChange={option =>
+                setSearchCriteria({
+                  ...searchCriteria,
+                  S_Stk: option ? option.value : ""
+                })
+              }
+              isClearable
+              placeholder="ทุกคลัง"
+              classNamePrefix="react-select"
+              styles={{
+                control: (base) => ({
+                  ...base,
+                  borderRadius: '0.5rem',
+                  minHeight: '40px',
+                  borderColor: getThemeClasses("input", currentTheme),
+                  boxShadow: 'none',
+                  fontSize: '1rem'
+                }),
+                menu: (base) => ({
+                  ...base,
+                  zIndex: 20
+                })
+              }}
+            />
+          </div>
+          <div>
+            <label
+              className={`block text-sm font-medium ${getThemeClasses(
+                "textSecondary",
+                currentTheme
+              )} mb-2`}
+            >
+              <Calendar className="w-4 h-4 inline mr-2" />
+              วันที่เริ่มต้น
+            </label>
+            <input
+              type="date"
+              value={searchCriteria.S_Date_Start}
+              onChange={(e) =>
+                setSearchCriteria({
+                  ...searchCriteria,
+                  S_Date_Start: e.target.value
+                })
+              }
+              className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
+                "input",
+                currentTheme
+              )}`}
+            />
+          </div>
+          <div>
+            <label
+              className={`block text-sm font-medium ${getThemeClasses(
+                "textSecondary",
+                currentTheme
+              )} mb-2`}
+            >
+              <Calendar className="w-4 h-4 inline mr-2" />
+              วันที่สิ้นสุด
+            </label>
+            <input
+              type="date"
+              value={searchCriteria.S_Date_End}
+              onChange={(e) =>
+                setSearchCriteria({
+                  ...searchCriteria,
+                  S_Date_End: e.target.value
+                })
+              }
+              className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
+                "input",
+                currentTheme
+              )}`}
+            />
+          </div>
+          <div>
+            <label
+              className={`block text-sm font-medium ${getThemeClasses(
+                "textSecondary",
+                currentTheme
+              )} mb-2`}
+            >
+              ประเภทการขาย
+            </label>
+            <select
+              value={searchCriteria.S_Rem}
+              onChange={(e) =>
+                setSearchCriteria({
+                  ...searchCriteria,
+                  S_Rem: e.target.value
+                })
+              }
+              className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
+                "input",
+                currentTheme
+              )}`}
+            >
+              <option value="">ทุกสถานะ</option>
+              <option value="N">SAL</option>
+            </select>
+          </div>
+          <div>
+            <label
+              className={`block text-sm font-medium ${getThemeClasses(
+                "textSecondary",
+                currentTheme
+              )} mb-2`}
+            >
+              รหัสสาขาเริ่มต้น
+            </label>
+            <Select
+              options={branchFile?.map(item => ({
+                value: item.Code,
+                label: `${item.Code}-${item.Name}`
+              }))}
+              value={branchFile?.find(item => item.Code === searchCriteria.S_Bran) ? {
+                value: searchCriteria.S_Bran,
+                label: `${searchCriteria.S_Bran}-${branchFile.find(item => item.Code === searchCriteria.S_Bran)?.Name}`
+              } : null}
+              onChange={option =>
+                setSearchCriteria({
+                  ...searchCriteria,
+                  S_Bran: option ? option.value : ""
+                })
+              }
+              isClearable
+              placeholder="ทุกสาขา"
+              classNamePrefix="react-select"
+              styles={{
+                control: (base) => ({
+                  ...base,
+                  borderRadius: '0.5rem',
+                  minHeight: '40px',
+                  borderColor: getThemeClasses("input", currentTheme),
+                  boxShadow: 'none',
+                  fontSize: '1rem'
+                }),
+                menu: (base) => ({
+                  ...base,
+                  zIndex: 20
+                })
+              }}
+            />
+          </div>
+          <div>
+            <label
+              className={`block text-sm font-medium ${getThemeClasses(
+                "textSecondary",
+                currentTheme
+              )} mb-2`}
+            >
+              รหัสสาขาสิ้นสุด
+            </label>
+            <Select
+              options={branchFile?.map(item => ({
+                value: item.Code,
+                label: `${item.Code}-${item.Name}`
+              }))}
+              value={branchFile?.find(item => item.Code === searchCriteria.S_Bran) ? {
+                value: searchCriteria.S_Bran,
+                label: `${searchCriteria.S_Bran}-${branchFile.find(item => item.Code === searchCriteria.S_Bran)?.Name}`
+              } : null}
+              onChange={option =>
+                setSearchCriteria({
+                  ...searchCriteria,
+                  S_Bran: option ? option.value : ""
+                })
+              }
+              isClearable
+              placeholder="ทุกสาขา"
+              classNamePrefix="react-select"
+              styles={{
+                control: (base) => ({
+                  ...base,
+                  borderRadius: '0.5rem',
+                  minHeight: '40px',
+                  borderColor: getThemeClasses("input", currentTheme),
+                  boxShadow: 'none',
+                  fontSize: '1rem'
+                }),
+                menu: (base) => ({
+                  ...base,
+                  zIndex: 20
+                })
+              }}
+            />
+          </div>
+          
         </div>
 
         {/* Search Actions */}
