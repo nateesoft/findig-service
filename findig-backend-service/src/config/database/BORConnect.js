@@ -19,7 +19,7 @@ const configBor = {
   database: process.env.BOR_DB_NAME,
   port: process.env.BOR_DB_PORT,
   waitForConnections: true,
-  connectionLimit: 10,
+  connectionLimit: 50,
   queueLimit: 0,
   connectTimeout: 10000,
   maxIdle: 3,

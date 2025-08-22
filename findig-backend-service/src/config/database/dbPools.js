@@ -12,7 +12,7 @@ for (const branch of branchConfig) {
   for (const [dbKey, dbConf] of Object.entries(branch.databases)) {
     if (branch.driver === 'mysql') {
       const pool = mysql.createPool({
-        connectionLimit: 10,
+        connectionLimit: 50,
         ...dbConf
       });
       // promisify ให้เหมือน mysql2
@@ -23,7 +23,7 @@ for (const branch of branchConfig) {
       };
     } else if (branch.driver === 'mysql2') {
       const pool = mysql2.createPool({
-        connectionLimit: 10,
+        connectionLimit: 50,
         ...dbConf
       });
       pools[branch.code][dbKey] = {

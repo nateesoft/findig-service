@@ -19,7 +19,7 @@ const configDb = {
   database: process.env.MYSQL5_DB_NAME,
   port: process.env.MYSQL5_DB_PORT,
   waitForConnections: true,
-  connectionLimit: 10,
+  connectionLimit: 50,
   queueLimit: 0,
   connectTimeout: 10000,
   maxIdle: 3,
