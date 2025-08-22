@@ -678,7 +678,7 @@ const SaleTable = ({
                 >
                   <div className="flex flex-col items-center justify-center space-y-2">
                     <FileText className="w-12 h-12 text-gray-300" />
-                    <p>ไม่พบข้อมูลสต๊อกที่ตรงกับเงื่อนไขการค้นหา</p>
+                    <p>ไม่พบข้อมูลรายงานที่ตรงกับเงื่อนไขการค้นหา</p>
                     {Object.values(searchCriteria).some(
                       (value) => value.trim() !== ""
                     ) && (

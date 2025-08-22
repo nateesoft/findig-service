@@ -19,7 +19,7 @@ const searchSummaryReport = async ({ payload, db }) => {
     sql += `and s.Branch between '${Branch_Start}' and '${Branch_End}' `
   }
   
-  sql += `order by st.S_Date, st.S_Bran, st.S_PCode`
+  sql += `order by s.Branch, s.BStk, g.GroupCode, s.BPCode`
 
   const results = await db.pos?.query(sql)
   return results
@@ -72,7 +72,7 @@ const searchReportStcard = async ({ db, payload }) => {
     sql += `and st.S_Bran between '${S_Bran_Start}' and '${S_Bran_End}' `
   }
   
-  sql += `order by st.S_Date, st.S_Bran, st.S_PCode`
+  sql += `order by st.S_Bran, p.PGroup, st.S_PCode`
 
   const results = await db.pos?.query(sql)
   return results
@@ -99,7 +99,7 @@ const getReportStkfile = async ({ db, payload }) => {
     sql += `and st.BStk = '${BStk}' `
   }
 
-  sql += `order by st.Branch, st.BPCode`
+  sql += `order by st.Branch, p.PGroup, st.BPCode`
 
   const results = await db.pos?.query(sql)
   return results

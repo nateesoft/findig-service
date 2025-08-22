@@ -3,7 +3,8 @@ import {
   FileText,
   Search,
   Filter,
-  RefreshCw
+  RefreshCw,
+  X
 } from "lucide-react"
 
 const SearchForm = ({
@@ -15,6 +16,8 @@ const SearchForm = ({
   draftSale,
   resetSearch,
   handleSearch,
+  handleCancelSearch,
+  isLoading,
   branchFile
 }) => {
   return (
@@ -139,11 +142,11 @@ const SearchForm = ({
               สาขาเริ่มต้น
             </label>
             <select
-              value={searchCriteria.branchCodeFrom}
+              value={searchCriteria.branch_code_Start}
               onChange={(e) =>
                 setSearchCriteria({
                   ...searchCriteria,
-                  branchCodeFrom: e.target.value
+                  branch_code_Start: e.target.value
                 })
               }
               className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
@@ -169,11 +172,11 @@ const SearchForm = ({
               สาขาสิ้นสุด
             </label>
             <select
-              value={searchCriteria.branchCodeTo}
+              value={searchCriteria.branch_code_End}
               onChange={(e) =>
                 setSearchCriteria({
                   ...searchCriteria,
-                  branchCodeTo: e.target.value
+                  branchCodbranch_code_EndeTo: e.target.value
                 })
               }
               className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
@@ -214,16 +217,29 @@ const SearchForm = ({
               <RefreshCw className="w-4 h-4 mr-2" />
               ล้างการค้นหา
             </button>
-            <button
-              onClick={handleSearch}
-              className={`px-4 py-2 text-white rounded-lg font-medium bg-blue-500 hover:bg-blue-600 ${getThemeClasses(
-                "transition",
-                currentTheme
-              )} hover:shadow-lg flex items-center`}
-            >
-              <Search className="w-4 h-4 mr-2" />
-              ค้นหา
-            </button>
+            {isLoading ? (
+              <button
+                onClick={handleCancelSearch}
+                className={`px-4 py-2 text-white rounded-lg font-medium bg-red-500 hover:bg-red-600 ${getThemeClasses(
+                  "transition",
+                  currentTheme
+                )} hover:shadow-lg flex items-center`}
+              >
+                <X className="w-4 h-4 mr-2" />
+                หยุดค้นหา
+              </button>
+            ) : (
+              <button
+                onClick={handleSearch}
+                className={`px-4 py-2 text-white rounded-lg font-medium bg-blue-500 hover:bg-blue-600 ${getThemeClasses(
+                  "transition",
+                  currentTheme
+                )} hover:shadow-lg flex items-center`}
+              >
+                <Search className="w-4 h-4 mr-2" />
+                ค้นหา
+              </button>
+            )}
           </div>
         </div>
       </div>

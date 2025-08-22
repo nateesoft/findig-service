@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useRef } from 'react';
 import { Search } from 'lucide-react';
 
 import { getThemeClasses } from '../../utils/themes';
@@ -24,24 +24,28 @@ const Sales = () => {
   const [showSearchForm, setShowSearchForm] = useState(true);
   const [showPostModal, setShowPostModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const abortControllerRef = useRef(null);
   
   // Search criteria state
   const [searchCriteria, setSearchCriteria] = useState({
-    Branch: branchCode || '',
+    Branch_Start: branchCode || '',
+    Branch_End: branchCode || '',
+    GroupCode_Start: '',
+    GroupCode_End: '',
     BPCode: '',
     BStk: '',
-    SendToPOS: '',
-    GroupCode: '',
-    GroupCode1: '',
-    GroupCode2: '',
-    Branch1: '',
-    Branch2: ''
   });
 
   const handleSearch = async () => {
     try {
+      // สร้าง AbortController ใหม่และยกเลิก request เดิม (ถ้ามี)
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      abortControllerRef.current = new AbortController();
+      
       setIsLoading(true)
-      const { data, error } = await searchData(searchCriteria)
+      const { data, error } = await searchData(searchCriteria, abortControllerRef.current.signal)
       if(data){
         setFilteredSales(data);
       }
@@ -58,22 +62,42 @@ const Sales = () => {
           ]
         });
       }
+    } catch (err) {
+      if (err.name !== 'AbortError') {
+        setActiveModal({
+          type: 'error',
+          title: 'ไม่สามารถแสดงข้อมูลได้',
+          message: 'เกิดข้อผิดพลาดในการค้นหา',
+          actions: [
+            {
+              label: 'ตกลง',
+              onClick: () => setActiveModal(null)
+            }
+          ]
+        });
+      }
     } finally {
       setIsLoading(false)
+      abortControllerRef.current = null;
+    }
+  };
+
+  const handleCancelSearch = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+      setIsLoading(false);
     }
   };
 
   const resetSearch = () => {
     setSearchCriteria({
-      Branch: '',
+      Branch_Start: branchCode || '',
+      Branch_End: branchCode || '',
+      GroupCode_Start: '',
+      GroupCode_End: '',
       BPCode: '',
       BStk: '',
-      SendToPOS: '',
-      GroupCode: '',
-      GroupCode1: '',
-      GroupCode2: '',
-      Branch1: '',
-      Branch2: ''
     });
     setFilteredSales([]);
   };
@@ -160,6 +184,8 @@ const Sales = () => {
           filteredSales={filteredSales}
           resetSearch={resetSearch}
           handleSearch={handleSearch}
+          handleCancelSearch={handleCancelSearch}
+          isLoading={isLoading}
           branchFile={branchFile}
           groupFile={groupFile}
         />

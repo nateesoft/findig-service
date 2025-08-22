@@ -1,4 +1,4 @@
-import { Calendar, FileText, Search, RefreshCw } from "lucide-react"
+import { Calendar, FileText, Search, RefreshCw, X } from "lucide-react"
 import Select from "react-select"
 
 const SearchForm = ({
@@ -9,6 +9,8 @@ const SearchForm = ({
   filteredSales,
   resetSearch,
   handleSearch,
+  handleCancelSearch,
+  isLoading,
   branchFile,
   groupFile
 }) => {
@@ -196,22 +198,21 @@ const SearchForm = ({
             >
               ประเภทการขาย
             </label>
-            <select
-              value={searchCriteria.S_Rem}
+            <input
+              type="text"
+              value={searchCriteria.S_PCode}
               onChange={(e) =>
                 setSearchCriteria({
                   ...searchCriteria,
-                  S_Rem: e.target.value
+                  S_PCode: e.target.value
                 })
               }
               className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
                 "input",
                 currentTheme
               )}`}
-            >
-              <option value="">ทุกสถานะ</option>
-              <option value="N">SAL</option>
-            </select>
+              placeholder="ประเภทการขาย เช่น SAL"
+            />
           </div>
           <div>
             <label
@@ -227,14 +228,14 @@ const SearchForm = ({
                 value: item.Code,
                 label: `${item.Code}-${item.Name}`
               }))}
-              value={branchFile?.find(item => item.Code === searchCriteria.S_Bran) ? {
-                value: searchCriteria.S_Bran,
-                label: `${searchCriteria.S_Bran}-${branchFile.find(item => item.Code === searchCriteria.S_Bran)?.Name}`
+              value={branchFile?.find(item => item.Code === searchCriteria.S_Bran_Start) ? {
+                value: searchCriteria.S_Bran_Start,
+                label: `${searchCriteria.S_Bran_Start}-${branchFile.find(item => item.Code === searchCriteria.S_Bran_Start)?.Name}`
               } : null}
               onChange={option =>
                 setSearchCriteria({
                   ...searchCriteria,
-                  S_Bran: option ? option.value : ""
+                  S_Bran_Start: option ? option.value : ""
                 })
               }
               isClearable
@@ -326,16 +327,29 @@ const SearchForm = ({
               <RefreshCw className="w-4 h-4 mr-2" />
               ล้างการค้นหา
             </button>
-            <button
-              onClick={handleSearch}
-              className={`px-4 py-2 text-white rounded-lg font-medium bg-blue-500 hover:bg-blue-600 ${getThemeClasses(
-                "transition",
-                currentTheme
-              )} hover:shadow-lg flex items-center`}
-            >
-              <Search className="w-4 h-4 mr-2" />
-              ค้นหา
-            </button>
+            {isLoading ? (
+              <button
+                onClick={handleCancelSearch}
+                className={`px-4 py-2 text-white rounded-lg font-medium bg-red-500 hover:bg-red-600 ${getThemeClasses(
+                  "transition",
+                  currentTheme
+                )} hover:shadow-lg flex items-center`}
+              >
+                <X className="w-4 h-4 mr-2" />
+                หยุดค้นหา
+              </button>
+            ) : (
+              <button
+                onClick={handleSearch}
+                className={`px-4 py-2 text-white rounded-lg font-medium bg-blue-500 hover:bg-blue-600 ${getThemeClasses(
+                  "transition",
+                  currentTheme
+                )} hover:shadow-lg flex items-center`}
+              >
+                <Search className="w-4 h-4 mr-2" />
+                ค้นหา
+              </button>
+            )}
           </div>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useRef } from 'react';
 import { Search } from 'lucide-react';
 
 import { getThemeClasses } from '../../utils/themes';
@@ -24,23 +24,28 @@ const Sales = () => {
   const [showSearchForm, setShowSearchForm] = useState(true);
   const [showPostModal, setShowPostModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const abortControllerRef = useRef(null);
   
   // Search criteria state
   const [searchCriteria, setSearchCriteria] = useState({
-    S_No: '',
+    GroupCode: '',
+    S_PCode: '',
+    S_Stk: '',
     S_Date_Start: '',
     S_Date_End: '',
-    S_Bran: branchCode || '',
-    S_Bran_End: '',
-    S_User: '',
     S_Rem: '',
-    S_Stk: '',
-    S_PCode: '',
-    GroupCode: ''
+    S_Bran_Start: branchCode || '',
+    S_Bran_End: branchCode || ''
   });
 
   const handleSearch = async () => {
     try {
+      // สร้าง AbortController ใหม่และยกเลิก request เดิม (ถ้ามี)
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      abortControllerRef.current = new AbortController();
+      
       setIsLoading(true)
       
       // สร้างเกณฑ์การค้นหาสำหรับ API โดยไม่รวม S_Bran_End และ GroupCode
@@ -55,7 +60,7 @@ const Sales = () => {
         S_PCode: searchCriteria.S_PCode
       }
       
-      const { data, error } = await searchData(apiSearchCriteria)
+      const { data, error } = await searchData(apiSearchCriteria, abortControllerRef.current.signal)
       if(data){
         // กรองข้อมูลเพิ่มเติมสำหรับ S_Bran_End และ GroupCode
         let filteredData = data;
@@ -107,24 +112,45 @@ const Sales = () => {
           ]
         });
       }
+    } catch (err) {
+      if (err.name !== 'AbortError') {
+        setActiveModal({
+          type: 'error',
+          title: 'ไม่สามารถแสดงข้อมูลได้',
+          message: 'เกิดข้อผิดพลาดในการค้นหา',
+          actions: [
+            {
+              label: 'ตกลง',
+              onClick: () => setActiveModal(null)
+            }
+          ]
+        });
+      }
     } finally {
       setIsLoading(false)
+      abortControllerRef.current = null;
+    }
+  };
+
+  const handleCancelSearch = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+      setIsLoading(false);
     }
   };
 
   // ล้างการค้นหา
   const resetSearch = () => {
     setSearchCriteria({
-      S_No: '',
+      GroupCode: '',
+      S_PCode: '',
+      S_Stk: '',
       S_Date_Start: '',
       S_Date_End: '',
-      S_Bran: '',
-      S_Bran_End: '',
-      S_User: '',
       S_Rem: '',
-      S_Stk: '',
-      S_PCode: '',
-      GroupCode: ''
+      S_Bran_Start: branchCode || '',
+      S_Bran_End: branchCode || ''
     });
     setFilteredSales([]);
   };
@@ -211,6 +237,8 @@ const Sales = () => {
           filteredSales={filteredSales}
           resetSearch={resetSearch}
           handleSearch={handleSearch}
+          handleCancelSearch={handleCancelSearch}
+          isLoading={isLoading}
           branchFile={branchFile}
           groupFile={groupFile}
         />

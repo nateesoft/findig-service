@@ -1,4 +1,4 @@
-import { Search, RefreshCw } from "lucide-react"
+import { Search, RefreshCw, X } from "lucide-react"
 import Select from "react-select"
 
 const SearchForm = ({
@@ -9,6 +9,8 @@ const SearchForm = ({
   filteredSales,
   resetSearch,
   handleSearch,
+  handleCancelSearch,
+  isLoading,
   branchFile,
   groupFile
 }) => {
@@ -80,42 +82,20 @@ const SearchForm = ({
             >
               รหัสสินค้า
             </label>
-            <Select
-              options={[
-                { value: "", label: "ทุกกลุ่มสินค้า" },
-                ...(groupFile ? groupFile.map(item => ({
-                  value: item.GroupCode,
-                  label: `${item.GroupCode}-${item.GroupName}`
-                })) : [])
-              ]}
-              value={(() => {
-                if (searchCriteria.GroupCode === "") return { value: "", label: "ทุกกลุ่มสินค้า" };
-                const found = groupFile?.find(item => item.GroupCode === searchCriteria.GroupCode);
-                return found ? { value: found.GroupCode, label: `${found.GroupCode}-${found.GroupName}` } : null;
-              })()}
-              onChange={option =>
+            <input
+              type="text"
+              value={searchCriteria.BPCode}
+              onChange={(e) =>
                 setSearchCriteria({
                   ...searchCriteria,
-                  GroupCode: option ? option.value : ""
+                  BPCode: e.target.value
                 })
               }
-              isClearable
-              placeholder="ทุกกลุ่มสินค้า"
-              classNamePrefix="react-select"
-              styles={{
-                control: (base) => ({
-                  ...base,
-                  borderRadius: '0.5rem',
-                  minHeight: '40px',
-                  borderColor: getThemeClasses("input", currentTheme),
-                  boxShadow: 'none',
-                  fontSize: '1rem'
-                }),
-                menu: (base) => ({
-                  ...base,
-                  zIndex: 20
-                })
-              }}
+              className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
+                "input",
+                currentTheme
+              )}`}
+              placeholder="ค้นหารหัสสินค้า"
             />
           </div>
           <div>
@@ -130,14 +110,14 @@ const SearchForm = ({
             <Select
               options={[{ value: "", label: "ทุกคลัง" }, { value: "A1", label: "คลังสินค้าหลัก" }]}
               value={(() => {
-                if (searchCriteria.S_Stk === "") return { value: "", label: "ทุกคลัง" };
-                if (searchCriteria.S_Stk === "A1") return { value: "A1", label: "คลังสินค้าหลัก" };
+                if (searchCriteria.BStk === "") return { value: "", label: "ทุกคลัง" };
+                if (searchCriteria.BStk === "A1") return { value: "A1", label: "คลังสินค้าหลัก" };
                 return null;
               })()}
               onChange={option =>
                 setSearchCriteria({
                   ...searchCriteria,
-                  S_Stk: option ? option.value : ""
+                  BStk: option ? option.value : ""
                 })
               }
               isClearable
@@ -173,14 +153,14 @@ const SearchForm = ({
                 value: item.Code,
                 label: `${item.Code}-${item.Name}`
               }))}
-              value={branchFile?.find(item => item.Code === searchCriteria.S_Bran_Start) ? {
-                value: searchCriteria.S_Bran_Start,
-                label: `${searchCriteria.S_Bran_Start}-${branchFile.find(item => item.Code === searchCriteria.S_Bran_Start)?.Name}`
+              value={branchFile?.find(item => item.Code === searchCriteria.Branch_Start) ? {
+                value: searchCriteria.Branch_Start,
+                label: `${searchCriteria.Branch_Start}-${branchFile.find(item => item.Code === searchCriteria.Branch_Start)?.Name}`
               } : null}
               onChange={option =>
                 setSearchCriteria({
                   ...searchCriteria,
-                  S_Bran_Start: option ? option.value : ""
+                  Branch_Start: option ? option.value : ""
                 })
               }
               isClearable
@@ -216,14 +196,14 @@ const SearchForm = ({
                 value: item.Code,
                 label: `${item.Code}-${item.Name}`
               }))}
-              value={branchFile?.find(item => item.Code === searchCriteria.S_Bran_End) ? {
-                value: searchCriteria.S_Bran_End,
-                label: `${searchCriteria.S_Bran_End}-${branchFile.find(item => item.Code === searchCriteria.S_Bran_End)?.Name}`
+              value={branchFile?.find(item => item.Code === searchCriteria.Branch_End) ? {
+                value: searchCriteria.Branch_End,
+                label: `${searchCriteria.Branch_End}-${branchFile.find(item => item.Code === searchCriteria.Branch_End)?.Name}`
               } : null}
               onChange={option =>
                 setSearchCriteria({
                   ...searchCriteria,
-                  S_Bran_End: option ? option.value : ""
+                  Branch_End: option ? option.value : ""
                 })
               }
               isClearable
@@ -271,16 +251,29 @@ const SearchForm = ({
               <RefreshCw className="w-4 h-4 mr-2" />
               ล้างการค้นหา
             </button>
-            <button
-              onClick={handleSearch}
-              className={`px-4 py-2 text-white rounded-lg font-medium bg-blue-500 hover:bg-blue-600 ${getThemeClasses(
-                "transition",
-                currentTheme
-              )} hover:shadow-lg flex items-center`}
-            >
-              <Search className="w-4 h-4 mr-2" />
-              ค้นหา
-            </button>
+            {isLoading ? (
+              <button
+                onClick={handleCancelSearch}
+                className={`px-4 py-2 text-white rounded-lg font-medium bg-red-500 hover:bg-red-600 ${getThemeClasses(
+                  "transition",
+                  currentTheme
+                )} hover:shadow-lg flex items-center`}
+              >
+                <X className="w-4 h-4 mr-2" />
+                หยุดค้นหา
+              </button>
+            ) : (
+              <button
+                onClick={handleSearch}
+                className={`px-4 py-2 text-white rounded-lg font-medium bg-blue-500 hover:bg-blue-600 ${getThemeClasses(
+                  "transition",
+                  currentTheme
+                )} hover:shadow-lg flex items-center`}
+              >
+                <Search className="w-4 h-4 mr-2" />
+                ค้นหา
+              </button>
+            )}
           </div>
         </div>
       </div>

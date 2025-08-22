@@ -11,16 +11,14 @@ import {
   Printer,
   Download
 } from 'lucide-react';
-import moment from 'moment';
 
 const DataTable = ({
-    getThemeClasses,
-    currentTheme,
+  getThemeClasses,
+  currentTheme,
   filteredSales,
-  showStockRemain,
-    searchCriteria,
-    resetSearch,
-    isLoading
+  searchCriteria,
+  resetSearch,
+  isLoading
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortField, setSortField] = useState('');
@@ -43,15 +41,9 @@ const DataTable = ({
     
     let aValue = a[sortField];
     let bValue = b[sortField];
-    
-    // จัดการกับข้อมูลวันที่
-    if (sortField === 'S_Date') {
-      aValue = new Date(aValue);
-      bValue = new Date(bValue);
-    }
-    
+  
     // จัดการกับข้อมูลตัวเลข
-    if (sortField === 'S_Que') {
+    if (sortField === 'BQty24') {
       aValue = Number(aValue);
       bValue = Number(bValue);
     }
@@ -114,30 +106,22 @@ const DataTable = ({
           <thead>
             <tr>
               <th>สาขา</th>
-              <th class="text-center">วันที่สร้าง</th>
-              <th>เลขที่บิล</th>
               <th>กลุ่มสินค้า</th>
               <th>รหัสสินค้า</th>
               <th>ชื่อสินค้า</th>
-              <th class="text-center">จำนวน</th>
+              <th class="text-center">คงเหลือล่าสุด</th>
               <th class="text-center">คลัง</th>
-              <th class="text-center">ประเภท</th>
-              <th class="text-center">Sync Data</th>
             </tr>
           </thead>
           <tbody>
             ${sortedSales.map(item => `
               <tr>
-                <td>${item.S_Bran || ''}</td>
-                <td class="text-center">${moment(item.S_Date).format('DD/MM/YYYY')}</td>
-                <td>${item.S_No || ''}</td>
+                <td>${item.Branch || ''}</td>
                 <td>${item.GroupName || ''}</td>
-                <td>${item.S_PCode || ''}</td>
+                <td>${item.BPCode || ''}</td>
                 <td>${item.PDesc || ''}</td>
-                <td class="text-center">${item.S_Que || ''}</td>
-                <td class="text-center">${item.S_Stk || ''}</td>
-                <td class="text-center">${item.S_Rem || ''}</td>
-                <td class="text-center">${item.Data_Sync || ''}</td>
+                <td class="text-center">${item.BQty24 || ''}</td>
+                <td class="text-center">${item.BStk || ''}</td>
               </tr>
             `).join('')}
           </tbody>
@@ -160,22 +144,18 @@ const DataTable = ({
   const handleExportExcel = () => {
     // สร้างข้อมูล CSV
     const headers = [
-      'สาขา', 'วันที่สร้าง', 'เลขที่บิล', 'กลุ่มสินค้า', 'รหัสสินค้า', 'ชื่อสินค้า', 'จำนวน', 'คลัง', 'ประเภท', 'Sync Data'
+      'สาขา', 'กลุ่มสินค้า', 'รหัสสินค้า', 'ชื่อสินค้า', 'คงเหลือล่าสุด', 'คลัง'
     ];
     
     const csvContent = [
       headers.join(','),
       ...sortedSales.map(item => [
-        item.S_Bran || '',
-        moment(item.S_Date).format('DD/MM/YYYY'),
-        item.S_No || '',
+        item.Branch || '',
         item.GroupName || '',
-        item.S_PCode || '',
+        item.BPCode || '',
         `"${item.PDesc || ''}"`,
-        item.S_Que || '',
-        item.S_Stk || '',
-        item.S_Rem || '',
-        item.Data_Sync || ''
+        item.BQty24 || '',
+        item.BStk || ''
       ].join(','))
     ].join('\n');
 
@@ -348,26 +328,11 @@ const DataTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('S_PCode')}
+                onClick={() => handleSort('Branch')}
               >
                 <div className="flex items-center">
-                  รหัสสินค้า
-                  {getSortIcon('S_PCode')}
-                </div>
-              </th>
-              <th
-                className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
-                  "textMuted",
-                  currentTheme
-                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
-                  "textPrimary",
-                  currentTheme
-                )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('PDesc')}
-              >
-                <div className="flex items-center">
-                  ชื่อสินค้า
-                  {getSortIcon('PDesc')}
+                  สาขา
+                  {getSortIcon('Branch')}
                 </div>
               </th>
               <th
@@ -393,11 +358,11 @@ const DataTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('S_Bran')}
+                onClick={() => handleSort('BPCode')}
               >
                 <div className="flex items-center">
-                  สาขา
-                  {getSortIcon('S_Bran')}
+                  รหัสสินค้า
+                  {getSortIcon('BPCode')}
                 </div>
               </th>
               <th
@@ -408,26 +373,11 @@ const DataTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('S_Rem')}
+                onClick={() => handleSort('PDesc')}
               >
                 <div className="flex items-center">
-                  ประเภท
-                  {getSortIcon('S_Rem')}
-                </div>
-              </th>
-              <th
-                className={`px-6 py-3 text-center text-xs font-medium ${getThemeClasses(
-                  "textMuted",
-                  currentTheme
-                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
-                  "textPrimary",
-                  currentTheme
-                )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('S_Date')}
-              >
-                <div className="flex items-center justify-center">
-                  วันที่สร้าง
-                  {getSortIcon('S_Date')}
+                  ชื่อสินค้า
+                  {getSortIcon('PDesc')}
                 </div>
               </th>
               <th
@@ -438,11 +388,11 @@ const DataTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('S_Que')}
+                onClick={() => handleSort('BQty24')}
               >
                 <div className="flex items-center">
-                  จำนวน
-                  {getSortIcon('S_Que')}
+                  คงเหลือล่าสุด
+                  {getSortIcon('BQty24')}
                 </div>
               </th>
               <th
@@ -453,41 +403,11 @@ const DataTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('S_Stk')}
+                onClick={() => handleSort('BStk')}
               >
                 <div className="flex items-center">
                   คลัง
-                  {getSortIcon('S_Stk')}
-                </div>
-              </th>
-              {showStockRemain && (
-                <th
-                  className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
-                    "textMuted",
-                    currentTheme
-                  )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
-                    "textPrimary",
-                    currentTheme
-                  )} ${getThemeClasses("transition", currentTheme)}`}
-                >
-                  <div className="flex items-center">
-                    คงเหลือล่าสุด
-                  </div>
-                </th>
-              )}
-              <th
-                className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
-                  "textMuted",
-                  currentTheme
-                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
-                  "textPrimary",
-                  currentTheme
-                )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('S_No')}
-              >
-                <div className="flex items-center">
-                  เลขที่บิล
-                  {getSortIcon('S_No')}
+                  {getSortIcon('BStk')}
                 </div>
               </th>
             </tr>
@@ -501,24 +421,16 @@ const DataTable = ({
             {currentItems.length > 0 ? (
               currentItems.map((draft_sale, index) => (
                 <tr
-                  key={draft_sale.S_No + (index+1)}
+                  key={draft_sale.BPCode + (index+1)}
                   className={getThemeClasses("tableRow", currentTheme)}
                 >
                   <td
-                    className={`px-6 py-4 whitespace-nowrap text-left text-sm ${getThemeClasses(
+                    className={`px-6 py-4 whitespace-nowrap text-left text-sm font-medium ${getThemeClasses(
                       "textPrimary",
                       currentTheme
                     )}`}
                   >
-                    {draft_sale.S_PCode}
-                  </td>
-                  <td
-                    className={`px-6 py-4 whitespace-nowrap text-left text-sm ${getThemeClasses(
-                      "textPrimary",
-                      currentTheme
-                    )}`}
-                  >
-                    {draft_sale.PDesc}
+                    {draft_sale.Branch}
                   </td>
                   <td
                     className={`px-6 py-4 whitespace-nowrap text-left text-sm ${getThemeClasses(
@@ -529,12 +441,20 @@ const DataTable = ({
                     {draft_sale.GroupName}
                   </td>
                   <td
-                    className={`px-6 py-4 whitespace-nowrap text-left text-sm font-medium ${getThemeClasses(
+                    className={`px-6 py-4 whitespace-nowrap text-left text-sm ${getThemeClasses(
                       "textPrimary",
                       currentTheme
                     )}`}
                   >
-                    {draft_sale.S_Bran}
+                    {draft_sale.BPCode}
+                  </td>
+                  <td
+                    className={`px-6 py-4 whitespace-nowrap text-left text-sm ${getThemeClasses(
+                      "textPrimary",
+                      currentTheme
+                    )}`}
+                  >
+                    {draft_sale.PDesc}
                   </td>
                   <td
                     className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
@@ -542,51 +462,15 @@ const DataTable = ({
                       currentTheme
                     )}`}
                   >
-                    {draft_sale.S_Rem}
+                    {draft_sale.BQty24}
                   </td>
-                  <td
-                    className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
-                      "textPrimary",
-                      currentTheme
-                    )}`}
-                  >
-                    {moment(draft_sale.S_Date).format(
-                      "DD/MM/YYYY"
-                    )}
-                  </td>
-                  <td
-                    className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
-                      "textPrimary",
-                      currentTheme
-                    )}`}
-                  >
-                    {draft_sale.S_Que}
-                  </td>
-                  <td
-                    className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
-                      "textPrimary",
-                      currentTheme
-                    )}`}
-                  >
-                    {draft_sale.S_Stk}
-                  </td>
-                  {showStockRemain && (
-                    <td
-                      className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
-                        "textPrimary",
-                        currentTheme
-                      )}`}
-                    >
-                      {draft_sale.StockRemain}
-                    </td>
-                  )}
                   <td
                     className={`px-6 py-4 whitespace-nowrap text-left text-sm ${getThemeClasses(
                       "textSecondary",
                       currentTheme
                     )}`}
                   >
-                    {draft_sale.S_No}
+                    {draft_sale.BStk}
                   </td>
                 </tr>
               ))
@@ -601,7 +485,7 @@ const DataTable = ({
                 >
                   <div className="flex flex-col items-center justify-center space-y-2">
                     <FileText className="w-12 h-12 text-gray-300" />
-                    <p>ไม่พบข้อมูลการขายที่ตรงกับเงื่อนไขการค้นหา</p>
+                    <p>ไม่พบข้อมูลรายงานที่ตรงกับเงื่อนไขการค้นหา</p>
                     {Object.values(searchCriteria).some(
                       (value) => value.trim() !== ""
                     ) && (

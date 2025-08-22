@@ -3,7 +3,7 @@ const cache = require('../utils/cache')
 const { mappingResultDataList } = require("../utils/ConvertThai")
 const { getMoment } = require("../utils/MomentUtil")
 
-const searchSummaryReport = async ({ repository, db }) => {
+const searchSummaryReport = async ({ repository, db, payload }) => {
   const cacheKey = 'searchSummaryReport_'+getMoment().format('YYYY-MM-DD')
 
   const cached = cache.get(cacheKey)
@@ -13,7 +13,7 @@ const searchSummaryReport = async ({ repository, db }) => {
   } else {
     console.log('🚀 Cache miss, querying DB')
   
-    const results = await repository.searchSummaryReport({db })
+    const results = await repository.searchSummaryReport({ db, payload })
     const mapped = mappingResultDataList(results)
   
     cache.set(cacheKey, mapped, 60);
@@ -21,7 +21,7 @@ const searchSummaryReport = async ({ repository, db }) => {
   }
 }
 
-const searchReportSale = async ({ repository, db }) => {
+const searchReportSale = async ({ repository, db, payload }) => {
   const cacheKey = 'searchReportSale_'+getMoment().format('YYYY-MM-DD')
 
   const cached = cache.get(cacheKey)
@@ -31,7 +31,7 @@ const searchReportSale = async ({ repository, db }) => {
   } else {
     console.log('🚀 Cache miss, querying DB')
   
-    const results = await repository.searchReportSale({db })
+    const results = await repository.searchReportSale({ db, payload })
     const mapped = mappingResultDataList(results)
   
     cache.set(cacheKey, mapped, 60);
@@ -39,7 +39,7 @@ const searchReportSale = async ({ repository, db }) => {
   }
 }
 
-const searchReportStcard = async ({ repository, db }) => {
+const searchReportStcard = async ({ repository, db, payload }) => {
   const cacheKey = 'getReportStcard_'+getMoment().format('YYYY-MM-DD')
 
   const cached = cache.get(cacheKey)
@@ -49,7 +49,7 @@ const searchReportStcard = async ({ repository, db }) => {
   } else {
     console.log('🚀 Cache miss, querying DB')
   
-    const results = await repository.searchReportStcard({db })
+    const results = await repository.searchReportStcard({ db, payload })
     const mapped = mappingResultDataList(results)
   
     cache.set(cacheKey, mapped, 60);
@@ -57,7 +57,7 @@ const searchReportStcard = async ({ repository, db }) => {
   }
 }
 
-const getReportStkfile = async ({ repository, db }) => {
+const getReportStkfile = async ({ repository, db, payload }) => {
   const cacheKey = 'getReportStkfile_'+getMoment().format('YYYY-MM-DD')
 
   const cached = cache.get(cacheKey)
@@ -67,7 +67,7 @@ const getReportStkfile = async ({ repository, db }) => {
   } else {
     console.log('🚀 Cache miss, querying DB')
   
-    const results = await repository.getReportStkfile({db })
+    const results = await repository.getReportStkfile({ db, payload })
     const mapped = mappingResultDataList(results)
   
     cache.set(cacheKey, mapped, 60);

@@ -5,7 +5,8 @@ const searchSummaryReport = async (req, res, next) => {
   try {
     const response = await ReportService.searchSummaryReport({
       repository: ReportRepository,
-      db: req.db
+      db: req.db,
+      payload: req.body
     })
     res.json(response)
   } catch (error) {
@@ -16,7 +17,8 @@ const searchReportSale = async (req, res, next) => {
   try {
     const response = await ReportService.searchReportSale({
       repository: ReportRepository,
-      db: req.db
+      db: req.db,
+      payload: req.body
     })
     res.json(response)
   } catch (error) {
@@ -27,7 +29,8 @@ const searchReportStcard = async (req, res, next) => {
   try {
     const response = await ReportService.searchReportStcard({
       repository: ReportRepository,
-      db: req.db
+      db: req.db,
+      payload: req.body
     })
     res.json(response)
   } catch (error) {
@@ -38,7 +41,8 @@ const getReportStkfile = async (req, res, next) => {
   try {
     const response = await ReportService.getReportStkfile({
       repository: ReportRepository,
-      db: req.db
+      db: req.db,
+      payload: req.body
     })
     res.json(response)
   } catch (error) {

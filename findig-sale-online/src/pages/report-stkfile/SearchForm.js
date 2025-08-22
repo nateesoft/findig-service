@@ -1,4 +1,4 @@
-import { Search, RefreshCw } from "lucide-react"
+import { Search, RefreshCw, X } from "lucide-react"
 import Select from "react-select"
 
 const SearchForm = ({
@@ -9,6 +9,8 @@ const SearchForm = ({
   filteredSales,
   resetSearch,
   handleSearch,
+  handleCancelSearch,
+  isLoading,
   branchFile,
   groupFile
 }) => {
@@ -38,14 +40,14 @@ const SearchForm = ({
                 value: item.Code,
                 label: `${item.Code}-${item.Name}`
               }))}
-              value={branchFile?.find(item => item.Code === searchCriteria.Branch1) ? {
-                value: searchCriteria.Branch1,
-                label: `${searchCriteria.Branch1}-${branchFile.find(item => item.Code === searchCriteria.Branch1)?.Name}`
+              value={branchFile?.find(item => item.Code === searchCriteria.Branch_Start) ? {
+                value: searchCriteria.Branch_Start,
+                label: `${searchCriteria.Branch_Start}-${branchFile.find(item => item.Code === searchCriteria.Branch_Start)?.Name}`
               } : null}
               onChange={option =>
                 setSearchCriteria({
                   ...searchCriteria,
-                  Branch1: option ? option.value : ""
+                  Branch_Start: option ? option.value : ""
                 })
               }
               isClearable
@@ -81,14 +83,14 @@ const SearchForm = ({
                 value: item.Code,
                 label: `${item.Code}-${item.Name}`
               }))}
-              value={branchFile?.find(item => item.Code === searchCriteria.Branch2) ? {
-                value: searchCriteria.Branch2,
-                label: `${searchCriteria.Branch2}-${branchFile.find(item => item.Code === searchCriteria.Branch2)?.Name}`
+              value={branchFile?.find(item => item.Code === searchCriteria.Branch_End) ? {
+                value: searchCriteria.Branch_End,
+                label: `${searchCriteria.Branch_End}-${branchFile.find(item => item.Code === searchCriteria.Branch_End)?.Name}`
               } : null}
               onChange={option =>
                 setSearchCriteria({
                   ...searchCriteria,
-                  Branch2: option ? option.value : ""
+                  Branch_End: option ? option.value : ""
                 })
               }
               isClearable
@@ -296,16 +298,29 @@ const SearchForm = ({
               <RefreshCw className="w-4 h-4 mr-2" />
               ล้างการค้นหา
             </button>
-            <button
-              onClick={handleSearch}
-              className={`px-4 py-2 text-white rounded-lg font-medium bg-blue-500 hover:bg-blue-600 ${getThemeClasses(
-                "transition",
-                currentTheme
-              )} hover:shadow-lg flex items-center`}
-            >
-              <Search className="w-4 h-4 mr-2" />
-              ค้นหา
-            </button>
+            {isLoading ? (
+              <button
+                onClick={handleCancelSearch}
+                className={`px-4 py-2 text-white rounded-lg font-medium bg-red-500 hover:bg-red-600 ${getThemeClasses(
+                  "transition",
+                  currentTheme
+                )} hover:shadow-lg flex items-center`}
+              >
+                <X className="w-4 h-4 mr-2" />
+                หยุดค้นหา
+              </button>
+            ) : (
+              <button
+                onClick={handleSearch}
+                className={`px-4 py-2 text-white rounded-lg font-medium bg-blue-500 hover:bg-blue-600 ${getThemeClasses(
+                  "transition",
+                  currentTheme
+                )} hover:shadow-lg flex items-center`}
+              >
+                <Search className="w-4 h-4 mr-2" />
+                ค้นหา
+              </button>
+            )}
           </div>
         </div>
       </div>

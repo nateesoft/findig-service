@@ -1,15 +1,15 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useRef } from 'react';
 import { Search } from 'lucide-react';
 
 import { getThemeClasses } from '../../utils/themes';
 import { AppContext } from '../../contexts';
-import { searchData } from '../../api/stcardApi';
 import SearchForm from './SearchForm';
 import DataTable from './DataTable';
 import StockBarChart from './StockBarChart';
 import { Modal } from '../../components/Modals';
 import { loadAllBranch } from '../../api/branchApi';
 import { loadAllGroupfile } from '../../api/groupfileApi';
+import { loadSummaryReport } from '../../api/reportApi';
 
 const Sales = () => {
   const [activeModal, setActiveModal] = useState(null);
@@ -19,67 +19,31 @@ const Sales = () => {
   const { appData } = useContext(AppContext)
   const { currentTheme, branchCode } = appData
 
-  // Mock data สำหรับความเคลื่อนไหวสินค้า
-  const mockStockMovements = [
-    {
-      S_Bran: 'สาขากรุงเทพ',
-      S_Date: '2025-08-01',
-      S_PCode: 'P001',
-      PDesc: 'น้ำดื่ม 500ml',
-      GroupName: 'เครื่องดื่ม',
-      S_Stk: 'คลังหลัก',
-      S_Que: 120,
-      S_Rem: 'รับเข้า',
-      StockRemain: 80,
-    },
-    {
-      S_Bran: 'สาขาเชียงใหม่',
-      S_Date: '2025-08-05',
-      S_PCode: 'P002',
-      PDesc: 'ขนมปัง',
-      GroupName: 'เบเกอรี่',
-      S_Stk: 'คลังรอง',
-      S_Que: 50,
-      S_Rem: 'รับเข้า',
-      StockRemain: 50,
-    },
-    {
-      S_Bran: 'สาขากรุงเทพ',
-      S_Date: '2025-08-10',
-      S_PCode: 'P001',
-      PDesc: 'น้ำดื่ม 500ml',
-      GroupName: 'เครื่องดื่ม',
-      S_Stk: 'คลังหลัก',
-      S_Que: -40,
-      S_Rem: 'ขายออก',
-      StockRemain: 40,
-    },
-  ];
-
-  const [filteredSales, setFilteredSales] = useState(mockStockMovements)
-  const [showSaleModal, setShowSaleModal] = useState(false);
-  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [filteredSales, setFilteredSales] = useState([])
   const [showSearchForm, setShowSearchForm] = useState(true);
-  const [showPostModal, setShowPostModal] = useState(false);
+  
   const [isLoading, setIsLoading] = useState(false);
+  const abortControllerRef = useRef(null);
   
   // Search criteria state
   const [searchCriteria, setSearchCriteria] = useState({
-    S_No: '',
-    S_Date_Start: '',
-    S_Date_End: '',
-    S_Bran_Start: branchCode || '',
-    S_Bran_End: branchCode || '',
-    S_User: '',
-    Data_Sync: '',
-    S_Stk: '',
-    S_PCode: ''
+    GroupCode: '',
+    BPCode: '',
+    BStk: '',
+    Branch_Start: branchCode || '',
+    Branch_End: branchCode || ''
   });
 
   const handleSearch = async () => {
     try {
+      // สร้าง AbortController ใหม่และยกเลิก request เดิม (ถ้ามี)
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      abortControllerRef.current = new AbortController();
+      
       setIsLoading(true)
-      const { data, error } = await searchData(searchCriteria)
+      const { data, error } = await loadSummaryReport(searchCriteria, abortControllerRef.current.signal)
       if(data){
         setFilteredSales(data);
       }
@@ -97,41 +61,45 @@ const Sales = () => {
           ]
         });
       }
+    } catch (err) {
+      if (err.name !== 'AbortError') {
+        setActiveModal({
+          type: 'error',
+          title: 'ไม่สามารถแสดงข้อมูลได้',
+          message: 'เกิดข้อผิดพลาดในการค้นหา',
+          actions: [
+            {
+              label: 'ตกลง',
+              onClick: () => setActiveModal(null)
+            }
+          ]
+        });
+      }
     } finally {
       setIsLoading(false)
+      abortControllerRef.current = null;
+    }
+  };
+
+  const handleCancelSearch = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+      setIsLoading(false);
     }
   };
 
   // ล้างการค้นหา
   const resetSearch = () => {
     setSearchCriteria({
-      S_No: '',
-      S_Date_Start: '',
-      S_Date_End: '',
-      S_Bran_Start: '',
-      S_Bran_End: '',
-      S_User: '',
-      Data_Sync: '',
-      S_Stk: '',
-      S_PCode: ''
+      GroupCode: '',
+      BPCode: '',
+      BStk: '',
+      Branch_Start: branchCode || '',
+      Branch_End: branchCode || ''
     });
     setFilteredSales(filteredSales);
   };
-
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (showSaleModal || showReviewModal || showPostModal) {
-        if (e.key === 'Escape') {
-          setShowSaleModal(false);
-          setShowReviewModal(false);
-          setShowPostModal(false);
-        }
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [showSaleModal, showReviewModal, showPostModal]);
 
   useEffect(()=> {
     const initLoadAllbranch = async () => {
@@ -200,6 +168,8 @@ const Sales = () => {
           filteredSales={filteredSales}
           resetSearch={resetSearch}
           handleSearch={handleSearch}
+          handleCancelSearch={handleCancelSearch}
+          isLoading={isLoading}
           branchFile={branchFile}
           groupFile={groupFile}
         />

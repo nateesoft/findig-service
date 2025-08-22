@@ -1,47 +1,35 @@
 import { useState, useEffect, useContext, useRef } from 'react';
-import { 
-  Plus, 
-  Upload,
-  Search} from 'lucide-react';
+import { Search} from 'lucide-react';
 
 import { getThemeClasses } from '../../utils/themes';
 import { AppContext } from '../../contexts';
-import { loadReportAllDraftSale } from '../../api/saleApi';
 import SearchForm from './SearchForm';
 import DataTable from './DataTable';
 import { Modal } from '../../components/Modals';
 import { loadAllBranch } from '../../api/branchApi';
+import { loadSaleReport } from '../../api/reportApi';
 
 const Sales = () => {
   const [activeModal, setActiveModal] = useState(null);
   const [branchFile, setBranchFile] = useState([])
 
   const { appData } = useContext(AppContext)
-  const { currentTheme, branchCode, userInfo } = appData
+  const { currentTheme, branchCode } = appData
 
   const [draftSale, setDraftSale] = useState([])
   const [filteredSales, setFilteredSales] = useState([])
-  const [showSaleModal, setShowSaleModal] = useState(false);
-  const [showReviewModal, setShowReviewModal] = useState(false);
   const [showSearchForm, setShowSearchForm] = useState(true);
-  const [showPostModal, setShowPostModal] = useState(false);
-  const [modalMode, setModalMode] = useState('create'); // 'create', 'edit', 'review'
-  const [currentSaleData, setCurrentSaleData] = useState(null);
   
-  const [postProgress, setPostProgress] = useState(0);
-  const [postStatus, setPostStatus] = useState('idle'); // 'idle', 'processing', 'completed', 'error'
-  const [processedItems, setProcessedItems] = useState([]);
-  const [currentProcessingItem, setCurrentProcessingItem] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const abortControllerRef = useRef(null);
   
   const [searchCriteria, setSearchCriteria] = useState({
     billNo: '',
-    dateFrom: '',
-    dateTo: '',
-    branchCodeFrom: '',
-    branchCodeTo: '',
+    document_date_Start: '',
+    document_date_End: '',
     empCode: '',
-    postStatus: ''
+    branch_code_Start: branchCode || '',
+    branch_code_End: branchCode || ''
   });
 
   const [productSearchTerm, setProductSearchTerm] = useState('');
@@ -51,28 +39,8 @@ const Sales = () => {
 
   const [productList, setProductList] = useState([])
   
-  const barcodeInputRef = useRef(null);
   const autocompleteRef = useRef(null);
-  
-  const [saleHeader, setSaleHeader] = useState({
-    branchCode: '',
-    billNo: '',
-    empCode: userInfo.UserName,
-    createDate: new Date().toISOString().split('T')[0],
-    branchCode: branchCode
-  });
-
-  const [currentItem, setCurrentItem] = useState({
-    barcode: '',
-    productName: '',
-    stock: '',
-    qty: 0,
-    canStock: null,
-    canSet: null
-  });
-
-  const [saleItems, setSaleItems] = useState([]);
-
+ 
   const searchProducts = (term) => {
     if (!term) return [];
     const searchTerm = term.toLowerCase();
@@ -107,12 +75,17 @@ const Sales = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
- 
-  const initLoadData = async () => {
+  const handleSearch = async () => {
     try {
-      setIsLoading(true)
-
-      const { data, error } = await loadReportAllDraftSale()
+      // สร้าง AbortController ใหม่และยกเลิก request เดิม (ถ้ามี)
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      abortControllerRef.current = new AbortController();
+      
+      setIsLoading(true);
+      
+      const { data, error } = await loadSaleReport()
 
       if(data) {
         setDraftSale(data)
@@ -129,89 +102,42 @@ const Sales = () => {
           ]
         });
       }
+    } catch (err) {
+      if (err.name !== 'AbortError') {
+        setActiveModal({
+          type: 'error',
+          title: 'ไม่สามารถค้นหาได้',
+          message: 'เกิดข้อผิดพลาดในการค้นหา',
+          actions: [
+            {
+              label: 'ตกลง',
+              onClick: () => setActiveModal(null)
+            }
+          ]
+        });
+      }
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
+      abortControllerRef.current = null;
     }
-    
-  }
+  };
 
-  const handleSearch = () => {
-    let filtered = [...draftSale];
-
-    if (searchCriteria.billNo.trim()) {
-      filtered = filtered.filter(item => 
-        item.billno.toLowerCase().includes(searchCriteria.billNo.toLowerCase())
-      );
+  const handleCancelSearch = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+      setIsLoading(false);
     }
-
-    if (searchCriteria.dateFrom) {
-      filtered = filtered.filter(item => {
-        const itemDate = new Date(item.document_date);
-        const fromDate = new Date(searchCriteria.dateFrom);
-        // เปรียบเทียบเฉพาะวันที่โดยไม่รวมเวลา
-        return new Date(itemDate.getFullYear(), itemDate.getMonth(), itemDate.getDate()) >= 
-               new Date(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate());
-      });
-    }
-
-    if (searchCriteria.dateTo) {
-      filtered = filtered.filter(item => {
-        const itemDate = new Date(item.document_date);
-        const toDate = new Date(searchCriteria.dateTo);
-        // เปรียบเทียบเฉพาะวันที่โดยไม่รวมเวลา
-        return new Date(itemDate.getFullYear(), itemDate.getMonth(), itemDate.getDate()) <= 
-               new Date(toDate.getFullYear(), toDate.getMonth(), toDate.getDate());
-      });
-    }
-
-    // กรองตามช่วงสาขา
-    if (searchCriteria.branchCodeFrom || searchCriteria.branchCodeTo) {
-      filtered = filtered.filter(item => {
-        const branchCode = item.branch_code;
-        
-        // ถ้ามีทั้งสาขาเริ่มต้นและสิ้นสุด
-        if (searchCriteria.branchCodeFrom && searchCriteria.branchCodeTo) {
-          return branchCode >= searchCriteria.branchCodeFrom && branchCode <= searchCriteria.branchCodeTo;
-        }
-        
-        // ถ้ามีเฉพาะสาขาเริ่มต้น
-        if (searchCriteria.branchCodeFrom) {
-          return branchCode >= searchCriteria.branchCodeFrom;
-        }
-        
-        // ถ้ามีเฉพาะสาขาสิ้นสุด
-        if (searchCriteria.branchCodeTo) {
-          return branchCode <= searchCriteria.branchCodeTo;
-        }
-        
-        return true;
-      });
-    }
-
-    if (searchCriteria.empCode.trim()) {
-      filtered = filtered.filter(item => 
-        item.emp_code.toLowerCase().includes(searchCriteria.empCode.toLowerCase())
-      );
-    }
-
-    if (searchCriteria.postStatus) {
-      filtered = filtered.filter(item => 
-        item.post_status === searchCriteria.postStatus
-      );
-    }
-
-    setFilteredSales(filtered);
   };
 
   const resetSearch = () => {
     setSearchCriteria({
       billNo: '',
-      dateFrom: '',
-      dateTo: '',
-      branchCodeFrom: '',
-      branchCodeTo: '',
+      document_date_Start: '',
+      document_date_End: '',
       empCode: '',
-      postStatus: ''
+      branch_code_Start: branchCode || '',
+      branch_code_End: branchCode || ''
     });
     setFilteredSales(draftSale);
   };
@@ -219,10 +145,6 @@ const Sales = () => {
   useEffect(() => {
     setFilteredSales(draftSale);
   }, [draftSale]);
-
-  useEffect(() => {
-    initLoadData()
-  }, [])
 
   useEffect(()=> {
       const initLoadAllbranch = async () => {
@@ -272,6 +194,8 @@ const Sales = () => {
           draftSale={draftSale}
           resetSearch={resetSearch}
           handleSearch={handleSearch}
+          handleCancelSearch={handleCancelSearch}
+          isLoading={isLoading}
           branchFile={branchFile}
         />
       )}
