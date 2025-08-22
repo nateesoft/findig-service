@@ -10,10 +10,13 @@ import {
   ArrowUp,
   ArrowDown,
   Printer,
-  Download
+  Download,
+  ChevronDown,
+  ChevronUp,
+  Package
 } from 'lucide-react';
 import moment from 'moment';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const DataTable = ({
     getThemeClasses,
@@ -28,7 +31,40 @@ const DataTable = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [sortField, setSortField] = useState('');
   const [sortDirection, setSortDirection] = useState('asc');
+  const [expandedBranches, setExpandedBranches] = useState(new Set());
   const itemsPerPage = 10;
+  
+  // ฟังก์ชันจัดกลุ่มข้อมูลตามสาขา
+  const groupByBranch = (sales) => {
+    const grouped = sales.reduce((acc, item) => {
+      const branchCode = item.branch_code || 'ไม่ระบุสาขา';
+      if (!acc[branchCode]) {
+        acc[branchCode] = {
+          branch_code: branchCode,
+          items: [],
+          totalItems: 0,
+          totalBills: 0
+        };
+      }
+      acc[branchCode].items.push(item);
+      acc[branchCode].totalItems += Number(item.total_item) || 0;
+      acc[branchCode].totalBills += 1;
+      return acc;
+    }, {});
+    
+    return Object.values(grouped).sort((a, b) => a.branch_code.localeCompare(b.branch_code));
+  };
+
+  // ฟังก์ชันสำหรับ toggle การแสดงรายละเอียดของสาขา
+  const toggleBranchExpansion = (branchCode) => {
+    const newExpanded = new Set(expandedBranches);
+    if (newExpanded.has(branchCode)) {
+      newExpanded.delete(branchCode);
+    } else {
+      newExpanded.add(branchCode);
+    }
+    setExpandedBranches(newExpanded);
+  };
   
   // ฟังก์ชันสำหรับการจัดเรียงข้อมูล
   const handleSort = (field) => {
@@ -40,23 +76,33 @@ const DataTable = ({
     }
   };
 
-  // จัดเรียงข้อมูล
-  const sortedSales = [...filteredSales].sort((a, b) => {
+  // จัดกลุ่มข้อมูลตามสาขา
+  const groupedData = groupByBranch(filteredSales);
+  
+  // จัดเรียงข้อมูลกลุ่มตามฟิลด์ที่เลือก
+  const sortedGroups = [...groupedData].sort((a, b) => {
     if (!sortField) return 0;
     
-    let aValue = a[sortField];
-    let bValue = b[sortField];
+    let aValue, bValue;
     
-    // จัดการกับข้อมูลวันที่
-    if (sortField === 'document_date') {
-      aValue = new Date(aValue);
-      bValue = new Date(bValue);
+    if (sortField === 'branch_code') {
+      aValue = a.branch_code;
+      bValue = b.branch_code;
+    } else if (sortField === 'totalItems') {
+      aValue = a.totalItems;
+      bValue = b.totalItems;
+    } else if (sortField === 'totalBills') {
+      aValue = a.totalBills;
+      bValue = b.totalBills;
+    } else {
+      return 0;
     }
     
     // จัดการกับข้อมูลตัวเลข
-    if (sortField === 'total_item') {
-      aValue = Number(aValue);
-      bValue = Number(bValue);
+    if (typeof aValue === 'number') {
+      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
     }
     
     // จัดการกับข้อมูลข้อความ
@@ -75,12 +121,12 @@ const DataTable = ({
   });
 
   // คำนวณจำนวนหน้าทั้งหมด
-  const totalPages = Math.ceil(sortedSales.length / itemsPerPage);
+  const totalPages = Math.ceil(sortedGroups.length / itemsPerPage);
   
   // คำนวณ index เริ่มต้นและสิ้นสุดสำหรับหน้าปัจจุบัน
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentItems = sortedSales.slice(startIndex, endIndex);
+  const currentGroups = sortedGroups.slice(startIndex, endIndex);
   
   // Reset หน้าเมื่อข้อมูลเปลี่ยน
   useEffect(() => {
@@ -129,25 +175,32 @@ const DataTable = ({
             </tr>
           </thead>
           <tbody>
-            ${sortedSales.map(item => `
-              <tr>
-                <td>${item.billno || ''}</td>
-                <td class="text-center">${moment(item.document_date).format('DD/MM/YYYY HH:mm:ss')}</td>
-                <td class="text-right">${item.total_item || ''}</td>
-                <td class="text-center">${item.emp_code || ''}</td>
-                <td class="text-center">${item.branch_code || ''}</td>
-                <td class="text-center">
-                  <span class="${
-                    item.post_status === 'Y' ? 'status-y' : 
-                    item.post_status === 'N' ? 'status-n' : 'status-other'
-                  }">${item.post_status || ''}</span>
+            ${sortedGroups.map(group => `
+              <tr style="background-color: #f8fafc; font-weight: bold;">
+                <td colspan="6" style="padding: 12px;">
+                  สาขา: ${group.branch_code} (${group.totalBills} บิล, รวม ${group.totalItems} สินค้า)
                 </td>
               </tr>
+              ${group.items.map(item => `
+                <tr>
+                  <td style="padding-left: 20px;">${item.billno || ''}</td>
+                  <td class="text-center">${moment(item.document_date).format('DD/MM/YYYY HH:mm:ss')}</td>
+                  <td class="text-right">${item.total_item || ''}</td>
+                  <td class="text-center">${item.emp_code || ''}</td>
+                  <td class="text-center">${item.branch_code || ''}</td>
+                  <td class="text-center">
+                    <span class="${
+                      item.post_status === 'Y' ? 'status-y' : 
+                      item.post_status === 'N' ? 'status-n' : 'status-other'
+                    }">${item.post_status || ''}</span>
+                  </td>
+                </tr>
+              `).join('')}
             `).join('')}
           </tbody>
         </table>
         <div style="margin-top: 20px; text-align: center; font-size: 12px;">
-          จำนวนรายการทั้งหมด: ${sortedSales.length} รายการ
+          จำนวนสาขาทั้งหมด: ${sortedGroups.length} สาขา, จำนวนรายการทั้งหมด: ${filteredSales.length} รายการ
         </div>
       </body>
       </html>
@@ -169,14 +222,17 @@ const DataTable = ({
     
     const csvContent = [
       headers.join(','),
-      ...sortedSales.map(item => [
-        item.billno || '',
-        moment(item.document_date).format('DD/MM/YYYY HH:mm:ss'),
-        item.total_item || '',
-        item.emp_code || '',
-        item.branch_code || '',
-        item.post_status || ''
-      ].join(','))
+      ...sortedGroups.flatMap(group => [
+        [`สาขา: ${group.branch_code}`, `${group.totalBills} บิล`, `รวม ${group.totalItems} สินค้า`, '', '', ''].join(','),
+        ...group.items.map(item => [
+          item.billno || '',
+          moment(item.document_date).format('DD/MM/YYYY HH:mm:ss'),
+          item.total_item || '',
+          item.emp_code || '',
+          item.branch_code || '',
+          item.post_status || ''
+        ].join(','))
+      ])
     ].join('\n');
 
     // สร้างไฟล์และดาวน์โหลด
@@ -291,9 +347,9 @@ const DataTable = ({
             >
               รายงานการเปิดบิลด้วยมือ แยกตามสาขา
             </h3>
-            {sortedSales.length > 0 && (
+            {sortedGroups.length > 0 && (
               <p className={`text-sm ${getThemeClasses("textMuted", currentTheme)} mt-2`}>
-                แสดงรายการ {startIndex + 1}-{Math.min(endIndex, sortedSales.length)} จากทั้งหมด {sortedSales.length} รายการ
+                แสดงสาขา {startIndex + 1}-{Math.min(endIndex, sortedGroups.length)} จากทั้งหมด {sortedGroups.length} สาขา ({filteredSales.length} รายการ)
               </p>
             )}
           </div>
@@ -347,11 +403,11 @@ const DataTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('billno')}
+                onClick={() => handleSort('branch_code')}
               >
                 <div className="flex items-center">
-                  เลขที่ใบเสร็จ
-                  {getSortIcon('billno')}
+                  สาขา
+                  {getSortIcon('branch_code')}
                 </div>
               </th>
               <th
@@ -362,57 +418,35 @@ const DataTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('document_date')}
+                onClick={() => handleSort('totalBills')}
               >
                 <div className="flex items-center justify-center">
-                  วันที่สร้างเอกสาร
-                  {getSortIcon('document_date')}
+                  จำนวนบิล
+                  {getSortIcon('totalBills')}
                 </div>
               </th>
               <th
-                className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
+                className={`px-6 py-3 text-center text-xs font-medium ${getThemeClasses(
                   "textMuted",
                   currentTheme
                 )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('total_item')}
+                onClick={() => handleSort('totalItems')}
               >
-                <div className="flex items-center">
-                  จำนวนสินค้า
-                  {getSortIcon('total_item')}
+                <div className="flex items-center justify-center">
+                  รวมสินค้า
+                  {getSortIcon('totalItems')}
                 </div>
               </th>
               <th
-                className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
+                className={`px-6 py-3 text-center text-xs font-medium ${getThemeClasses(
                   "textMuted",
                   currentTheme
-                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
-                  "textPrimary",
-                  currentTheme
-                )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('emp_code')}
+                )} uppercase tracking-wider`}
               >
-                <div className="flex items-center">
-                  พนักงานทำรายการ
-                  {getSortIcon('emp_code')}
-                </div>
-              </th>
-              <th
-                className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
-                  "textMuted",
-                  currentTheme
-                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
-                  "textPrimary",
-                  currentTheme
-                )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('branch_code')}
-              >
-                <div className="flex items-center">
-                  สาขา
-                  {getSortIcon('branch_code')}
-                </div>
+                รายละเอียด
               </th>
             </tr>
           </thead>
@@ -422,60 +456,149 @@ const DataTable = ({
               currentTheme
             )} divide-y ${getThemeClasses("tableBorder", currentTheme)}`}
           >
-            {currentItems.length > 0 ? (
-              currentItems.map((draft_sale) => (
-                <tr
-                  key={draft_sale.billno}
-                  className={getThemeClasses("tableRow", currentTheme)}
-                >
-                  <td
-                    className={`px-6 py-4 whitespace-nowrap text-center text-sm font-medium ${getThemeClasses(
-                      "textPrimary",
-                      currentTheme
-                    )}`}
-                  >
-                    {draft_sale.billno}
-                  </td>
-                  <td
-                    className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
-                      "textPrimary",
-                      currentTheme
-                    )}`}
-                  >
-                    {moment(draft_sale.document_date).format(
-                      "DD/MM/YYYY HH:mm:ss"
-                    )}
-                  </td>
-                  <td
-                    className={`px-6 py-4 whitespace-nowrap text-right text-sm ${getThemeClasses(
-                      "textSecondary",
-                      currentTheme
-                    )}`}
-                  >
-                    {draft_sale.total_item}
-                  </td>
-                  <td
-                    className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
-                      "textPrimary",
-                      currentTheme
-                    )}`}
-                  >
-                    {draft_sale.emp_code}
-                  </td>
-                  <td
-                    className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
-                      "textPrimary",
-                      currentTheme
-                    )}`}
-                  >
-                    {draft_sale.branch_code}
-                  </td>
-                </tr>
+            {currentGroups.length > 0 ? (
+              currentGroups.map((branchGroup) => (
+                <React.Fragment key={branchGroup.branch_code}>
+                  {/* สรุปข้อมูลแต่ละสาขา */}
+                  <tr className={`${getThemeClasses("tableRow", currentTheme)} ${getThemeClasses("tableHeader", currentTheme)}`}>
+                    <td
+                      className={`px-6 py-4 text-sm font-semibold ${getThemeClasses(
+                        "textPrimary",
+                        currentTheme
+                      )}`}
+                    >
+                      <div className="flex items-center">
+                        <Package className="w-4 h-4 mr-2 text-blue-600" />
+                        {branchGroup.branch_code}
+                      </div>
+                    </td>
+                    <td
+                      className={`px-6 py-4 text-center text-sm font-medium ${getThemeClasses(
+                        "textPrimary",
+                        currentTheme
+                      )}`}
+                    >
+                      {branchGroup.totalBills.toLocaleString()} บิล
+                    </td>
+                    <td
+                      className={`px-6 py-4 text-center text-sm font-medium ${getThemeClasses(
+                        "textPrimary",
+                        currentTheme
+                      )}`}
+                    >
+                      {branchGroup.totalItems.toLocaleString()} สินค้า
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <button
+                        onClick={() => toggleBranchExpansion(branchGroup.branch_code)}
+                        className={`p-2 rounded-full ${getThemeClasses(
+                          "cardBg",
+                          currentTheme
+                        )} border ${getThemeClasses(
+                          "cardBorder",
+                          currentTheme
+                        )} hover:bg-gray-100 dark:hover:bg-gray-700 ${getThemeClasses(
+                          "transition",
+                          currentTheme
+                        )}`}
+                        title={expandedBranches.has(branchGroup.branch_code) ? "ซ่อนรายละเอียด" : "แสดงรายละเอียด"}
+                      >
+                        {expandedBranches.has(branchGroup.branch_code) ? (
+                          <ChevronUp className="w-4 h-4" />
+                        ) : (
+                          <ChevronDown className="w-4 h-4" />
+                        )}
+                      </button>
+                    </td>
+                  </tr>
+                  
+                  {/* รายละเอียดสินค้าในแต่ละสาขา */}
+                  {expandedBranches.has(branchGroup.branch_code) && (
+                    <>
+                      {/* Header สำหรับรายละเอียด */}
+                      <tr className={`${getThemeClasses("tableHeader", currentTheme)}`}>
+                        <td
+                          className={`px-6 py-2 text-xs font-medium ${getThemeClasses(
+                            "textMuted",
+                            currentTheme
+                          )} uppercase tracking-wider`}
+                        >
+                          เลขที่ใบเสร็จ
+                        </td>
+                        <td
+                          className={`px-6 py-2 text-center text-xs font-medium ${getThemeClasses(
+                            "textMuted",
+                            currentTheme
+                          )} uppercase tracking-wider`}
+                        >
+                          วันที่สร้างเอกสาร
+                        </td>
+                        <td
+                          className={`px-6 py-2 text-center text-xs font-medium ${getThemeClasses(
+                            "textMuted",
+                            currentTheme
+                          )} uppercase tracking-wider`}
+                        >
+                          จำนวนสินค้า
+                        </td>
+                        <td
+                          className={`px-6 py-2 text-center text-xs font-medium ${getThemeClasses(
+                            "textMuted",
+                            currentTheme
+                          )} uppercase tracking-wider`}
+                        >
+                          พนักงาน
+                        </td>
+                      </tr>
+                      
+                      {/* รายการสินค้าในสาขา */}
+                      {branchGroup.items.map((item) => (
+                        <tr
+                          key={item.billno}
+                          className={`${getThemeClasses("tableRow", currentTheme)}`}
+                        >
+                          <td
+                            className={`px-6 py-3 text-sm ${getThemeClasses(
+                              "textPrimary",
+                              currentTheme
+                            )} pl-8`}
+                          >
+                            {item.billno}
+                          </td>
+                          <td
+                            className={`px-6 py-3 text-center text-sm ${getThemeClasses(
+                              "textSecondary",
+                              currentTheme
+                            )}`}
+                          >
+                            {moment(item.document_date).format("DD/MM/YYYY HH:mm:ss")}
+                          </td>
+                          <td
+                            className={`px-6 py-3 text-center text-sm ${getThemeClasses(
+                              "textSecondary",
+                              currentTheme
+                            )}`}
+                          >
+                            {item.total_item?.toLocaleString()}
+                          </td>
+                          <td
+                            className={`px-6 py-3 text-center text-sm ${getThemeClasses(
+                              "textSecondary",
+                              currentTheme
+                            )}`}
+                          >
+                            {item.emp_code}
+                          </td>
+                        </tr>
+                      ))}
+                    </>
+                  )}
+                </React.Fragment>
               ))
             ) : (
               <tr>
                 <td
-                  colSpan="7"
+                  colSpan="4"
                   className={`px-6 py-8 text-center text-sm ${getThemeClasses(
                     "textMuted",
                     currentTheme
@@ -503,7 +626,7 @@ const DataTable = ({
       </div>
       
       {/* Pagination */}
-      {sortedSales.length > itemsPerPage && (
+      {sortedGroups.length > itemsPerPage && (
         <div className={`px-6 py-4 border-t ${getThemeClasses("cardBorder", currentTheme)}`}>
           <div className="flex items-center justify-between">
             <div className={`text-sm ${getThemeClasses("textMuted", currentTheme)}`}>
