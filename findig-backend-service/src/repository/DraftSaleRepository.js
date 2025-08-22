@@ -1,3 +1,9 @@
+const getAllData = async ({ db }) => {
+  const sql = `select * from draft_sale`
+  const results = await db.pos?.query(sql)
+  return results
+}
+
 const getData = async ({ payload, db }) => {
   const { branch_code } = payload
   const sql = `select * from draft_sale where branch_code=?`
@@ -70,5 +76,6 @@ module.exports = {
   deleteData,
   processStockFromSale,
   getAllBillNotProcess,
-  getDataForDashboard
+  getDataForDashboard,
+  getAllData
 }

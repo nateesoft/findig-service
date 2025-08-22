@@ -19,6 +19,19 @@ const getData = async (req, res, next) => {
   }
 }
 
+const getAllData = async (req, res, next) => {
+  try {
+    const dataInfo = await DraftSaleService.getAllData({
+      payload: {},
+      repository: DraftSaleRepository,
+      db: req.db
+    })
+    res.json(dataInfo)
+  } catch (error) {
+    next(error)
+  }
+}
+
 const getDataForDashboard = async (req, res, next) => {
   try {
     const { branchCode } = req.query
@@ -120,5 +133,6 @@ module.exports = {
   updateData,
   deleteData,
   processStockFromSale,
-  getDataForDashboard
+  getDataForDashboard,
+  getAllData
 }

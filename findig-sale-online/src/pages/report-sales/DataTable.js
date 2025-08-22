@@ -94,7 +94,7 @@ const DataTable = ({
       <!DOCTYPE html>
       <html>
       <head>
-        <title>รายการข้อมูลการขาย</title>
+        <title>รายงานการเปิดบิลด้วยมือ แยกตามสาขา</title>
         <meta charset="utf-8">
         <style>
           body { font-family: 'Sarabun', Arial, sans-serif; margin: 20px; }
@@ -116,7 +116,7 @@ const DataTable = ({
       </head>
       <body>
         <div class="print-date">วันที่พิมพ์: ${new Date().toLocaleDateString('th-TH')}</div>
-        <h1>รายการข้อมูลการขาย</h1>
+        <h1>รายงานการเปิดบิลด้วยมือ แยกตามสาขา</h1>
         <table>
           <thead>
             <tr>
@@ -185,7 +185,7 @@ const DataTable = ({
     if (link.download !== undefined) {
       const url = URL.createObjectURL(blob);
       link.setAttribute('href', url);
-      link.setAttribute('download', `รายการข้อมูลการขาย_${new Date().toISOString().split('T')[0]}.csv`);
+      link.setAttribute('download', `รายงานการเปิดบิลด้วยมือ แยกตามสาขา${new Date().toISOString().split('T')[0]}.csv`);
       link.style.visibility = 'hidden';
       document.body.appendChild(link);
       link.click();
@@ -253,7 +253,7 @@ const DataTable = ({
     return (
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <h1 className={`text-2xl font-bold ${getThemeClasses('textPrimary', currentTheme)}`}>เมนูบันทึกการขาย</h1>
+          <h1 className={`text-2xl font-bold ${getThemeClasses('textPrimary', currentTheme)}`}>รายงานการเปิดบิลด้วยมือ</h1>
         </div>
         <div className="flex items-center justify-center py-20">
           <div className="flex flex-col items-center space-y-4">
@@ -289,7 +289,7 @@ const DataTable = ({
                 currentTheme
               )}`}
             >
-              รายการข้อมูลการขาย
+              รายงานการเปิดบิลด้วยมือ แยกตามสาขา
             </h3>
             {sortedSales.length > 0 && (
               <p className={`text-sm ${getThemeClasses("textMuted", currentTheme)} mt-2`}>
@@ -414,29 +414,6 @@ const DataTable = ({
                   {getSortIcon('branch_code')}
                 </div>
               </th>
-              <th
-                className={`px-6 py-3 text-left text-xs font-medium ${getThemeClasses(
-                  "textMuted",
-                  currentTheme
-                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
-                  "textPrimary",
-                  currentTheme
-                )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('post_status')}
-              >
-                <div className="flex items-center">
-                  สถานะ POST
-                  {getSortIcon('post_status')}
-                </div>
-              </th>
-              <th
-                className={`px-6 py-3 text-center text-xs font-medium ${getThemeClasses(
-                  "textMuted",
-                  currentTheme
-                )} uppercase tracking-wider`}
-              >
-                จัดการ
-              </th>
             </tr>
           </thead>
           <tbody
@@ -492,64 +469,6 @@ const DataTable = ({
                     )}`}
                   >
                     {draft_sale.branch_code}
-                  </td>
-                  <td
-                    className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(
-                      "textPrimary",
-                      currentTheme
-                    )}`}
-                  >
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        draft_sale.post_status === "Y"
-                          ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                          : draft_sale.post_status === "N"
-                          ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
-                          : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-                      }`}
-                    >
-                      {draft_sale.post_status}
-                    </span>
-                  </td>
-                  <td
-                    className={`px-6 py-4 whitespace-nowrap text-center text-sm font-medium`}
-                  >
-                    <div className="flex justify-center space-x-2">
-                      <button
-                        onClick={() => handleReviewSale(draft_sale.id)}
-                        className={`p-2 rounded-lg ${getThemeClasses(
-                          "textSecondary",
-                          currentTheme
-                        )} hover:${getThemeClasses(
-                          "textPrimary",
-                          currentTheme
-                        )} ${getThemeClasses(
-                          "transition",
-                          currentTheme
-                        )} hover:bg-blue-50 dark:hover:bg-blue-900`}
-                        title="ดูรายละเอียด"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-                      {draft_sale.post_status !== "Y" && 
-                        <button
-                          onClick={() => handleEditSale(draft_sale.id)}
-                          className={`p-2 rounded-lg ${getThemeClasses(
-                            "textMuted",
-                            currentTheme
-                          )} hover:${getThemeClasses(
-                            "textSecondary",
-                            currentTheme
-                          )} ${getThemeClasses(
-                            "transition",
-                            currentTheme
-                          )} hover:bg-yellow-50 dark:hover:bg-yellow-900`}
-                          title="แก้ไข"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </button>
-                      }
-                    </div>
                   </td>
                 </tr>
               ))

@@ -1,9 +1,14 @@
-const { mappingResultData } = require("../utils/ConvertThai")
+const { mappingResultData, mappingResultDataList } = require("../utils/ConvertThai")
 const { getMoment } = require("../utils/MomentUtil")
 const { generateUUID } = require("../utils/StringUtil")
 
 const DraftSaleDetailsService = require("../services/DraftSaleDetailsService")
 const DraftSaleDetailsRepository = require('../repository/DraftSaleDetailsRepository')
+
+const getAllData = async ({ payload, repository, db }) => {
+  const results = await repository.getAllData({ db })
+  return mappingResultDataList(results)
+}
 
 const getData = async ({ payload, repository, db }) => {
   const results = await repository.getData({ payload, db })
@@ -145,5 +150,6 @@ module.exports = {
   saveData,
   updateData,
   deleteData,
-  getDataForDashboard
+  getDataForDashboard,
+  getAllData
 }

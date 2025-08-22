@@ -6,11 +6,7 @@ import {
 
 import { getThemeClasses } from '../../utils/themes';
 import { AppContext } from '../../contexts';
-import { createDraftSaleInfo, loadDraftSaleById, loadDraftSaleInfo, processStockFromSale, updateDraftSaleInfo } from '../../api/saleApi';
-import { loadAllProduct } from '../../api/productApi';
-import POSTModal from './POSTModal';
-import ReviewModal from './ReviewModal';
-import CreateEditModal from './CreateEditModal'
+import { loadReportAllDraftSale } from '../../api/saleApi';
 import SearchForm from './SearchForm';
 import DataTable from './DataTable';
 import { Modal } from '../../components/Modals';
@@ -110,333 +106,12 @@ const Sales = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleBarcodeKeyDown = (e) => {
-    if (!showAutocomplete || filteredProducts.length === 0) return;
-
-    switch (e.key) {
-      case 'ArrowDown':
-        e.preventDefault();
-        setSelectedProductIndex(prev => 
-          prev < filteredProducts.length - 1 ? prev + 1 : prev
-        );
-        break;
-      case 'ArrowUp':
-        e.preventDefault();
-        setSelectedProductIndex(prev => prev > 0 ? prev - 1 : prev);
-        break;
-      case 'Enter':
-        if (selectedProductIndex >= 0) {
-          e.preventDefault();
-          selectProduct(filteredProducts[selectedProductIndex]);
-        }
-        break;
-      case 'Escape':
-        setShowAutocomplete(false);
-        setSelectedProductIndex(-1);
-        break;
-    }
-  };
-
-  const selectProduct = (product) => {
-    setCurrentItem({
-      barcode: product.PCode,
-      productName: product.PDesc,
-      stock: product.stock,
-      qty: product.qty,
-      canStock: product.PStock,
-      canSet: product.PSet
-    });
-    setProductSearchTerm(product.PCode);
-    setSelectedProductIndex(-1);
-    
-    setTimeout(() => {
-      setShowAutocomplete(false);
-    }, 50);
-  };
-
-  const handleBarcodeChange = async (e) => {
-    const value = e.target.value;
-    setCurrentItem({...currentItem, barcode: value});
-    
-    await initLoadProduct(value)
-    
-    const exactMatch = productList.find(product => product.barcode === value);
-    if (exactMatch) {
-      setCurrentItem({
-        barcode: exactMatch.PCode,
-        productName: exactMatch.PDesc,
-        canStock: exactMatch.PStock,
-        canSet: exactMatch.PSet
-      });
-      setShowAutocomplete(false);
-    }
-  };
-
-  const resetNewSaleForm = () => {
-    setSaleHeader({
-      branchCode: branchCode,
-      billNo: '',
-      empCode: userInfo.UserName,
-      createDate: new Date().toISOString().split('T')[0],
-    });
-    setCurrentItem({
-      barcode: '',
-      productName: '',
-      stock: '',
-      qty: 0,
-      canStock: null,
-      canSet: null
-    });
-    setSaleItems([]);
-    setCurrentSaleData(null);
-    setProductSearchTerm('');
-  };
-
-  const resetCurrentItem = () => {
-    setCurrentItem({
-      barcode: '',
-      productName: '',
-      stock: '',
-      qty: 0,
-      canStock: null,
-      canSet: null
-    });
-  };
-
-  const addItemToSale = () => {
-    if (!currentItem.barcode || !currentItem.productName || currentItem.qty <= 0) {
-      setActiveModal({
-        type: 'warning',
-        title: 'ไม่สามารถบันทึกข้อมูลได้',
-        message: 'กรุณากรอกข้อมูลสินค้าให้ครบถ้วน',
-        actions: [
-          {
-            label: 'ตกลง',
-            onClick: () => setActiveModal(null)
-          }
-        ]
-      });
-      return;
-    }
-    const newItem = {
-      id: Date.now(),
-      ...currentItem,
-      total: currentItem.qty
-    };
-
-    setSaleItems(prev => [...prev, newItem]);
-    resetCurrentItem();
-    setProductSearchTerm('');
-  };
-
-  const removeItemFromSale = (itemId) => {
-    setSaleItems(prev => prev.filter(item => item.id !== itemId));
-  };
-
-  const editSaleItem = (itemId) => {
-    const itemToEdit = saleItems.find(item => item.id === itemId);
-    if (itemToEdit) {
-      setCurrentItem({ ...itemToEdit});
-      removeItemFromSale(itemId);
-    }
-  };
-
-  const initLoadProduct = async (searchText) => {
-    try {
-      const { data, error } = await loadAllProduct(searchText);
-      if (data) {
-        setProductList(data)
-        setProductSearchTerm(searchText);
-      } else {
-        setActiveModal({
-          type: 'error',
-          title: 'ไม่สามารถแสดงข้อมูลได้',
-          message: error || 'กรุณาลองใหม่อีกครั้ง',
-          actions: [
-            {
-              label: 'ตกลง',
-              onClick: () => setActiveModal(null)
-            }
-          ]
-        });
-      }
-    } catch (error) {
-      setActiveModal({
-        type: 'error',
-        title: 'ไม่สามารถแสดงข้อมูลได้',
-        message: error || 'กรุณาลองใหม่อีกครั้ง',
-        actions: [
-          {
-            label: 'ตกลง',
-            onClick: () => setActiveModal(null)
-          }
-        ]
-      });
-    }
-  };
-
-  const handleReviewSale = async (id) => {
-    try {
-      const { data, error } = await loadDraftSaleById({ id });
-      
-      if (data) {
-        setCurrentSaleData(data);
-        setModalMode('review');
-        setShowReviewModal(true);
-      } else {
-        setActiveModal({
-          type: 'error',
-          title: 'ไม่สามารถแสดงข้อมูลได้',
-          message: error || 'กรุณาลองใหม่อีกครั้ง',
-          actions: [
-            {
-              label: 'ตกลง',
-              onClick: () => setActiveModal(null)
-            }
-          ]
-        });
-      }
-    } catch (error) {
-      setActiveModal({
-        type: 'error',
-        title: 'ไม่สามารถแสดงข้อมูลได้',
-        message: error || 'กรุณาลองใหม่อีกครั้ง',
-        actions: [
-          {
-            label: 'ตกลง',
-            onClick: () => setActiveModal(null)
-          }
-        ]
-      });
-    }
-  };
-
-  const handleEditSale = async (id) => {
-    try {
-      const { data, error } = await loadDraftSaleById({ id });
-      
-      if (data) {
-        setSaleHeader({
-          ...data,
-          emp_code_update: userInfo.UserName,
-          branchCode: branchCode,
-          createDate: data.createDate || new Date().toISOString().split('T')[0]
-        });
-        
-        setSaleItems(data.items || []);
-        setCurrentSaleData(data);
-        setModalMode('edit');
-        setShowSaleModal(true);
-      } else {
-        setActiveModal({
-          type: 'error',
-          title: 'ไม่สามารถแสดงข้อมูลได้',
-          message: error || 'กรุณาลองใหม่อีกครั้ง',
-          actions: [
-            {
-              label: 'ตกลง',
-              onClick: () => setActiveModal(null)
-            }
-          ]
-        });
-      }
-    } catch (error) {
-      setActiveModal({
-        type: 'error',
-        title: 'ไม่สามารถแสดงข้อมูลได้',
-        message: error || 'กรุณาลองใหม่อีกครั้ง',
-        actions: [
-          {
-            label: 'ตกลง',
-            onClick: () => setActiveModal(null)
-          }
-        ]
-      });
-    }
-  };
-
-  const handleNewSaleSubmit = async () => {
-    if (!saleHeader.billNo) {
-      return;
-    }
-
-    if (saleItems.length === 0) {
-      setActiveModal({
-        type: 'warning',
-        title: 'ไม่สามารถเพิ่มข้อมูลได้',
-        message: 'กรุณาเพิ่มรายการสินค้าอย่างน้อย 1 รายการ',
-        actions: [
-          {
-            label: 'ตกลง',
-            onClick: () => setActiveModal(null)
-          }
-        ]
-      });
-      return;
-    }
-
-    const totalQty = saleItems.reduce((sum, item) => sum + item.qty, 0);
-
-    try {
-      let result;
-      if (modalMode === 'edit') {
-        result = await updateDraftSaleInfo({
-          ...saleHeader,
-          totalItem: totalQty,
-          saleItems
-        });
-      } else {
-        result = await createDraftSaleInfo({
-          branchCode: saleHeader.branchCode, 
-          billNo: saleHeader.billNo, 
-          empCode: saleHeader.empCode, 
-          totalItem: totalQty,
-          saleItems
-        });
-      }
-
-      const { data, error } = result;
-
-      if(data) {
-        initLoadData();
-      } else {
-        setActiveModal({
-          type: 'error',
-          title: 'ไม่สามารถแสดงข้อมูลได้',
-          message: error || 'กรุณาลองใหม่อีกครั้ง',
-          actions: [
-            {
-              label: 'ตกลง',
-              onClick: () => setActiveModal(null)
-            }
-          ]
-        });
-      }
-    } catch (error) {
-      setActiveModal({
-        type: 'error',
-        title: 'ไม่สามารถแสดงข้อมูลได้',
-        message: error || 'กรุณาลองใหม่อีกครั้ง',
-        actions: [
-          {
-            label: 'ตกลง',
-            onClick: () => setActiveModal(null)
-          }
-        ]
-      });
-    }
-    
-    resetNewSaleForm();
-    setShowSaleModal(false);
-  };
-
+ 
   const initLoadData = async () => {
     try {
       setIsLoading(true)
 
-      const { data, error } = await loadDraftSaleInfo({
-        branchCode: branchCode
-      })
+      const { data, error } = await loadReportAllDraftSale()
 
       if(data) {
         setDraftSale(data)
@@ -458,88 +133,6 @@ const Sales = () => {
     }
     
   }
-
-  const handleCreateNew = () => {
-    resetNewSaleForm();
-    setModalMode('create');
-    setShowSaleModal(true);
-  };
-  
-  const handlePostStock = () => {
-    const tempSales = filteredSales.filter(sale => sale.post_status === 'N');
-    
-    if (tempSales.length === 0) {
-      setActiveModal({
-        type: 'warning',
-        title: 'ไม่สามารถ POST ข้อมูลได้',
-        message: 'ไม่มีรายการที่สามารถ POST ได้',
-        actions: [
-          {
-            label: 'ตกลง',
-            onClick: () => setActiveModal(null)
-          }
-        ]
-      });
-      return;
-    }
-    
-    setPostProgress(0);
-    setPostStatus('idle');
-    setProcessedItems([]);
-    setCurrentProcessingItem(null);
-    setShowPostModal(true);
-  };
-
-  const processPostItem = async (item, index, total) => {
-    setCurrentProcessingItem(item);
-
-    let isSuccess = false
-    const { data, error } = await processStockFromSale({ branchCode: branchCode, saleInfo: item })
-    if(data) {
-      isSuccess = true
-    }
-    
-    const result = {
-      ...item,
-      processed: true,
-      success: isSuccess,
-      message: isSuccess ? 'POST สำเร็จ' : error,
-      processedAt: new Date().toISOString()
-    };
-    
-    setProcessedItems(prev => [...prev, result]);
-    setPostProgress(((index + 1) / total) * 100);
-    
-    return result;
-  };
-
-  const handleConfirmPost = async () => {
-    const tempSales = filteredSales.filter(sale => sale.post_status === 'N');
-    
-    setPostStatus('processing');
-    setPostProgress(0);
-    setProcessedItems([]);
-    
-    try {
-      const results = [];
-      
-      for (let i = 0; i < tempSales.length; i++) {
-        const result = await processPostItem(tempSales[i], i, tempSales.length);
-        results.push(result);
-      }
-      
-      setCurrentProcessingItem(null);
-      setPostStatus('completed');
-      
-      setTimeout(() => {
-        initLoadData();
-      }, 1000);
-      
-    } catch (error) {
-      setPostStatus('error');
-      console.error('Error during POST process:', error);
-    }
-  };
 
   const handleSearch = () => {
     let filtered = [...draftSale];
@@ -603,25 +196,6 @@ const Sales = () => {
     initLoadData()
   }, [])
 
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (showSaleModal || showReviewModal || showPostModal) {
-        if (e.key === 'Escape') {
-          setShowSaleModal(false);
-          setShowReviewModal(false);
-          setShowPostModal(false);
-        } else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-          if (showSaleModal && currentItem.barcode && currentItem.productName && currentItem.qty > 0) {
-            addItemToSale();
-          }
-        }
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [showSaleModal, showReviewModal, showPostModal, currentItem]);
-
   useEffect(()=> {
       const initLoadAllbranch = async () => {
         const { data, error } = await loadAllBranch()
@@ -648,7 +222,7 @@ const Sales = () => {
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-        <h1 className={`text-2xl font-bold ${getThemeClasses('textPrimary', currentTheme)}`}>เมนูบันทึกการขาย</h1>
+        <h1 className={`text-2xl font-bold ${getThemeClasses('textPrimary', currentTheme)}`}>รายงานการเปิดบิลด้วยมือ</h1>
         <div className="mt-4 sm:mt-0 flex space-x-3">
           <button 
             onClick={() => setShowSearchForm(!showSearchForm)}
@@ -656,18 +230,6 @@ const Sales = () => {
           >
             <Search className="w-4 h-4 mr-2" />
             {showSearchForm ? 'ซ่อนการค้นหา' : 'ค้นหา'}
-          </button>
-          <button 
-            onClick={handlePostStock}
-            className={`text-white px-4 py-2 rounded-lg font-medium bg-green-500 hover:bg-green-600 hover:shadow-lg transform hover:scale-105 transition-all duration-300 ease-in-out flex items-center`}>
-            <Upload className="w-4 h-4 mr-2" />
-            POST ตัดสต๊อก
-          </button>
-          <button 
-            onClick={handleCreateNew}
-            className={`text-white px-4 py-2 rounded-lg font-medium ${getThemeClasses('primaryBtn', currentTheme)} ${getThemeClasses('transition', currentTheme)} flex items-center`}>
-            <Plus className="w-4 h-4 mr-2" />
-            เพิ่มข้อมูล
           </button>
         </div>
       </div>
@@ -690,62 +252,10 @@ const Sales = () => {
         getThemeClasses={getThemeClasses}
         currentTheme={currentTheme}
         filteredSales={filteredSales}
-        handleReviewSale={handleReviewSale}
-        handleEditSale={handleEditSale}
         searchCriteria={searchCriteria}
         resetSearch={resetSearch}
         isLoading={isLoading}
       />
-
-      {showPostModal && (
-        <POSTModal
-          currentTheme={currentTheme}
-          postStatus={postStatus}
-          filteredSales={filteredSales}
-          currentProcessingItem={currentProcessingItem}
-          handleConfirmPost={handleConfirmPost}
-          setShowPostModal={setShowPostModal}
-          postProgress={postProgress}
-          processedItems={processedItems}
-        />
-      )}
-
-      {showReviewModal && currentSaleData && (
-        <ReviewModal 
-          getThemeClasses={getThemeClasses}
-          currentTheme={currentTheme}
-          currentSaleData={currentSaleData}
-          setShowReviewModal={setShowReviewModal}
-        />
-      )}
-
-      {showSaleModal && (
-        <CreateEditModal
-          getThemeClasses={getThemeClasses}
-          currentTheme={currentTheme}
-          modalMode={modalMode}
-          saleHeader={saleHeader}
-          setSaleHeader={setSaleHeader}
-          saleItems={saleItems}
-          currentItem={currentItem}
-          setCurrentItem={setCurrentItem}
-          productSearchTerm={productSearchTerm}
-          filteredProducts={filteredProducts}
-          showAutocomplete={showAutocomplete}
-          selectedProductIndex={selectedProductIndex}
-          barcodeInputRef={barcodeInputRef}
-          autocompleteRef={autocompleteRef}
-          handleBarcodeChange={handleBarcodeChange}
-          handleBarcodeKeyDown={handleBarcodeKeyDown}
-          selectProduct={selectProduct}
-          addItemToSale={addItemToSale}
-          editSaleItem={editSaleItem}
-          removeItemFromSale={removeItemFromSale}
-          setShowSaleModal={setShowSaleModal}
-          resetNewSaleForm={resetNewSaleForm}
-          handleNewSaleSubmit={handleNewSaleSubmit}
-        />
-      )}
 
       {activeModal && (
         <Modal
