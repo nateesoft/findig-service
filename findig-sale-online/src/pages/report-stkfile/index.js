@@ -31,7 +31,11 @@ const Sales = () => {
     BPCode: '',
     BStk: '',
     SendToPOS: '',
-    GroupCode: ''
+    GroupCode: '',
+    GroupCode1: '',
+    GroupCode2: '',
+    Branch1: '',
+    Branch2: ''
   });
 
   const handleSearch = async () => {
@@ -65,9 +69,13 @@ const Sales = () => {
       BPCode: '',
       BStk: '',
       SendToPOS: '',
-      GroupCode: ''
+      GroupCode: '',
+      GroupCode1: '',
+      GroupCode2: '',
+      Branch1: '',
+      Branch2: ''
     });
-    setFilteredSales(filteredSales);
+    setFilteredSales([]);
   };
 
   useEffect(() => {

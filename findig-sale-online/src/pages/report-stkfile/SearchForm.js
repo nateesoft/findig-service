@@ -23,7 +23,7 @@ const SearchForm = ({
       )} animate-fade-in`}
     >
       <div className="p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-4">
           <div>
             <label
               className={`block text-sm font-medium ${getThemeClasses(
@@ -31,25 +31,25 @@ const SearchForm = ({
                 currentTheme
               )} mb-2`}
             >
-              รหัสสาขา
+              สาขาเริ่มต้น
             </label>
             <Select
               options={branchFile?.map(item => ({
                 value: item.Code,
                 label: `${item.Code}-${item.Name}`
               }))}
-              value={branchFile?.find(item => item.Code === searchCriteria.Branch) ? {
-                value: searchCriteria.Branch,
-                label: `${searchCriteria.Branch}-${branchFile.find(item => item.Code === searchCriteria.Branch)?.Name}`
+              value={branchFile?.find(item => item.Code === searchCriteria.Branch1) ? {
+                value: searchCriteria.Branch1,
+                label: `${searchCriteria.Branch1}-${branchFile.find(item => item.Code === searchCriteria.Branch1)?.Name}`
               } : null}
               onChange={option =>
                 setSearchCriteria({
                   ...searchCriteria,
-                  Branch: option ? option.value : ""
+                  Branch1: option ? option.value : ""
                 })
               }
               isClearable
-              placeholder="ทุกสาขา"
+              placeholder="สาขาเริ่มต้น"
               classNamePrefix="react-select"
               styles={{
                 control: (base) => ({
@@ -74,23 +74,25 @@ const SearchForm = ({
                 currentTheme
               )} mb-2`}
             >
-              คลังสินค้า
+              สาขาสิ้นสุด
             </label>
             <Select
-              options={[{ value: "", label: "ทุกคลัง" }, { value: "A1", label: "คลังสินค้าหลัก" }]}
-              value={(() => {
-                if (searchCriteria.BStk === "") return { value: "", label: "ทุกคลัง" };
-                if (searchCriteria.BStk === "A1") return { value: "A1", label: "คลังสินค้าหลัก" };
-                return null;
-              })()}
+              options={branchFile?.map(item => ({
+                value: item.Code,
+                label: `${item.Code}-${item.Name}`
+              }))}
+              value={branchFile?.find(item => item.Code === searchCriteria.Branch2) ? {
+                value: searchCriteria.Branch2,
+                label: `${searchCriteria.Branch2}-${branchFile.find(item => item.Code === searchCriteria.Branch2)?.Name}`
+              } : null}
               onChange={option =>
                 setSearchCriteria({
                   ...searchCriteria,
-                  BStk: option ? option.value : ""
+                  Branch2: option ? option.value : ""
                 })
               }
               isClearable
-              placeholder="ทุกคลัง"
+              placeholder="สาขาสิ้นสุด"
               classNamePrefix="react-select"
               styles={{
                 control: (base) => ({
@@ -115,7 +117,7 @@ const SearchForm = ({
                 currentTheme
               )} mb-2`}
             >
-              กลุ่มสินค้า
+              กลุ่มสินค้าเริ่มต้น
             </label>
             <Select
               options={[
@@ -126,18 +128,65 @@ const SearchForm = ({
                 })) : [])
               ]}
               value={(() => {
-                if (searchCriteria.GroupCode === "") return { value: "", label: "ทุกกลุ่มสินค้า" };
-                const found = groupFile?.find(item => item.GroupCode === searchCriteria.GroupCode);
+                if (searchCriteria.GroupCode1 === "") return { value: "", label: "ทุกกลุ่มสินค้า" };
+                const found = groupFile?.find(item => item.GroupCode === searchCriteria.GroupCode1);
                 return found ? { value: found.GroupCode, label: `${found.GroupCode}-${found.GroupName}` } : null;
               })()}
               onChange={option =>
                 setSearchCriteria({
                   ...searchCriteria,
-                  GroupCode: option ? option.value : ""
+                  GroupCode1: option ? option.value : ""
                 })
               }
               isClearable
-              placeholder="ทุกกลุ่มสินค้า"
+              placeholder="กลุ่มเริ่มต้น"
+              classNamePrefix="react-select"
+              styles={{
+                control: (base) => ({
+                  ...base,
+                  borderRadius: '0.5rem',
+                  minHeight: '40px',
+                  borderColor: getThemeClasses("input", currentTheme),
+                  boxShadow: 'none',
+                  fontSize: '1rem'
+                }),
+                menu: (base) => ({
+                  ...base,
+                  zIndex: 20
+                })
+              }}
+            />
+          </div>
+          <div>
+            <label
+              className={`block text-sm font-medium ${getThemeClasses(
+                "textSecondary",
+                currentTheme
+              )} mb-2`}
+            >
+              กลุ่มสินค้าสิ้นสุด
+            </label>
+            <Select
+              options={[
+                { value: "", label: "ทุกกลุ่มสินค้า" },
+                ...(groupFile ? groupFile.map(item => ({
+                  value: item.GroupCode,
+                  label: `${item.GroupCode}-${item.GroupName}`
+                })) : [])
+              ]}
+              value={(() => {
+                if (searchCriteria.GroupCode2 === "") return { value: "", label: "ทุกกลุ่มสินค้า" };
+                const found = groupFile?.find(item => item.GroupCode === searchCriteria.GroupCode2);
+                return found ? { value: found.GroupCode, label: `${found.GroupCode}-${found.GroupName}` } : null;
+              })()}
+              onChange={option =>
+                setSearchCriteria({
+                  ...searchCriteria,
+                  GroupCode2: option ? option.value : ""
+                })
+              }
+              isClearable
+              placeholder="กลุ่มสิ้นสุด"
               classNamePrefix="react-select"
               styles={{
                 control: (base) => ({
@@ -179,33 +228,6 @@ const SearchForm = ({
               )}`}
               placeholder="ค้นหารหัสสินค้า"
             />
-          </div>
-          <div>
-            <label
-              className={`block text-sm font-medium ${getThemeClasses(
-                "textSecondary",
-                currentTheme
-              )} mb-2`}
-            >
-              Sync Data
-            </label>
-            <select
-              value={searchCriteria.SendToPOS}
-              onChange={(e) =>
-                setSearchCriteria({
-                  ...searchCriteria,
-                  SendToPOS: e.target.value
-                })
-              }
-              className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
-                "input",
-                currentTheme
-              )}`}
-            >
-              <option value="">ทุกสถานะ</option>
-              <option value="N">WAIT</option>
-              <option value="Y">SUCCESS</option>
-            </select>
           </div>
         </div>
 
