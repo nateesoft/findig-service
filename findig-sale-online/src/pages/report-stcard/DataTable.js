@@ -90,7 +90,7 @@ const DataTable = ({
       <!DOCTYPE html>
       <html>
       <head>
-        <title>ข้อมูลความเคลื่อนไหวสินค้า</title>
+        <title>รายงานความเคลื่อนไหวสินค้าสินค้า</title>
         <meta charset="utf-8">
         <style>
           body { font-family: 'Sarabun', Arial, sans-serif; margin: 20px; }
@@ -108,7 +108,7 @@ const DataTable = ({
       </head>
       <body>
         <div class="print-date">วันที่พิมพ์: ${new Date().toLocaleDateString('th-TH')}</div>
-        <h1>ข้อมูลความเคลื่อนไหวสินค้า</h1>
+        <h1>รายงานความเคลื่อนไหวสินค้าสินค้า</h1>
         <table>
           <thead>
             <tr>
@@ -184,7 +184,7 @@ const DataTable = ({
     if (link.download !== undefined) {
       const url = URL.createObjectURL(blob);
       link.setAttribute('href', url);
-      link.setAttribute('download', `ข้อมูลความเคลื่อนไหวสินค้า_${new Date().toISOString().split('T')[0]}.csv`);
+      link.setAttribute('download', `รายงานความเคลื่อนไหวสินค้าสินค้า_${new Date().toISOString().split('T')[0]}.csv`);
       link.style.visibility = 'hidden';
       document.body.appendChild(link);
       link.click();
@@ -252,7 +252,7 @@ const DataTable = ({
     return (
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <h1 className={`text-2xl font-bold ${getThemeClasses('textPrimary', currentTheme)}`}>ข้อมูลความเคลื่อนไหว</h1>
+          <h1 className={`text-2xl font-bold ${getThemeClasses('textPrimary', currentTheme)}`}>รายงานความเคลื่อนไหวสินค้า</h1>
         </div>
         <div className="flex items-center justify-center py-20">
           <div className="flex flex-col items-center space-y-4">
@@ -289,7 +289,7 @@ const DataTable = ({
                 currentTheme
               )}`}
             >
-              ข้อมูลความเคลื่อนไหวสินค้า
+              รายงานความเคลื่อนไหวสินค้าสินค้า
             </h3>
             {sortedSales.length > 0 && (
               <p className={`text-sm ${getThemeClasses("textMuted", currentTheme)} mt-2`}>

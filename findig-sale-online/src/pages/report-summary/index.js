@@ -177,7 +177,7 @@ const Sales = () => {
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-        <h1 className={`text-2xl font-bold ${getThemeClasses('textPrimary', currentTheme)}`}>รายงานความเคลื่อนไหว</h1>
+        <h1 className={`text-2xl font-bold ${getThemeClasses('textPrimary', currentTheme)}`}>รายงานภาพรวมสินค้า</h1>
         <div className="mt-4 sm:mt-0 flex space-x-3">
           <button 
             onClick={() => setShowSearchForm(!showSearchForm)}

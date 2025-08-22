@@ -77,7 +77,7 @@ const SaleTable = ({
       <!DOCTYPE html>
       <html>
       <head>
-        <title>ข้อมูลสินค้าคงเหลือ</title>
+        <title>รายงาน สต๊อกคงเหลือ</title>
         <meta charset="utf-8">
         <style>
           body { font-family: 'Sarabun', Arial, sans-serif; margin: 20px; }
@@ -95,7 +95,7 @@ const SaleTable = ({
       </head>
       <body>
         <div class="print-date">วันที่พิมพ์: ${new Date().toLocaleDateString('th-TH')}</div>
-        <h1>ข้อมูลสินค้าคงเหลือ</h1>
+        <h1>รายงาน สต๊อกคงเหลือ</h1>
         <table>
           <thead>
             <tr>
@@ -173,7 +173,7 @@ const SaleTable = ({
     if (link.download !== undefined) {
       const url = URL.createObjectURL(blob);
       link.setAttribute('href', url);
-      link.setAttribute('download', `ข้อมูลสินค้าคงเหลือ_${new Date().toISOString().split('T')[0]}.csv`);
+      link.setAttribute('download', `รายงาน สต๊อกคงเหลือ_${new Date().toISOString().split('T')[0]}.csv`);
       link.style.visibility = 'hidden';
       document.body.appendChild(link);
       link.click();
@@ -241,7 +241,7 @@ const SaleTable = ({
     return (
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <h1 className={`text-2xl font-bold ${getThemeClasses('textPrimary', currentTheme)}`}>ข้อมูลสินค้าคงเหลือ</h1>
+          <h1 className={`text-2xl font-bold ${getThemeClasses('textPrimary', currentTheme)}`}>รายงาน สต๊อกคงเหลือ</h1>
         </div>
         <div className="flex items-center justify-center py-20">
           <div className="flex flex-col items-center space-y-4">
@@ -278,7 +278,7 @@ const SaleTable = ({
                 currentTheme
               )}`}
             >
-              ข้อมูลสินค้าคงเหลือ
+              รายงาน สต๊อกคงเหลือ
             </h3>
             {sortedSales.length > 0 && (
               <p className={`text-sm ${getThemeClasses("textMuted", currentTheme)} mt-2`}>
