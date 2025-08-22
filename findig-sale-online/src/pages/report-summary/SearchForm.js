@@ -146,7 +146,7 @@ const SearchForm = ({
                 currentTheme
               )} mb-2`}
             >
-              รหัสสาขาเริ่มต้น
+              สาขาเริ่มต้น
             </label>
             <Select
               options={branchFile?.map(item => ({
@@ -189,7 +189,7 @@ const SearchForm = ({
                 currentTheme
               )} mb-2`}
             >
-              รหัสสาขาสิ้นสุด
+              สาขาสิ้นสุด
             </label>
             <Select
               options={branchFile?.map(item => ({

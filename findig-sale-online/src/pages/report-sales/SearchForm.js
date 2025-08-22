@@ -6,6 +6,7 @@ import {
   RefreshCw,
   X
 } from "lucide-react"
+import Select from "react-select"
 
 const SearchForm = ({
   getThemeClasses,
@@ -138,29 +139,42 @@ const SearchForm = ({
                 currentTheme
               )} mb-2`}
             >
-              <Filter className="w-4 h-4 inline mr-2" />
               สาขาเริ่มต้น
             </label>
-            <select
-              value={searchCriteria.branch_code_Start}
-              onChange={(e) =>
+            <Select
+              options={branchFile?.map(item => ({
+                value: item.Code,
+                label: `${item.Code}-${item.Name}`
+              }))}
+              value={branchFile?.find(item => item.Code === searchCriteria.branch_code_Start) ? {
+                value: searchCriteria.branch_code_Start,
+                label: `${searchCriteria.branch_code_Start}-${branchFile.find(item => item.Code === searchCriteria.branch_code_Start)?.Name}`
+              } : null}
+              onChange={option =>
                 setSearchCriteria({
                   ...searchCriteria,
-                  branch_code_Start: e.target.value
+                  branch_code_Start: option ? option.value : ""
                 })
               }
-              className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
-                "input",
-                currentTheme
-              )}`}
-            >
-              <option value="">เลือกสาขาเริ่มต้น</option>
-              {branchFile && branchFile.map(item=>
-                <option key={item.Code} value={item.Code}>{item.Code}-{item.Name}</option>
-              )}
-            </select>
+              isClearable
+              placeholder="ทุกสาขา"
+              classNamePrefix="react-select"
+              styles={{
+                control: (base) => ({
+                  ...base,
+                  borderRadius: '0.5rem',
+                  minHeight: '40px',
+                  borderColor: getThemeClasses("input", currentTheme),
+                  boxShadow: 'none',
+                  fontSize: '1rem'
+                }),
+                menu: (base) => ({
+                  ...base,
+                  zIndex: 20
+                })
+              }}
+            />
           </div>
-
           <div>
             <label
               className={`block text-sm font-medium ${getThemeClasses(
@@ -168,27 +182,41 @@ const SearchForm = ({
                 currentTheme
               )} mb-2`}
             >
-              <Filter className="w-4 h-4 inline mr-2" />
               สาขาสิ้นสุด
             </label>
-            <select
-              value={searchCriteria.branch_code_End}
-              onChange={(e) =>
+            <Select
+              options={branchFile?.map(item => ({
+                value: item.Code,
+                label: `${item.Code}-${item.Name}`
+              }))}
+              value={branchFile?.find(item => item.Code === searchCriteria.branch_code_End) ? {
+                value: searchCriteria.branch_code_End,
+                label: `${searchCriteria.branch_code_End}-${branchFile.find(item => item.Code === searchCriteria.branch_code_End)?.Name}`
+              } : null}
+              onChange={option =>
                 setSearchCriteria({
                   ...searchCriteria,
-                  branchCodbranch_code_EndeTo: e.target.value
+                  branch_code_End: option ? option.value : ""
                 })
               }
-              className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
-                "input",
-                currentTheme
-              )}`}
-            >
-              <option value="">เลือกสาขาสิ้นสุด</option>
-              {branchFile && branchFile.map(item=>
-                <option key={item.Code} value={item.Code}>{item.Code}-{item.Name}</option>
-              )}
-            </select>
+              isClearable
+              placeholder="ทุกสาขา"
+              classNamePrefix="react-select"
+              styles={{
+                control: (base) => ({
+                  ...base,
+                  borderRadius: '0.5rem',
+                  minHeight: '40px',
+                  borderColor: getThemeClasses("input", currentTheme),
+                  boxShadow: 'none',
+                  fontSize: '1rem'
+                }),
+                menu: (base) => ({
+                  ...base,
+                  zIndex: 20
+                })
+              }}
+            />
           </div>
         </div>
 
