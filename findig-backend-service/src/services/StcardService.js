@@ -61,8 +61,7 @@ const getReportStcard = async ({ repository, db }) => {
 
 const searchStCardData = async ({ repository, db, payload }) => {
   const results = await repository.searchData({db, payload })
-  const mapped = mappingResultData(results)
-  return mapped
+  return mappingResultData(results)
 }
 
 const processStock = async ({ payload, repository, db }) => {

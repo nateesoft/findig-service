@@ -11,6 +11,29 @@ const getData = async ({ payload, db }) => {
   return results
 }
 
+const searchSaleData = async ({ payload, db }) => {
+  const { billno, document_date_start, document_date_end, branch_code, emp_code, post_status } = payload
+  let sql = `select * from draft_sale where 1=1 `
+  if(billno) {
+    sql += `and billno like '%${billno}%' `
+  }
+  if(document_date_start && document_date_end) {
+    sql += `and document_date between '${document_date_start} 00:00:00' and '${document_date_end} 23:59:59' `
+  }
+  if(branch_code) {
+    sql += `and branch_code = '${branch_code}' `
+  }
+  if(emp_code) {
+    sql += `and emp_code like '%${emp_code}%' `
+  }
+  if(post_status) {
+    sql += `and post_status = '${post_status}' `
+  }
+  sql += `order by  branch_code, document_date, billno`
+  const results = await db.pos?.query(sql)
+  return results
+}
+
 const getDataForDashboard = async ({ payload, db }) => {
   const { branch_code } = payload
   const sql = `select * from draft_sale where branch_code=? limit 0, 10`
@@ -77,5 +100,6 @@ module.exports = {
   processStockFromSale,
   getAllBillNotProcess,
   getDataForDashboard,
-  getAllData
+  getAllData,
+  searchSaleData
 }

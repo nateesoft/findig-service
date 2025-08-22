@@ -3,12 +3,12 @@ import { Search } from 'lucide-react';
 
 import { getThemeClasses } from '../../utils/themes';
 import { AppContext } from '../../contexts';
-import { searchData } from '../../api/stcardApi';
 import SearchForm from './SearchForm';
 import DataTable from './DataTable';
 import { Modal } from '../../components/Modals';
 import { loadAllBranch } from '../../api/branchApi';
 import { loadAllGroupfile } from '../../api/groupfileApi';
+import { loadStcardReport } from '../../api/reportApi';
 
 const Sales = () => {
   const [activeModal, setActiveModal] = useState(null);
@@ -48,55 +48,9 @@ const Sales = () => {
       
       setIsLoading(true)
       
-      // สร้างเกณฑ์การค้นหาสำหรับ API โดยไม่รวม S_Bran_End และ GroupCode
-      const apiSearchCriteria = {
-        S_No: searchCriteria.S_No,
-        S_Date_Start: searchCriteria.S_Date_Start,
-        S_Date_End: searchCriteria.S_Date_End,
-        S_Bran: searchCriteria.S_Bran,
-        S_User: searchCriteria.S_User,
-        S_Rem: searchCriteria.S_Rem,
-        S_Stk: searchCriteria.S_Stk,
-        S_PCode: searchCriteria.S_PCode
-      }
-      
-      const { data, error } = await searchData(apiSearchCriteria, abortControllerRef.current.signal)
+      const { data, error } = await loadStcardReport(searchCriteria, abortControllerRef.current.signal)
       if(data){
-        // กรองข้อมูลเพิ่มเติมสำหรับ S_Bran_End และ GroupCode
-        let filteredData = data;
-        
-        // กรองด้วยรหัสสาขาสิ้นสุด
-        if (searchCriteria.S_Bran_End) {
-          filteredData = filteredData.filter(item => 
-            item.S_Bran <= searchCriteria.S_Bran_End
-          );
-        }
-        
-        // กรองด้วยกลุ่มสินค้า
-        if (searchCriteria.GroupCode) {
-          filteredData = filteredData.filter(item => 
-            item.GroupCode === searchCriteria.GroupCode
-          );
-        }
-        
-        // กรองข้อมูลโดยเปรียบเทียบเฉพาะวันที่ ไม่รวมเวลา
-        if (searchCriteria.S_Date_Start) {
-          const startDate = new Date(searchCriteria.S_Date_Start);
-          filteredData = filteredData.filter(item => {
-            const itemDate = new Date(item.S_Date);
-            return itemDate.toDateString() >= startDate.toDateString();
-          });
-        }
-        
-        if (searchCriteria.S_Date_End) {
-          const endDate = new Date(searchCriteria.S_Date_End);
-          filteredData = filteredData.filter(item => {
-            const itemDate = new Date(item.S_Date);
-            return itemDate.toDateString() <= endDate.toDateString();
-          });
-        }
-        
-        setFilteredSales(filteredData);
+        setFilteredSales(data);
       }
 
       if(error){

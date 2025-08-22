@@ -6,7 +6,7 @@ import {
 
 import { getThemeClasses } from '../../utils/themes';
 import { AppContext } from '../../contexts';
-import { createDraftSaleInfo, loadDraftSaleById, loadDraftSaleInfo, processStockFromSale, updateDraftSaleInfo } from '../../api/saleApi';
+import { createDraftSaleInfo, loadDraftSaleById, loadDraftSaleInfo, processStockFromSale, searchData, updateDraftSaleInfo } from '../../api/saleApi';
 import { loadAllProduct } from '../../api/productApi';
 import POSTModal from './POSTModal';
 import ReviewModal from './ReviewModal';
@@ -39,12 +39,12 @@ const Sales = () => {
   const [isLoading, setIsLoading] = useState(false);
   
   const [searchCriteria, setSearchCriteria] = useState({
-    billNo: '',
-    dateFrom: '',
-    dateTo: '',
-    branchCode: branchCode || '',
-    empCode: '',
-    postStatus: ''
+    billno: '',
+    document_date_start: '',
+    document_date_end: '',
+    branch_code: branchCode || '',
+    emp_code: '',
+    post_status: ''
   });
 
   const [productSearchTerm, setProductSearchTerm] = useState('');
@@ -194,12 +194,12 @@ const Sales = () => {
 
   const resetCurrentItem = () => {
     setCurrentItem({
-      barcode: '',
-      productName: '',
-      stock: '',
-      qty: 0,
-      canStock: null,
-      canSet: null
+      billno: '',
+      document_date_start: '',
+      document_date_end: '',
+      branch_code: branchCode || '',
+      emp_code: '',
+      post_status: ''
     });
   };
 
@@ -541,54 +541,30 @@ const Sales = () => {
     }
   };
 
-  const handleSearch = () => {
-    let filtered = [...draftSale];
+  const handleSearch = async () => {
+     try {
+      setIsLoading(true)
+      const { data, error } = await searchData(searchCriteria)
+      if(data){
+        setFilteredSales(data);
+      }
 
-    if (searchCriteria.billNo.trim()) {
-      filtered = filtered.filter(item => 
-        item.billno.toLowerCase().includes(searchCriteria.billNo.toLowerCase())
-      );
+      if(error){
+        setActiveModal({
+          type: 'error',
+          title: 'ไม่สามารถแสดงข้อมูลได้',
+          message: error || 'กรุณาลองใหม่อีกครั้ง',
+          actions: [
+            {
+              label: 'ตกลง',
+              onClick: () => setActiveModal(null)
+            }
+          ]
+        });
+      }
+    } finally {
+      setIsLoading(false)
     }
-
-    // เปรียบเทียบวันที่โดยไม่สนใจเวลา
-    const formatDate = (dateStr) => {
-      if (!dateStr) return '';
-      return new Date(dateStr).toISOString().split('T')[0];
-    };
-
-    if (searchCriteria.dateFrom) {
-      const fromDate = formatDate(searchCriteria.dateFrom);
-      filtered = filtered.filter(item => 
-        formatDate(item.document_date) >= fromDate
-      );
-    }
-
-    if (searchCriteria.dateTo) {
-      const toDate = formatDate(searchCriteria.dateTo);
-      filtered = filtered.filter(item => 
-        formatDate(item.document_date) <= toDate
-      );
-    }
-
-    if (searchCriteria.branchCode) {
-      filtered = filtered.filter(item => 
-        item.branch_code === searchCriteria.branchCode
-      );
-    }
-
-    if (searchCriteria.empCode.trim()) {
-      filtered = filtered.filter(item => 
-        item.emp_code.toLowerCase().includes(searchCriteria.empCode.toLowerCase())
-      );
-    }
-
-    if (searchCriteria.postStatus) {
-      filtered = filtered.filter(item => 
-        item.post_status === searchCriteria.postStatus
-      );
-    }
-
-    setFilteredSales(filtered);
   };
 
   const resetSearch = () => {
@@ -606,10 +582,6 @@ const Sales = () => {
   useEffect(() => {
     setFilteredSales(draftSale);
   }, [draftSale]);
-
-  useEffect(() => {
-    initLoadData()
-  }, [])
 
   useEffect(() => {
     const handleKeyDown = (e) => {

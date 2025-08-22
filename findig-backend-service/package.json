@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "dev": "node ./bin/www",
+    "dev": "node --env-file=.env.local ./bin/www",
     "ics": "node --env-file=.env.prod ./bin/www",
     "local:watch": "nodemon --trace-warnings ./bin/www",
     "start:watch": "nodemon ./bin/www"

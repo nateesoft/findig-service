@@ -41,9 +41,9 @@ const SearchForm = ({
             </label>
             <input
               type="text"
-              value={searchCriteria.billNo}
+              value={searchCriteria.billno}
               onChange={(e) =>
-                setSearchCriteria({ ...searchCriteria, billNo: e.target.value })
+                setSearchCriteria({ ...searchCriteria, billno: e.target.value })
               }
               className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
                 "input",
@@ -65,11 +65,11 @@ const SearchForm = ({
             </label>
             <input
               type="date"
-              value={searchCriteria.dateFrom}
+              value={searchCriteria.document_date_start}
               onChange={(e) =>
                 setSearchCriteria({
                   ...searchCriteria,
-                  dateFrom: e.target.value
+                  document_date_start: e.target.value
                 })
               }
               className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
@@ -91,9 +91,9 @@ const SearchForm = ({
             </label>
             <input
               type="date"
-              value={searchCriteria.dateTo}
+              value={searchCriteria.document_date_end}
               onChange={(e) =>
-                setSearchCriteria({ ...searchCriteria, dateTo: e.target.value })
+                setSearchCriteria({ ...searchCriteria, document_date_end: e.target.value })
               }
               className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
                 "input",
@@ -112,11 +112,11 @@ const SearchForm = ({
               รหัสสาขา
             </label>
             <select
-              value={searchCriteria.branchCode}
+              value={searchCriteria.branch_code}
               onChange={(e) =>
                 setSearchCriteria({
                   ...searchCriteria,
-                  branchCode: e.target.value
+                  branch_code: e.target.value
                 })
               }
               className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
@@ -142,11 +142,11 @@ const SearchForm = ({
             </label>
             <input
               type="text"
-              value={searchCriteria.empCode}
+              value={searchCriteria.emp_code}
               onChange={(e) =>
                 setSearchCriteria({
                   ...searchCriteria,
-                  empCode: e.target.value
+                  emp_code: e.target.value
                 })
               }
               className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
@@ -167,11 +167,11 @@ const SearchForm = ({
               สถานะ POST
             </label>
             <select
-              value={searchCriteria.postStatus}
+              value={searchCriteria.post_status}
               onChange={(e) =>
                 setSearchCriteria({
                   ...searchCriteria,
-                  postStatus: e.target.value
+                  post_status: e.target.value
                 })
               }
               className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(

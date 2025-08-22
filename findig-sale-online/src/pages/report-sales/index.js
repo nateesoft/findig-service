@@ -85,7 +85,7 @@ const Sales = () => {
       
       setIsLoading(true);
       
-      const { data, error } = await loadSaleReport()
+      const { data, error } = await loadSaleReport(searchCriteria, abortControllerRef.current.signal)
 
       if(data) {
         setDraftSale(data)

@@ -19,19 +19,6 @@ const getData = async (req, res, next) => {
   }
 }
 
-const getReportSales = async (req, res, next) => {
-  try {
-    const dataInfo = await DraftSaleService.getReportSales({
-      payload: req.body,
-      repository: DraftSaleRepository,
-      db: req.db
-    })
-    res.json(dataInfo)
-  } catch (error) {
-    next(error)
-  }
-}
-
 const getDataForDashboard = async (req, res, next) => {
   try {
     const { branchCode } = req.query
@@ -126,6 +113,19 @@ const processStockFromSale = async (req, res, next) => {
   }
 }
 
+const searchSaleData = async (req, res, next) => {
+  try {
+    const dataInfo = await DraftSaleService.searchSaleData({
+      payload: req.body,
+      repository: DraftSaleRepository,
+      db: req.db
+    })
+    res.json(dataInfo)
+  } catch (error) {
+    next(error)
+  }
+}
+
 module.exports = {
   getData,
   getDataById,
@@ -134,5 +134,5 @@ module.exports = {
   deleteData,
   processStockFromSale,
   getDataForDashboard,
-  getReportSales
+  searchSaleData
 }

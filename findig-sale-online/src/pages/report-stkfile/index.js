@@ -3,12 +3,12 @@ import { Search } from 'lucide-react';
 
 import { getThemeClasses } from '../../utils/themes';
 import { AppContext } from '../../contexts';
-import { searchData } from '../../api/stkfileApi';
 import SearchForm from './SearchForm';
 import DataTable from './DataTable';
 import { Modal } from '../../components/Modals';
 import { loadAllBranch } from '../../api/branchApi';
 import { loadAllGroupfile } from '../../api/groupfileApi';
+import { loadStkfileReport } from '../../api/reportApi';
 
 const Sales = () => {
   const [activeModal, setActiveModal] = useState(null);
@@ -45,7 +45,7 @@ const Sales = () => {
       abortControllerRef.current = new AbortController();
       
       setIsLoading(true)
-      const { data, error } = await searchData(searchCriteria, abortControllerRef.current.signal)
+      const { data, error } = await loadStkfileReport(searchCriteria, abortControllerRef.current.signal)
       if(data){
         setFilteredSales(data);
       }

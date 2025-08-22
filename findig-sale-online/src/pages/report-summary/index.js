@@ -5,7 +5,7 @@ import { getThemeClasses } from '../../utils/themes';
 import { AppContext } from '../../contexts';
 import SearchForm from './SearchForm';
 import DataTable from './DataTable';
-import StockBarChart from './StockBarChart';
+import InventoryChart from './InventoryChart';
 import { Modal } from '../../components/Modals';
 import { loadAllBranch } from '../../api/branchApi';
 import { loadAllGroupfile } from '../../api/groupfileApi';
@@ -175,12 +175,12 @@ const Sales = () => {
         />
       )}
 
-      {/* กราฟแท่งคงเหลือสินค้า */}
-      <div className="mt-8">
-        <h2 className={`text-xl font-bold mb-4 ${getThemeClasses('textPrimary', currentTheme)}`}>กราฟแท่งคงเหลือสินค้า (ตัวอย่าง 3-5 รายการล่าสุด)</h2>
-        <StockBarChart data={filteredSales} productCode={''} />
-      </div>
-
+      {/* กราฟแท่งคงเหลือสินค้าตามสาขา (Top 3 รายการ) */}
+      <InventoryChart 
+        filteredSales={filteredSales} 
+        getThemeClasses={getThemeClasses} 
+        currentTheme={currentTheme} 
+      />
       <DataTable
         getThemeClasses={getThemeClasses}
         currentTheme={currentTheme}

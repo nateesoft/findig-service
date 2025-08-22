@@ -5,11 +5,6 @@ const { generateUUID } = require("../utils/StringUtil")
 const DraftSaleDetailsService = require("../services/DraftSaleDetailsService")
 const DraftSaleDetailsRepository = require('../repository/DraftSaleDetailsRepository')
 
-const getReportSales = async ({ payload, repository, db }) => {
-  const results = await repository.getReportSales({ db, payload })
-  return mappingResultDataList(results)
-}
-
 const getData = async ({ payload, repository, db }) => {
   const results = await repository.getData({ payload, db })
   return mappingResultData(results)
@@ -144,6 +139,11 @@ const deleteData = async ({ payload, repository, db }) => {
   return results
 }
 
+const searchSaleData = async ({ repository, db, payload }) => {
+  const results = await repository.searchSaleData({db, payload })
+  return mappingResultDataList(results)
+}
+
 module.exports = {
   getData,
   getDataById,
@@ -151,5 +151,5 @@ module.exports = {
   updateData,
   deleteData,
   getDataForDashboard,
-  getReportSales
+  searchSaleData
 }
