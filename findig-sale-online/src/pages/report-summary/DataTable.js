@@ -117,7 +117,7 @@ const DataTable = ({
             ${sortedSales.map(item => `
               <tr>
                 <td>${item.Branch || ''}</td>
-                <td>${item.GroupName || ''}</td>
+                <td>${item.PGroup || ''}</td>
                 <td>${item.BPCode || ''}</td>
                 <td>${item.PDesc || ''}</td>
                 <td class="text-center">${item.BQty24 || ''}</td>
@@ -151,7 +151,7 @@ const DataTable = ({
       headers.join(','),
       ...sortedSales.map(item => [
         item.Branch || '',
-        item.GroupName || '',
+        item.PGroup || '',
         item.BPCode || '',
         `"${item.PDesc || ''}"`,
         item.BQty24 || '',
@@ -343,11 +343,11 @@ const DataTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('GroupName')}
+                onClick={() => handleSort('PGroup')}
               >
                 <div className="flex items-center">
                   กลุ่มสินค้า
-                  {getSortIcon('GroupName')}
+                  {getSortIcon('PGroup')}
                 </div>
               </th>
               <th
@@ -438,7 +438,7 @@ const DataTable = ({
                       currentTheme
                     )}`}
                   >
-                    {draft_sale.GroupName}
+                    {draft_sale.PGroup}
                   </td>
                   <td
                     className={`px-6 py-4 whitespace-nowrap text-left text-sm ${getThemeClasses(

@@ -5,17 +5,15 @@ const searchSummaryReport = async ({ payload, db }) => {
     }
 
     const { GroupCode, BPCode, BStk, Branch_Start, Branch_End } = payload
-    let sql = `select s.BPCode, p.PDesc, g.GroupCode, g.GroupName, s.BStk, s.Branch, s.BQty24 
+    let sql = `select s.BPCode, p.PDesc, p.PGroup, s.BStk, s.Branch, s.BQty24 
       from stkfile s 
       left join product p on s.BPCode=p.PCode 
-      left join groupfile g on p.PGroup=g.GroupCode 
-      left join stcard s2 on s.BPCode=s2.S_PCode 
-      where 1=1 `
+      where s.BQty24>0 `
     
     const params = []
     
     if (GroupCode) {
-      sql += `and g.GroupCode = ? `
+      sql += `and p.PGroup = ? `
       params.push(GroupCode)
     }
     if (BPCode) {
@@ -31,7 +29,7 @@ const searchSummaryReport = async ({ payload, db }) => {
       params.push(Branch_Start, Branch_End)
     }
     
-    sql += `order by s.Branch, s.BStk, g.GroupCode, s.BPCode`
+    sql += `order by s.Branch, s.BStk, p.PGroup, s.BPCode`
 
     const results = await db.pos.query(sql, params)
     return results

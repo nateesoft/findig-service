@@ -40,13 +40,13 @@ const SearchForm = ({
                 { value: "", label: "ทุกกลุ่มสินค้า" },
                 ...(groupFile ? groupFile.map(item => ({
                   value: item.GroupCode,
-                  label: `${item.GroupCode}-${item.GroupName}`
+                  label: `${item.GroupCode}-${item.PGroup}`
                 })) : [])
               ]}
               value={(() => {
                 if (searchCriteria.GroupCode === "") return { value: "", label: "ทุกกลุ่มสินค้า" };
                 const found = groupFile?.find(item => item.GroupCode === searchCriteria.GroupCode);
-                return found ? { value: found.GroupCode, label: `${found.GroupCode}-${found.GroupName}` } : null;
+                return found ? { value: found.GroupCode, label: `${found.GroupCode}-${found.PGroup}` } : null;
               })()}
               onChange={option =>
                 setSearchCriteria({

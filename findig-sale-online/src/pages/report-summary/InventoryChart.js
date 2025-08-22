@@ -5,7 +5,10 @@ const InventoryChart = ({ filteredSales, getThemeClasses, currentTheme }) => {
   
   // ฟังก์ชันสำหรับประมวลผลข้อมูลสำหรับกราฟ
   const processDataForChart = (data) => {
-    if (!data || data.length === 0) return [];
+    if (!data || data.length === 0) {
+      console.log('InventoryChart - No data available');
+      return [];
+    }
 
     // จัดกลุ่มข้อมูลตามสาขา
     const groupedByBranch = data.reduce((acc, item) => {

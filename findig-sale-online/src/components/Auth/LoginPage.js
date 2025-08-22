@@ -19,7 +19,7 @@ const LoginPage = ( { onLogin, setUser }) => {
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e) => {
-    if(!loginData.branchCode){
+    if(!loginData.branchCode || !loginData.username || !loginData.password) {
       return;
     }
     e.preventDefault();

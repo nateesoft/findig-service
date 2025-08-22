@@ -104,48 +104,78 @@ const AppContent = () => {
   const [sessionCountdown, setSessionCountdown] = useState(60)
   const [lastActivity, setLastActivity] = useState(Date.now())
 
-  // เพิ่ม useEffect สำหรับ initialize user จาก localStorage
+  // เพิ่ม useEffect สำหรับ initialize user จาก localStorage และ context
   useEffect(() => {
-    // ตรวจสอบ userInfo จาก localStorage
-    const storedUserInfo = localStorage.getItem('userInfo')
+    let userFound = false;
     
-    if (storedUserInfo && storedUserInfo !== 'null' && storedUserInfo !== 'undefined') {
-      try {
-        const parsedUserInfo = JSON.parse(storedUserInfo)
-        if (parsedUserInfo) {
-          setUser(parsedUserInfo)
-          // อัพเดท context ด้วย
-          setAppData(prevData => ({
-            ...prevData,
-            userInfo: parsedUserInfo
-          }))
-        }
-      } catch (error) {
-        console.error('Error parsing userInfo from localStorage:', error)
-        localStorage.removeItem('userInfo') // ลบข้อมูลที่เสียหาย
-      }
-    }
-    
-    setIsInitialized(true)
-  }, [setAppData])
-
-  // ทำให้ user state sync กับ userInfo จาก context
-  useEffect(() => {
-    if (userInfo && userInfo !== 'null' && !user) {
+    // ตรวจสอบ userInfo จาก context ก่อน
+    if (userInfo && userInfo !== 'null' && userInfo !== 'undefined') {
       if (typeof userInfo === 'string') {
         try {
           const parsedUserInfo = JSON.parse(userInfo)
-          setUser(parsedUserInfo)
+          if (parsedUserInfo && parsedUserInfo.id) {
+            setUser(parsedUserInfo)
+            userFound = true;
+          }
+        } catch (error) {
+          console.error('Error parsing userInfo from context:', error)
+        }
+      } else if (userInfo && userInfo.id) {
+        setUser(userInfo)
+        userFound = true;
+      }
+    }
+
+    // ถ้าไม่มีใน context ให้ตรวจสอบ localStorage
+    if (!userFound) {
+      const storedUserInfo = localStorage.getItem('userInfo')
+      
+      if (storedUserInfo && storedUserInfo !== 'null' && storedUserInfo !== 'undefined') {
+        try {
+          const parsedUserInfo = JSON.parse(storedUserInfo)
+          if (parsedUserInfo && parsedUserInfo.id) {
+            setUser(parsedUserInfo)
+            // อัพเดท context ด้วย
+            setAppData(prevData => ({
+              ...prevData,
+              userInfo: parsedUserInfo
+            }))
+            userFound = true;
+          }
+        } catch (error) {
+          console.error('Error parsing userInfo from localStorage:', error)
+          localStorage.removeItem('userInfo') // ลบข้อมูลที่เสียหาย
+        }
+      }
+    }
+    
+    // set initialized เมื่อเสร็จแล้ว (ไม่ว่าจะมี user หรือไม่)
+    setIsInitialized(true)
+  }, [setAppData, userInfo])
+
+  // ทำให้ user state sync กับ userInfo จาก context (เมื่อ context เปลี่ยน)
+  useEffect(() => {
+    // ถ้า context มี userInfo และ local user state ยังไม่มี หรือไม่ตรงกัน
+    if (userInfo && userInfo !== 'null' && userInfo !== 'undefined') {
+      if (typeof userInfo === 'string') {
+        try {
+          const parsedUserInfo = JSON.parse(userInfo)
+          if (parsedUserInfo && parsedUserInfo.id && (!user || user.id !== parsedUserInfo.id)) {
+            setUser(parsedUserInfo)
+          }
         } catch (error) {
           console.error('Error parsing userInfo:', error)
         }
-      } else {
+      } else if (userInfo && userInfo.id && (!user || user.id !== userInfo.id)) {
         setUser(userInfo)
       }
     } else if (!userInfo || userInfo === 'null') {
-      setUser(null)
+      // ถ้า context ไม่มี userInfo แต่ local state มี ให้เคลียร์ local state
+      if (user) {
+        setUser(null)
+      }
     }
-  }, [userInfo])
+  }, [userInfo, user])
 
   useEffect(() => {
     if (!user) return;
@@ -299,7 +329,7 @@ const AppContent = () => {
         <Route
           path="/dashboard"
           element={
-            <ProtectedRoute user={user}>
+            <ProtectedRoute user={user} isInitialized={isInitialized}>
               <AppLayout
                 user={user}
                 currentTheme={currentTheme}
@@ -318,7 +348,7 @@ const AppContent = () => {
         <Route
           path="/sales"
           element={
-            <ProtectedRoute user={user}>
+            <ProtectedRoute user={user} isInitialized={isInitialized}>
               <AppLayout
                 user={user}
                 currentTheme={currentTheme}
@@ -345,7 +375,7 @@ const AppContent = () => {
         <Route
           path="/stcard"
           element={
-            <ProtectedRoute user={user}>
+            <ProtectedRoute user={user} isInitialized={isInitialized}>
               <AppLayout
                 user={user}
                 currentTheme={currentTheme}
@@ -372,7 +402,7 @@ const AppContent = () => {
         <Route
           path="/stkfile"
           element={
-            <ProtectedRoute user={user}>
+            <ProtectedRoute user={user} isInitialized={isInitialized}>
               <AppLayout
                 user={user}
                 currentTheme={currentTheme}
@@ -399,7 +429,7 @@ const AppContent = () => {
         <Route
           path="/user-groups"
           element={
-            <ProtectedRoute user={user}>
+            <ProtectedRoute user={user} isInitialized={isInitialized}>
               <AppLayout
                 user={user}
                 currentTheme={currentTheme}
@@ -418,7 +448,7 @@ const AppContent = () => {
         <Route
           path="/system-settings"
           element={
-            <ProtectedRoute user={user}>
+            <ProtectedRoute user={user} isInitialized={isInitialized}>
               <AppLayout
                 user={user}
                 currentTheme={currentTheme}
@@ -439,7 +469,7 @@ const AppContent = () => {
         <Route
           path="/branch-info"
           element={
-            <ProtectedRoute user={user}>
+            <ProtectedRoute user={user} isInitialized={isInitialized}>
               <AppLayout
                 user={user}
                 currentTheme={currentTheme}
@@ -458,7 +488,7 @@ const AppContent = () => {
         <Route
           path="/report-summary"
           element={
-            <ProtectedRoute user={user}>
+            <ProtectedRoute user={user} isInitialized={isInitialized}>
               <AppLayout
                 user={user}
                 currentTheme={currentTheme}
@@ -485,7 +515,7 @@ const AppContent = () => {
         <Route
           path="/report-stkfile"
           element={
-            <ProtectedRoute user={user}>
+            <ProtectedRoute user={user} isInitialized={isInitialized}>
               <AppLayout
                 user={user}
                 currentTheme={currentTheme}
@@ -512,7 +542,7 @@ const AppContent = () => {
         <Route
           path="/report-sales"
           element={
-            <ProtectedRoute user={user}>
+            <ProtectedRoute user={user} isInitialized={isInitialized}>
               <AppLayout
                 user={user}
                 currentTheme={currentTheme}
@@ -539,7 +569,7 @@ const AppContent = () => {
         <Route
           path="/report-stcard"
           element={
-            <ProtectedRoute user={user}>
+            <ProtectedRoute user={user} isInitialized={isInitialized}>
               <AppLayout
                 user={user}
                 currentTheme={currentTheme}
