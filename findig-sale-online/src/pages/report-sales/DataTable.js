@@ -486,7 +486,7 @@ const DataTable = ({
                         currentTheme
                       )}`}
                     >
-                      {branchGroup.totalItems.toLocaleString()} สินค้า
+                      {branchGroup.totalItems.toLocaleString()} รายการ
                     </td>
                     <td className="px-6 py-4 text-center">
                       <button

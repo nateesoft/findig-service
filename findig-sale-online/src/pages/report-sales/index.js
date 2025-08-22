@@ -38,7 +38,8 @@ const Sales = () => {
     billNo: '',
     dateFrom: '',
     dateTo: '',
-    branchCode: branchCode || '',
+    branchCodeFrom: '',
+    branchCodeTo: '',
     empCode: '',
     postStatus: ''
   });
@@ -144,21 +145,47 @@ const Sales = () => {
     }
 
     if (searchCriteria.dateFrom) {
-      filtered = filtered.filter(item => 
-        new Date(item.document_date) >= new Date(searchCriteria.dateFrom)
-      );
+      filtered = filtered.filter(item => {
+        const itemDate = new Date(item.document_date);
+        const fromDate = new Date(searchCriteria.dateFrom);
+        // เปรียบเทียบเฉพาะวันที่โดยไม่รวมเวลา
+        return new Date(itemDate.getFullYear(), itemDate.getMonth(), itemDate.getDate()) >= 
+               new Date(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate());
+      });
     }
 
     if (searchCriteria.dateTo) {
-      filtered = filtered.filter(item => 
-        new Date(item.document_date) <= new Date(searchCriteria.dateTo)
-      );
+      filtered = filtered.filter(item => {
+        const itemDate = new Date(item.document_date);
+        const toDate = new Date(searchCriteria.dateTo);
+        // เปรียบเทียบเฉพาะวันที่โดยไม่รวมเวลา
+        return new Date(itemDate.getFullYear(), itemDate.getMonth(), itemDate.getDate()) <= 
+               new Date(toDate.getFullYear(), toDate.getMonth(), toDate.getDate());
+      });
     }
 
-    if (searchCriteria.branchCode) {
-      filtered = filtered.filter(item => 
-        item.branch_code === searchCriteria.branchCode
-      );
+    // กรองตามช่วงสาขา
+    if (searchCriteria.branchCodeFrom || searchCriteria.branchCodeTo) {
+      filtered = filtered.filter(item => {
+        const branchCode = item.branch_code;
+        
+        // ถ้ามีทั้งสาขาเริ่มต้นและสิ้นสุด
+        if (searchCriteria.branchCodeFrom && searchCriteria.branchCodeTo) {
+          return branchCode >= searchCriteria.branchCodeFrom && branchCode <= searchCriteria.branchCodeTo;
+        }
+        
+        // ถ้ามีเฉพาะสาขาเริ่มต้น
+        if (searchCriteria.branchCodeFrom) {
+          return branchCode >= searchCriteria.branchCodeFrom;
+        }
+        
+        // ถ้ามีเฉพาะสาขาสิ้นสุด
+        if (searchCriteria.branchCodeTo) {
+          return branchCode <= searchCriteria.branchCodeTo;
+        }
+        
+        return true;
+      });
     }
 
     if (searchCriteria.empCode.trim()) {
@@ -181,7 +208,8 @@ const Sales = () => {
       billNo: '',
       dateFrom: '',
       dateTo: '',
-      branchCode: branchCode || '',
+      branchCodeFrom: '',
+      branchCodeTo: '',
       empCode: '',
       postStatus: ''
     });

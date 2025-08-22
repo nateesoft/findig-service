@@ -28,7 +28,7 @@ const SearchForm = ({
       )} animate-fade-in`}
     >
       <div className="p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-4">
           <div>
             <label
               className={`block text-sm font-medium ${getThemeClasses(
@@ -109,14 +109,15 @@ const SearchForm = ({
                 currentTheme
               )} mb-2`}
             >
-              รหัสสาขา
+              <Filter className="w-4 h-4 inline mr-2" />
+              สาขาเริ่มต้น
             </label>
             <select
-              value={searchCriteria.branchCode}
+              value={searchCriteria.branchCodeFrom}
               onChange={(e) =>
                 setSearchCriteria({
                   ...searchCriteria,
-                  branchCode: e.target.value
+                  branchCodeFrom: e.target.value
                 })
               }
               className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
@@ -124,7 +125,37 @@ const SearchForm = ({
                 currentTheme
               )}`}
             >
-              <option value="">ทุกสาขา</option>
+              <option value="">เลือกสาขาเริ่มต้น</option>
+              {branchFile && branchFile.map(item=>
+                <option key={item.Code} value={item.Code}>{item.Code}-{item.Name}</option>
+              )}
+            </select>
+          </div>
+
+          <div>
+            <label
+              className={`block text-sm font-medium ${getThemeClasses(
+                "textSecondary",
+                currentTheme
+              )} mb-2`}
+            >
+              <Filter className="w-4 h-4 inline mr-2" />
+              สาขาสิ้นสุด
+            </label>
+            <select
+              value={searchCriteria.branchCodeTo}
+              onChange={(e) =>
+                setSearchCriteria({
+                  ...searchCriteria,
+                  branchCodeTo: e.target.value
+                })
+              }
+              className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
+                "input",
+                currentTheme
+              )}`}
+            >
+              <option value="">เลือกสาขาสิ้นสุด</option>
               {branchFile && branchFile.map(item=>
                 <option key={item.Code} value={item.Code}>{item.Code}-{item.Name}</option>
               )}
@@ -155,34 +186,6 @@ const SearchForm = ({
               )}`}
               placeholder="ค้นหารหัสพนักงาน"
             />
-          </div>
-
-          <div>
-            <label
-              className={`block text-sm font-medium ${getThemeClasses(
-                "textSecondary",
-                currentTheme
-              )} mb-2`}
-            >
-              สถานะ POST
-            </label>
-            <select
-              value={searchCriteria.postStatus}
-              onChange={(e) =>
-                setSearchCriteria({
-                  ...searchCriteria,
-                  postStatus: e.target.value
-                })
-              }
-              className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
-                "input",
-                currentTheme
-              )}`}
-            >
-              <option value="">ทุกสถานะ</option>
-              <option value="N">WAIT</option>
-              <option value="Y">POSTED</option>
-            </select>
           </div>
         </div>
 
