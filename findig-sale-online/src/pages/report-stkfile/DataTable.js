@@ -194,24 +194,24 @@ const SaleTable = ({
           <thead>
             <tr>
               <th>สาขา</th>
-              <th>กลุ่ม</th>
-              <th class="text-center">รหัสสินค้า</th>
+              <th>กลุ่มสินค้า</th>
+              <th>รหัสสินค้า</th>
               <th>ชื่อสินค้า</th>
+              <th class="text-center">หมวดสินค้า</th>
               <th class="text-center">คงเหลือ</th>
               <th class="text-center">คลัง</th>
-              <th class="text-center">Sync Data</th>
             </tr>
           </thead>
           <tbody>
             ${sortedGroups.map(group => `
               <tr style="background-color: #f8fafc; font-weight: bold;">
-                <td colspan="6" style="padding: 12px;">
+                <td colspan="7" style="padding: 12px;">
                   สาขา: ${group.branchCode} (${group.totalItems} รายการ, รวม ${group.totalQty} ชิ้น)
                 </td>
               </tr>
               ${groupByProductGroup(group.items).map(productGroup => `
                 <tr style="background-color: #f1f5f9; font-weight: bold;">
-                  <td colspan="6" style="padding-left: 20px;">
+                  <td colspan="7" style="padding-left: 20px;">
                     กลุ่ม: ${productGroup.groupName} (${productGroup.totalItems} รายการ, รวม ${productGroup.totalQty} ชิ้น)
                   </td>
                 </tr>
@@ -219,8 +219,9 @@ const SaleTable = ({
                   <tr>
                     <td style="padding-left: 40px;">${item.Branch || ''}</td>
                     <td>${item.GroupName || ''}</td>
-                    <td class="text-center">${item.BPCode || ''}</td>
+                    <td>${item.BPCode || ''}</td>
                     <td>${item.PDesc || ''}</td>
+                    <td class="text-center">${item.PGroup || ''}</td>
                     <td class="text-center">${item.BQty24 || ''}</td>
                     <td class="text-center">${item.BStk || ''}</td>
                   </tr>
@@ -247,34 +248,23 @@ const SaleTable = ({
   const handleExportExcel = () => {
     // สร้างข้อมูล CSV
     const headers = [
-      'สาขา', 'กลุ่ม', 'รหัสสินค้า', 'ชื่อสินค้า', 'M24', 'คลัง', 'M13', 'M14', 'M15', 'M16', 'M17', 'M18', 'M19', 'M20', 'M21', 'M22', 'M23', 'Sync Data'
+      'สาขา', 'กลุ่มสินค้า', 'รหัสสินค้า', 'ชื่อสินค้า', 'หมวดสินค้า', 'คงเหลือ', 'คลัง'
     ];
     
     const csvContent = [
       headers.join(','),
       ...sortedGroups.flatMap(group => [
-        [`สาขา: ${group.branchCode}`, `${group.totalItems} รายการ`, `รวม ${group.totalQty} ชิ้น`, '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''].join(','),
+        [`สาขา: ${group.branchCode}`, `${group.totalItems} รายการ`, `รวม ${group.totalQty} ชิ้น`, '', '', '', ''].join(','),
         ...groupByProductGroup(group.items).flatMap(productGroup => [
-          [`  กลุ่ม: ${productGroup.groupName}`, `${productGroup.totalItems} รายการ`, `รวม ${productGroup.totalQty} ชิ้น`, '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''].join(','),
+          [`  กลุ่ม: ${productGroup.groupName}`, `${productGroup.totalItems} รายการ`, `รวม ${productGroup.totalQty} ชิ้น`, '', '', '', ''].join(','),
           ...productGroup.items.map(item => [
             item.Branch || '',
             item.GroupName || '',
             item.BPCode || '',
             `"${item.PDesc || ''}"`,
+            item.PGroup || '',
             item.BQty24 || '',
-            item.BStk || '',
-            item.BQty13 || '',
-            item.BQty14 || '',
-            item.BQty15 || '',
-            item.BQty16 || '',
-            item.BQty17 || '',
-            item.BQty18 || '',
-            item.BQty19 || '',
-            item.BQty20 || '',
-            item.BQty21 || '',
-            item.BQty22 || '',
-            item.BQty23 || '',
-            item.SendToPOS || ''
+            item.BStk || ''
           ].join(','))
         ])
       ])

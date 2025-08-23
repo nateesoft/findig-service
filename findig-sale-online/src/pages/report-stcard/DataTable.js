@@ -172,7 +172,7 @@ const DataTable = ({
       <!DOCTYPE html>
       <html>
       <head>
-        <title>รายงานความเคลื่อนไหวสินค้าสินค้า</title>
+        <title>รายงานความเคลื่อนไหวสินค้า</title>
         <meta charset="utf-8">
         <style>
           body { font-family: 'Sarabun', Arial, sans-serif; margin: 20px; }
@@ -190,19 +190,19 @@ const DataTable = ({
       </head>
       <body>
         <div class="print-date">วันที่พิมพ์: ${new Date().toLocaleDateString('th-TH')}</div>
-        <h1>รายงานความเคลื่อนไหวสินค้าสินค้า</h1>
+        <h1>รายงานความเคลื่อนไหวสินค้า</h1>
         <table>
           <thead>
             <tr>
               <th>สาขา</th>
-              <th class="text-center">วันที่สร้าง</th>
-              <th>เลขที่บิล</th>
               <th>กลุ่มสินค้า</th>
+              <th class="text-center">วันที่</th>
+              <th>เลขที่บิล</th>
+              <th>ประเภท</th>
               <th>รหัสสินค้า</th>
               <th>ชื่อสินค้า</th>
               <th class="text-center">จำนวน</th>
               <th class="text-center">คลัง</th>
-              <th class="text-center">ประเภท</th>
             </tr>
           </thead>
           <tbody>
@@ -212,18 +212,25 @@ const DataTable = ({
                   สาขา: ${group.branchCode} (${group.totalItems} รายการ, รวม ${group.totalQty} ชิ้น)
                 </td>
               </tr>
-              ${group.items.map(item => `
-                <tr>
-                  <td style="padding-left: 20px;">${item.S_Bran || ''}</td>
-                  <td class="text-center">${moment(item.S_Date).format('DD/MM/YYYY')}</td>
-                  <td>${item.S_No || ''}</td>
-                  <td>${item.GroupName || ''}</td>
-                  <td>${item.S_PCode || ''}</td>
-                  <td>${item.PDesc || ''}</td>
-                  <td class="text-center">${item.S_Que || ''}</td>
-                  <td class="text-center">${item.S_Stk || ''}</td>
-                  <td class="text-center">${item.S_Rem || ''}</td>
+              ${groupByProductGroup(group.items).map(productGroup => `
+                <tr style="background-color: #f1f5f9; font-weight: bold;">
+                  <td colspan="9" style="padding-left: 20px;">
+                    กลุ่ม: ${productGroup.groupName} (${productGroup.totalItems} รายการ, รวม ${productGroup.totalQty} ชิ้น)
+                  </td>
                 </tr>
+                ${productGroup.items.map(item => `
+                  <tr>
+                    <td style="padding-left: 40px;">${item.S_Bran || ''}</td>
+                    <td>${item.GroupName || ''}</td>
+                    <td class="text-center">${moment(item.S_Date).format('DD/MM/YYYY')}</td>
+                    <td>${item.S_No || ''}</td>
+                    <td>${item.S_Rem || ''}</td>
+                    <td>${item.S_PCode || ''}</td>
+                    <td>${item.PDesc || ''}</td>
+                    <td class="text-center">${item.S_Que || ''}</td>
+                    <td class="text-center">${item.S_Stk || ''}</td>
+                  </tr>
+                `).join('')}
               `).join('')}
             `).join('')}
           </tbody>
@@ -246,24 +253,27 @@ const DataTable = ({
   const handleExportExcel = () => {
     // สร้างข้อมูล CSV
     const headers = [
-      'สาขา', 'วันที่สร้าง', 'เลขที่บิล', 'กลุ่มสินค้า', 'รหัสสินค้า', 'ชื่อสินค้า', 'จำนวน', 'คลัง', 'ประเภท'
+      'สาขา', 'กลุ่มสินค้า', 'วันที่', 'เลขที่บิล', 'ประเภท', 'รหัสสินค้า', 'ชื่อสินค้า', 'จำนวน', 'คลัง'
     ];
     
     const csvContent = [
       headers.join(','),
       ...sortedGroups.flatMap(group => [
         [`สาขา: ${group.branchCode}`, `${group.totalItems} รายการ`, `รวม ${group.totalQty} ชิ้น`, '', '', '', '', '', ''].join(','),
-        ...group.items.map(item => [
-          item.S_Bran || '',
-          moment(item.S_Date).format('DD/MM/YYYY'),
-          item.S_No || '',
-          item.GroupName || '',
-          item.S_PCode || '',
-          `"${item.PDesc || ''}"`,
-          item.S_Que || '',
-          item.S_Stk || '',
-          item.S_Rem || ''
-        ].join(','))
+        ...groupByProductGroup(group.items).flatMap(productGroup => [
+          [`  กลุ่ม: ${productGroup.groupName}`, `${productGroup.totalItems} รายการ`, `รวม ${productGroup.totalQty} ชิ้น`, '', '', '', '', '', ''].join(','),
+          ...productGroup.items.map(item => [
+            item.S_Bran || '',
+            item.GroupName || '',
+            moment(item.S_Date).format('DD/MM/YYYY'),
+            item.S_No || '',
+            item.S_Rem || '',
+            item.S_PCode || '',
+            `"${item.PDesc || ''}"`,
+            item.S_Que || '',
+            item.S_Stk || ''
+          ].join(','))
+        ])
       ])
     ].join('\n');
 
@@ -273,7 +283,7 @@ const DataTable = ({
     if (link.download !== undefined) {
       const url = URL.createObjectURL(blob);
       link.setAttribute('href', url);
-      link.setAttribute('download', `รายงานความเคลื่อนไหวสินค้าสินค้า_${new Date().toISOString().split('T')[0]}.csv`);
+      link.setAttribute('download', `รายงานความเคลื่อนไหวสินค้า_${new Date().toISOString().split('T')[0]}.csv`);
       link.style.visibility = 'hidden';
       document.body.appendChild(link);
       link.click();
@@ -397,7 +407,7 @@ const DataTable = ({
               )} border ${getThemeClasses(
                 "cardBorder",
                 currentTheme
-              )} ${getThemeClasses("hover", currentTheme)} ${getThemeClasses(
+              )} hover:bg-gray-50 dark:hover:bg-gray-700 ${getThemeClasses(
                 "transition",
                 currentTheme
               )}`}

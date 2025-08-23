@@ -147,9 +147,6 @@ const DataTable = ({
           .text-center { text-align: center; }
           .text-right { text-align: right; }
           .print-date { text-align: right; margin-bottom: 10px; font-size: 12px; }
-          .status-y { background-color: #dcfce7; color: #166534; padding: 2px 8px; border-radius: 12px; }
-          .status-n { background-color: #fef3c7; color: #92400e; padding: 2px 8px; border-radius: 12px; }
-          .status-other { background-color: #fee2e2; color: #dc2626; padding: 2px 8px; border-radius: 12px; }
           @media print {
             body { margin: 0; }
             .no-print { display: none; }
@@ -163,33 +160,34 @@ const DataTable = ({
           <thead>
             <tr>
               <th>เลขที่ใบเสร็จ</th>
-              <th class="text-center">วันที่สร้างเอกสาร</th>
-              <th class="text-right">จำนวนสินค้า</th>
-              <th class="text-center">พนักงานทำรายการ</th>
+              <th class="text-center">วันที่ออกใบเสร็จ</th>
+              <th class="text-center">เวลา</th>
+              <th class="text-center">จำนวนขาย</th>
+              <th>รหัสสินค้า</th>
+              <th>ชื่อสินค้า</th>
+              <th class="text-center">หมวดสินค้า</th>
               <th class="text-center">สาขา</th>
-              <th class="text-center">สถานะ POST</th>
+              <th class="text-center">พนักงาน</th>
             </tr>
           </thead>
           <tbody>
             ${sortedGroups.map(group => `
               <tr style="background-color: #f8fafc; font-weight: bold;">
-                <td colspan="6" style="padding: 12px;">
+                <td colspan="9" style="padding: 12px;">
                   สาขา: ${group.branch_code} (${group.totalBills} บิล, รวม ${group.totalItems} สินค้า)
                 </td>
               </tr>
               ${group.items.map(item => `
                 <tr>
                   <td style="padding-left: 20px;">${item.billno || ''}</td>
-                  <td class="text-center">${moment(item.document_date).format('DD/MM/YYYY HH:mm:ss')}</td>
-                  <td class="text-right">${item.total_item || ''}</td>
-                  <td class="text-center">${item.emp_code || ''}</td>
+                  <td class="text-center">${moment(item.document_date).format('DD/MM/YYYY')}</td>
+                  <td class="text-center">${moment(item.document_date).format('HH:mm:ss')}</td>
+                  <td class="text-center">${item.qty || ''}</td>
+                  <td>${item.barcode || ''}</td>
+                  <td>${item.product_name || ''}</td>
+                  <td class="text-center">${item.PGroup || ''}</td>
                   <td class="text-center">${item.branch_code || ''}</td>
-                  <td class="text-center">
-                    <span class="${
-                      item.post_status === 'Y' ? 'status-y' : 
-                      item.post_status === 'N' ? 'status-n' : 'status-other'
-                    }">${item.post_status || ''}</span>
-                  </td>
+                  <td class="text-center">${item.emp_code || ''}</td>
                 </tr>
               `).join('')}
             `).join('')}
@@ -213,20 +211,23 @@ const DataTable = ({
   const handleExportExcel = () => {
     // สร้างข้อมูล CSV
     const headers = [
-      'เลขที่ใบเสร็จ', 'วันที่สร้างเอกสาร', 'จำนวนสินค้า', 'พนักงานทำรายการ', 'สาขา', 'สถานะ POST'
+      'เลขที่ใบเสร็จ', 'วันที่ออกใบเสร็จ', 'เวลา', 'จำนวนขาย', 'รหัสสินค้า', 'ชื่อสินค้า', 'หมวดสินค้า', 'สาขา', 'พนักงาน'
     ];
     
     const csvContent = [
       headers.join(','),
       ...sortedGroups.flatMap(group => [
-        [`สาขา: ${group.branch_code}`, `${group.totalBills} บิล`, `รวม ${group.totalItems} สินค้า`, '', '', ''].join(','),
+        [`สาขา: ${group.branch_code}`, `${group.totalBills} บิล`, `รวม ${group.totalItems} สินค้า`, '', '', '', '', '', ''].join(','),
         ...group.items.map(item => [
           item.billno || '',
-          moment(item.document_date).format('DD/MM/YYYY HH:mm:ss'),
-          item.total_item || '',
-          item.emp_code || '',
+          moment(item.document_date).format('DD/MM/YYYY'),
+          moment(item.document_date).format('HH:mm:ss'),
+          item.qty || '',
+          item.barcode || '',
+          `"${item.product_name || ''}"`,
+          item.PGroup || '',
           item.branch_code || '',
-          item.post_status || ''
+          item.emp_code || ''
         ].join(','))
       ])
     ].join('\n');
@@ -237,7 +238,7 @@ const DataTable = ({
     if (link.download !== undefined) {
       const url = URL.createObjectURL(blob);
       link.setAttribute('href', url);
-      link.setAttribute('download', `รายงานการเปิดบิลด้วยมือ แยกตามสาขา${new Date().toISOString().split('T')[0]}.csv`);
+      link.setAttribute('download', `รายงานการเปิดบิลด้วยมือ แยกตามสาขา_${new Date().toISOString().split('T')[0]}.csv`);
       link.style.visibility = 'hidden';
       document.body.appendChild(link);
       link.click();

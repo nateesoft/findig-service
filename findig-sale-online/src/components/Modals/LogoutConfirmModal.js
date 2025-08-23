@@ -26,7 +26,7 @@ const LogoutConfirmModal = ({
   }
 
   return (
-    <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center p-4 z-50 animate-fade-in">
+    <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center p-4 z-[9999] animate-fade-in">
       <div 
         className={`${getThemeClasses('cardBg', currentTheme)} rounded-xl shadow-2xl w-full max-w-md ${getThemeClasses('transition', currentTheme)} transform animate-scale-in`}
         onClick={(e) => e.stopPropagation()}
