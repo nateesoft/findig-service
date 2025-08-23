@@ -1,4 +1,6 @@
 import { Search, RefreshCw, X } from "lucide-react"
+import DatePicker from "react-datepicker"
+import "react-datepicker/dist/react-datepicker.css"
 import Select from "react-select"
 
 const SearchForm = ({
@@ -14,6 +16,30 @@ const SearchForm = ({
   branchFile,
   groupFile
 }) => {
+  // ฟังก์ชันช่วยแปลง string เป็น Date และ Date เป็น string dd/MM/yyyy
+  function parseDate(str) {
+    if (!str) return null;
+    const parts = str.split("/");
+    if (parts.length === 3) {
+      // dd/MM/yyyy
+      return new Date(parts[2], parts[1] - 1, parts[0]);
+    }
+    // fallback: yyyy-mm-dd
+    const dashParts = str.split("-");
+    if (dashParts.length === 3) {
+      return new Date(dashParts[0], dashParts[1] - 1, dashParts[2]);
+    }
+    return null;
+  }
+
+  function formatDate(date) {
+    if (!date) return "";
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  }
+
   return (
     <div
       className={`${getThemeClasses(
@@ -26,6 +52,54 @@ const SearchForm = ({
     >
       <div className="p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+      <div>
+        <label
+          className={`block text-sm font-medium ${getThemeClasses(
+            "textSecondary",
+            currentTheme
+          )} mb-2`}
+        >
+          วันที่เริ่มต้น
+        </label>
+        <DatePicker
+          selected={searchCriteria.Date_Start ? parseDate(searchCriteria.Date_Start) : null}
+          onChange={date =>
+            setSearchCriteria({
+              ...searchCriteria,
+              Date_Start: date ? formatDate(date) : ""
+            })
+          }
+          dateFormat="dd/MM/yyyy"
+          className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses("input", currentTheme)}`}
+          placeholderText="เลือกวันที่เริ่มต้น"
+          autoComplete="off"
+          isClearable
+        />
+      </div>
+      <div>
+        <label
+          className={`block text-sm font-medium ${getThemeClasses(
+            "textSecondary",
+            currentTheme
+          )} mb-2`}
+        >
+          วันที่สิ้นสุด
+        </label>
+        <DatePicker
+          selected={searchCriteria.Date_End ? parseDate(searchCriteria.Date_End) : null}
+          onChange={date =>
+            setSearchCriteria({
+              ...searchCriteria,
+              Date_End: date ? formatDate(date) : ""
+            })
+          }
+          dateFormat="dd/MM/yyyy"
+          className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses("input", currentTheme)}`}
+          placeholderText="เลือกวันที่สิ้นสุด"
+          autoComplete="off"
+          isClearable
+        />
+      </div>
           <div>
             <label
               className={`block text-sm font-medium ${getThemeClasses(

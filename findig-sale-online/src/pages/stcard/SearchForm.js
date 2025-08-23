@@ -1,4 +1,6 @@
 import { Calendar, FileText, Search, RefreshCw } from "lucide-react"
+import DatePicker from "react-datepicker"
+import "react-datepicker/dist/react-datepicker.css"
 import Select from "react-select"
 
 const SearchForm = ({
@@ -12,6 +14,30 @@ const SearchForm = ({
   branchFile,
   groupFile
 }) => {
+  // ฟังก์ชันช่วยแปลง string เป็น Date และ Date เป็น string dd/MM/yyyy
+  function parseDate(str) {
+    if (!str) return null;
+    const parts = str.split("/");
+    if (parts.length === 3) {
+      // dd/MM/yyyy
+      return new Date(parts[2], parts[1] - 1, parts[0]);
+    }
+    // fallback: yyyy-mm-dd
+    const dashParts = str.split("-");
+    if (dashParts.length === 3) {
+      return new Date(dashParts[0], dashParts[1] - 1, dashParts[2]);
+    }
+    return null;
+  }
+
+  function formatDate(date) {
+    if (!date) return "";
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  }
+
   return (
     <div
       className={`${getThemeClasses(
@@ -57,19 +83,19 @@ const SearchForm = ({
               <Calendar className="w-4 h-4 inline mr-2" />
               วันที่เริ่มต้น
             </label>
-            <input
-              type="date"
-              value={searchCriteria.S_Date_Start}
-              onChange={(e) =>
+            <DatePicker
+              selected={searchCriteria.S_Date_Start ? parseDate(searchCriteria.S_Date_Start) : null}
+              onChange={date =>
                 setSearchCriteria({
                   ...searchCriteria,
-                  S_Date_Start: e.target.value
+                  S_Date_Start: date ? formatDate(date) : ""
                 })
               }
-              className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
-                "input",
-                currentTheme
-              )}`}
+              dateFormat="dd/MM/yyyy"
+              className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses("input", currentTheme)}`}
+              placeholderText="เลือกวันที่เริ่มต้น"
+              autoComplete="off"
+              isClearable
             />
           </div>
           <div>
@@ -82,19 +108,19 @@ const SearchForm = ({
               <Calendar className="w-4 h-4 inline mr-2" />
               วันที่สิ้นสุด
             </label>
-            <input
-              type="date"
-              value={searchCriteria.S_Date_End}
-              onChange={(e) =>
+            <DatePicker
+              selected={searchCriteria.S_Date_End ? parseDate(searchCriteria.S_Date_End) : null}
+              onChange={date =>
                 setSearchCriteria({
                   ...searchCriteria,
-                  S_Date_End: e.target.value
+                  S_Date_End: date ? formatDate(date) : ""
                 })
               }
-              className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
-                "input",
-                currentTheme
-              )}`}
+              dateFormat="dd/MM/yyyy"
+              className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses("input", currentTheme)}`}
+              placeholderText="เลือกวันที่สิ้นสุด"
+              autoComplete="off"
+              isClearable
             />
           </div>
           <div>
