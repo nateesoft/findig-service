@@ -74,6 +74,7 @@ const SearchForm = ({
           placeholderText="เลือกวันที่เริ่มต้น"
           autoComplete="off"
           isClearable
+          wrapperClassName="w-full"
         />
       </div>
       <div>
@@ -98,6 +99,7 @@ const SearchForm = ({
           placeholderText="เลือกวันที่สิ้นสุด"
           autoComplete="off"
           isClearable
+          wrapperClassName="w-full"
         />
       </div>
           <div>
