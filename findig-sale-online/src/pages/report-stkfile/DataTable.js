@@ -628,9 +628,10 @@ const SaleTable = ({
                                     currentTheme
                                   )} uppercase tracking-wider pl-16`}
                                 >
-                                  <div className="grid grid-cols-4 gap-4">
+                                  <div className="grid grid-cols-5 gap-4">
                                     <span>รหัสสินค้า</span>
                                     <span>ชื่อสินค้า</span>
+                                    <span>หมวดสินค้า</span>
                                     <span>คงเหลือ</span>
                                     <span>คลัง</span>
                                   </div>
@@ -650,9 +651,10 @@ const SaleTable = ({
                                       currentTheme
                                     )} pl-16`}
                                   >
-                                    <div className="grid grid-cols-4 gap-4">
+                                    <div className="grid grid-cols-5 gap-4">
                                       <span>{item.BPCode}</span>
                                       <span className="truncate" title={item.PDesc}>{item.PDesc}</span>
+                                      <span>{item.PGroup}</span>
                                       <span>{item.BQty24}</span>
                                       <span>{item.BStk}</span>
                                     </div>

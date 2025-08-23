@@ -218,6 +218,31 @@ const SearchForm = ({
               }}
             />
           </div>
+          <div>
+            <label
+              className={`block text-sm font-medium ${getThemeClasses(
+                "textSecondary",
+                currentTheme
+              )} mb-2`}
+            >
+              รหัสสินค้า
+            </label>
+            <input
+              type="text"
+              value={searchCriteria.S_PCode}
+              onChange={(e) =>
+                setSearchCriteria({
+                  ...searchCriteria,
+                  S_PCode: e.target.value
+                })
+              }
+              className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
+                "input",
+                currentTheme
+              )}`}
+              placeholder="ค้นหารหัสสินค้า"
+            />
+          </div>
         </div>
 
         {/* Search Actions */}

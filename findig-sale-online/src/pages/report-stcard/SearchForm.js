@@ -200,11 +200,11 @@ const SearchForm = ({
             </label>
             <input
               type="text"
-              value={searchCriteria.S_PCode}
+              value={searchCriteria.S_Rem}
               onChange={(e) =>
                 setSearchCriteria({
                   ...searchCriteria,
-                  S_PCode: e.target.value
+                  S_Rem: e.target.value
                 })
               }
               className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(

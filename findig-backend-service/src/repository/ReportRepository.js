@@ -44,8 +44,14 @@ const searchReportSale = async ({ db, payload }) => {
       throw new Error('POS database connection not available')
     }
 
-    const { billno, document_date_Start, document_date_End, emp_code, branch_code_Start, branch_code_End } = payload
-    let sql = `select d.* from draft_sale d where 1=1 `
+    const { billno, document_date_Start, document_date_End, emp_code, 
+      branch_code_Start, branch_code_End, barcode } = payload
+    let sql = `select 
+    d.billno, d.document_date, d.emp_code, d.branch_code, dd.*, p.PGroup 
+    from draft_sale d 
+    left join draft_sale_details dd on d.billno=dd.billno 
+    left join product p on dd.barcode=p.PCode 
+    where 1=1 `
     const params = []
 
     if (billno) {
@@ -63,6 +69,10 @@ const searchReportSale = async ({ db, payload }) => {
     if (branch_code_Start && branch_code_End) {
       sql += `and d.branch_code between ? and ? `
       params.push(branch_code_Start, branch_code_End)
+    }
+    if(barcode){
+      sql += `and dd.barcode = ? `
+      params.push(barcode)
     }
 
     sql += `order by d.branch_code, d.document_date, d.billno`

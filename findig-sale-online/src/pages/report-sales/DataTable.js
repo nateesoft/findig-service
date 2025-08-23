@@ -1,6 +1,4 @@
-import { 
-  Eye, 
-  Edit,
+import {
   FileText,
   ChevronLeft,
   ChevronRight,
@@ -22,8 +20,6 @@ const DataTable = ({
     getThemeClasses,
     currentTheme,
     filteredSales,
-    handleReviewSale,
-    handleEditSale,
     searchCriteria,
     resetSearch,
     isLoading
@@ -47,7 +43,7 @@ const DataTable = ({
         };
       }
       acc[branchCode].items.push(item);
-      acc[branchCode].totalItems += Number(item.total_item) || 0;
+      acc[branchCode].totalItems += Number(item.qty) || 0;
       acc[branchCode].totalBills += 1;
       return acc;
     }, {});
@@ -523,7 +519,7 @@ const DataTable = ({
                             currentTheme
                           )} uppercase tracking-wider`}
                         >
-                          เลขที่ใบเสร็จ
+                          ใบเสร็จเลขที่
                         </td>
                         <td
                           className={`px-6 py-2 text-center text-xs font-medium ${getThemeClasses(
@@ -531,7 +527,7 @@ const DataTable = ({
                             currentTheme
                           )} uppercase tracking-wider`}
                         >
-                          วันที่สร้างเอกสาร
+                          วันที่ออกใบเสร็จ
                         </td>
                         <td
                           className={`px-6 py-2 text-center text-xs font-medium ${getThemeClasses(
@@ -539,7 +535,39 @@ const DataTable = ({
                             currentTheme
                           )} uppercase tracking-wider`}
                         >
-                          จำนวนสินค้า
+                          เวลา
+                        </td>
+                        <td
+                          className={`px-6 py-2 text-center text-xs font-medium ${getThemeClasses(
+                            "textMuted",
+                            currentTheme
+                          )} uppercase tracking-wider`}
+                        >
+                          จำนวนขาย
+                        </td>
+                        <td
+                          className={`px-6 py-2 text-center text-xs font-medium ${getThemeClasses(
+                            "textMuted",
+                            currentTheme
+                          )} uppercase tracking-wider`}
+                        >
+                          รหัสสินค้า
+                        </td>
+                        <td
+                          className={`px-6 py-2 text-center text-xs font-medium ${getThemeClasses(
+                            "textMuted",
+                            currentTheme
+                          )} uppercase tracking-wider`}
+                        >
+                          ชื่อสินค้า
+                        </td>
+                        <td
+                          className={`px-6 py-2 text-center text-xs font-medium ${getThemeClasses(
+                            "textMuted",
+                            currentTheme
+                          )} uppercase tracking-wider`}
+                        >
+                          หมวดสินค้า
                         </td>
                         <td
                           className={`px-6 py-2 text-center text-xs font-medium ${getThemeClasses(
@@ -554,7 +582,7 @@ const DataTable = ({
                       {/* รายการสินค้าในสาขา */}
                       {branchGroup.items.map((item) => (
                         <tr
-                          key={item.billno}
+                          key={item.billno+item.barcode}
                           className={`${getThemeClasses("tableRow", currentTheme)}`}
                         >
                           <td
@@ -571,7 +599,7 @@ const DataTable = ({
                               currentTheme
                             )}`}
                           >
-                            {moment(item.document_date).format("DD/MM/YYYY HH:mm:ss")}
+                            {moment(item.document_date).format("DD/MM/YYYY")}
                           </td>
                           <td
                             className={`px-6 py-3 text-center text-sm ${getThemeClasses(
@@ -579,7 +607,39 @@ const DataTable = ({
                               currentTheme
                             )}`}
                           >
-                            {item.total_item?.toLocaleString()}
+                            {moment(item.document_date).format("HH:mm:ss")}
+                          </td>
+                          <td
+                            className={`px-6 py-3 text-center text-sm ${getThemeClasses(
+                              "textSecondary",
+                              currentTheme
+                            )}`}
+                          >
+                            {item.qty?.toLocaleString()}
+                          </td>
+                          <td
+                            className={`px-6 py-3 text-sm ${getThemeClasses(
+                              "textPrimary",
+                              currentTheme
+                            )} pl-8`}
+                          >
+                            {item.barcode}
+                          </td>
+                          <td
+                            className={`px-6 py-3 text-sm ${getThemeClasses(
+                              "textPrimary",
+                              currentTheme
+                            )} pl-8`}
+                          >
+                            {item.product_name}
+                          </td>
+                          <td
+                            className={`px-6 py-3 text-center text-sm ${getThemeClasses(
+                              "textSecondary",
+                              currentTheme
+                            )}`}
+                          >
+                            {item.PGroup}
                           </td>
                           <td
                             className={`px-6 py-3 text-center text-sm ${getThemeClasses(
