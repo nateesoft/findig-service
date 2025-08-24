@@ -50,7 +50,7 @@ const DataTable = ({
     }
     
     // จัดการกับข้อมูลตัวเลข
-    if (sortField === 'S_Que') {
+    if (sortField === 'S_Out') {
       aValue = Number(aValue);
       bValue = Number(bValue);
     }
@@ -133,7 +133,7 @@ const DataTable = ({
                 <td>${item.GroupName || ''}</td>
                 <td>${item.S_PCode || ''}</td>
                 <td>${item.PDesc || ''}</td>
-                <td class="text-center">${item.S_Que || ''}</td>
+                <td class="text-center">${item.S_Out || ''}</td>
                 <td class="text-center">${item.S_Stk || ''}</td>
                 <td class="text-center">${item.S_Rem || ''}</td>
                 <td class="text-center">${item.Data_Sync || ''}</td>
@@ -171,7 +171,7 @@ const DataTable = ({
         item.GroupName || '',
         item.S_PCode || '',
         `"${item.PDesc || ''}"`,
-        item.S_Que || '',
+        item.S_Out || '',
         item.S_Stk || '',
         item.S_Rem || '',
         item.Data_Sync || ''
@@ -437,11 +437,11 @@ const DataTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('S_Que')}
+                onClick={() => handleSort('S_Out')}
               >
                 <div className="flex items-center">
                   จำนวน
-                  {getSortIcon('S_Que')}
+                  {getSortIcon('S_Out')}
                 </div>
               </th>
               <th
@@ -559,7 +559,7 @@ const DataTable = ({
                       currentTheme
                     )}`}
                   >
-                    {draft_sale.S_Que}
+                    {draft_sale.S_Out}
                   </td>
                   <td
                     className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(

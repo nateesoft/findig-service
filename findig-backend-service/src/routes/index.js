@@ -3,6 +3,7 @@ const router = express.Router();
 
 const ProductController = require('../controllers/ProductController')
 const GroupfileController = require('../controllers/GroupfileController')
+const SaleRemController = require('../controllers/SaleRemController')
 
 const BranchController = require('../controllers/BranchController')
 const STCardController = require('../controllers/STCardController')
@@ -56,7 +57,7 @@ router.put('/api/draftsale_detail/:id', DraftSaleDetailsController.updateData)
 router.delete('/api/draftsale_detail/:id', DraftSaleDetailsController.deleteData)
 
 router.post('/api/product', ProductController.getProductData);
-
 router.get('/api/groupfile/list', GroupfileController.getAllGroupfile);
+router.get('/api/salerem/list', SaleRemController.getAllSaleRem);
 
 module.exports = router

@@ -14,7 +14,8 @@ const SearchForm = ({
   handleCancelSearch,
   isLoading,
   branchFile,
-  groupFile
+  groupFile,
+  saleRem
 }) => {
   // ฟังก์ชันช่วยแปลง string เป็น Date และ Date เป็น string dd/MM/yyyy
   function parseDate(str) {
@@ -227,20 +228,42 @@ const SearchForm = ({
             >
               ประเภทการขาย
             </label>
-            <input
-              type="text"
-              value={searchCriteria.S_Rem}
-              onChange={(e) =>
+            <Select
+              options={[
+                { value: "", label: "ทุกประเภทการขาย" },
+                ...(saleRem ? saleRem.map(item => ({
+                  value: item.Code_REM,
+                  label: `${item.Code_REM}-${item.Name_REM}`
+                })) : [])
+              ]}
+              value={(() => {
+                if (searchCriteria.S_Rem === "") return { value: "", label: "ทุกประเภทการขาย" };
+                const found = saleRem?.find(item => item.Code_REM === searchCriteria.S_Rem);
+                return found ? { value: found.S_Rem, label: `${found.Code_REM}-${found.Name_REM}` } : null;
+              })()}
+              onChange={option =>
                 setSearchCriteria({
                   ...searchCriteria,
-                  S_Rem: e.target.value
+                  S_Rem: option ? option.value : ""
                 })
               }
-              className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
-                "input",
-                currentTheme
-              )}`}
-              placeholder="ประเภทการขาย เช่น SAL"
+              isClearable
+              placeholder="ทุกประเภทการขาย"
+              classNamePrefix="react-select"
+              styles={{
+                control: (base) => ({
+                  ...base,
+                  borderRadius: '0.5rem',
+                  minHeight: '40px',
+                  borderColor: getThemeClasses("input", currentTheme),
+                  boxShadow: 'none',
+                  fontSize: '1rem'
+                }),
+                menu: (base) => ({
+                  ...base,
+                  zIndex: 20
+                })
+              }}
             />
           </div>
           <div>
@@ -253,14 +276,18 @@ const SearchForm = ({
               สาขาเริ่มต้น
             </label>
             <Select
-              options={branchFile?.map(item => ({
-                value: item.Code,
-                label: `${item.Code}-${item.Name}`
-              }))}
-              value={branchFile?.find(item => item.Code === searchCriteria.S_Bran_Start) ? {
-                value: searchCriteria.S_Bran_Start,
-                label: `${searchCriteria.S_Bran_Start}-${branchFile.find(item => item.Code === searchCriteria.S_Bran_Start)?.Name}`
-              } : null}
+              options={[
+                { value: "", label: "ทุกสาขา" },
+                ...(branchFile ? branchFile.map(item => ({
+                  value: item.Code,
+                  label: `${item.Code}-${item.Name}`
+                })) : [])
+              ]}
+              value={(() => {
+                if (searchCriteria.S_Bran_Start === "") return { value: "", label: "ทุกสาขา" };
+                const found = branchFile?.find(item => item.Code === searchCriteria.S_Bran_Start);
+                return found ? { value: found.Code, label: `${found.Code}-${found.Name}` } : null;
+              })()}
               onChange={option =>
                 setSearchCriteria({
                   ...searchCriteria,
@@ -296,14 +323,18 @@ const SearchForm = ({
               สาขาสิ้นสุด
             </label>
             <Select
-              options={branchFile?.map(item => ({
-                value: item.Code,
-                label: `${item.Code}-${item.Name}`
-              }))}
-              value={branchFile?.find(item => item.Code === searchCriteria.S_Bran_End) ? {
-                value: searchCriteria.S_Bran_End,
-                label: `${searchCriteria.S_Bran_End}-${branchFile.find(item => item.Code === searchCriteria.S_Bran_End)?.Name}`
-              } : null}
+              options={[
+                { value: "", label: "ทุกสาขา" },
+                ...(branchFile ? branchFile.map(item => ({
+                  value: item.Code,
+                  label: `${item.Code}-${item.Name}`
+                })) : [])
+              ]}
+              value={(() => {
+                if (searchCriteria.S_Bran_End === "") return { value: "", label: "ทุกสาขา" };
+                const found = branchFile?.find(item => item.Code === searchCriteria.S_Bran_End);
+                return found ? { value: found.Code, label: `${found.Code}-${found.Name}` } : null;
+              })()}
               onChange={option =>
                 setSearchCriteria({
                   ...searchCriteria,
@@ -329,7 +360,6 @@ const SearchForm = ({
               }}
             />
           </div>
-          
         </div>
 
         {/* Search Actions */}

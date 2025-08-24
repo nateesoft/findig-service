@@ -114,8 +114,8 @@ const searchReportStcard = async ({ db, payload }) => {
       params.push(S_Date_Start, S_Date_End)
     }
     if (S_Rem) {
-      sql += `and st.S_No like ? `
-      params.push(`%${S_Rem}%`)
+      sql += `and st.S_Rem = ? `
+      params.push(S_Rem)
     }
     if (S_Bran_Start && S_Bran_End) {
       sql += `and st.S_Bran between ? and ? `

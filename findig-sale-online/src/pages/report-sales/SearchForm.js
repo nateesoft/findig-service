@@ -163,7 +163,6 @@ const SearchForm = ({
               placeholder="ค้นหารหัสพนักงาน"
             />
           </div>
-
           <div>
             <label
               className={`block text-sm font-medium ${getThemeClasses(
@@ -171,17 +170,21 @@ const SearchForm = ({
                 currentTheme
               )} mb-2`}
             >
-              สาขาเริ่มต้น
+              สาขาสิ้นสุด
             </label>
             <Select
-              options={branchFile?.map(item => ({
-                value: item.Code,
-                label: `${item.Code}-${item.Name}`
-              }))}
-              value={branchFile?.find(item => item.Code === searchCriteria.branch_code_Start) ? {
-                value: searchCriteria.branch_code_Start,
-                label: `${searchCriteria.branch_code_Start}-${branchFile.find(item => item.Code === searchCriteria.branch_code_Start)?.Name}`
-              } : null}
+              options={[
+                { value: "", label: "ทุกสาขา" },
+                ...(branchFile ? branchFile.map(item => ({
+                  value: item.Code,
+                  label: `${item.Code}-${item.Name}`
+                })) : [])
+              ]}
+              value={(() => {
+                if (searchCriteria.branch_code_Start === "") return { value: "", label: "ทุกสาขา" };
+                const found = branchFile?.find(item => item.Code === searchCriteria.branch_code_Start);
+                return found ? { value: found.Code, label: `${found.Code}-${found.Name}` } : null;
+              })()}
               onChange={option =>
                 setSearchCriteria({
                   ...searchCriteria,
@@ -214,17 +217,21 @@ const SearchForm = ({
                 currentTheme
               )} mb-2`}
             >
-              สาขาสิ้นสุด
+              สาขาเริ่มต้น
             </label>
             <Select
-              options={branchFile?.map(item => ({
-                value: item.Code,
-                label: `${item.Code}-${item.Name}`
-              }))}
-              value={branchFile?.find(item => item.Code === searchCriteria.branch_code_End) ? {
-                value: searchCriteria.branch_code_End,
-                label: `${searchCriteria.branch_code_End}-${branchFile.find(item => item.Code === searchCriteria.branch_code_End)?.Name}`
-              } : null}
+              options={[
+                { value: "", label: "ทุกสาขา" },
+                ...(branchFile ? branchFile.map(item => ({
+                  value: item.Code,
+                  label: `${item.Code}-${item.Name}`
+                })) : [])
+              ]}
+              value={(() => {
+                if (searchCriteria.branch_code_End === "") return { value: "", label: "ทุกสาขา" };
+                const found = branchFile?.find(item => item.Code === searchCriteria.branch_code_End);
+                return found ? { value: found.Code, label: `${found.Code}-${found.Name}` } : null;
+              })()}
               onChange={option =>
                 setSearchCriteria({
                   ...searchCriteria,

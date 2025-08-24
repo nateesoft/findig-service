@@ -103,253 +103,262 @@ const SearchForm = ({
           wrapperClassName="w-full"
         />
       </div>
-          <div>
-            <label
-              className={`block text-sm font-medium ${getThemeClasses(
-                "textSecondary",
-                currentTheme
-              )} mb-2`}
-            >
-              สาขาเริ่มต้น
-            </label>
-            <Select
-              options={branchFile?.map(item => ({
-                value: item.Code,
-                label: `${item.Code}-${item.Name}`
-              }))}
-              value={branchFile?.find(item => item.Code === searchCriteria.Branch_Start) ? {
-                value: searchCriteria.Branch_Start,
-                label: `${searchCriteria.Branch_Start}-${branchFile.find(item => item.Code === searchCriteria.Branch_Start)?.Name}`
-              } : null}
-              onChange={option =>
-                setSearchCriteria({
-                  ...searchCriteria,
-                  Branch_Start: option ? option.value : ""
-                })
-              }
-              isClearable
-              placeholder="สาขาเริ่มต้น"
-              classNamePrefix="react-select"
-              styles={{
-                control: (base) => ({
-                  ...base,
-                  borderRadius: '0.5rem',
-                  minHeight: '40px',
-                  borderColor: getThemeClasses("input", currentTheme),
-                  boxShadow: 'none',
-                  fontSize: '1rem'
-                }),
-                menu: (base) => ({
-                  ...base,
-                  zIndex: 20
-                })
-              }}
-            />
-          </div>
-          <div>
-            <label
-              className={`block text-sm font-medium ${getThemeClasses(
-                "textSecondary",
-                currentTheme
-              )} mb-2`}
-            >
-              สาขาสิ้นสุด
-            </label>
-            <Select
-              options={branchFile?.map(item => ({
-                value: item.Code,
-                label: `${item.Code}-${item.Name}`
-              }))}
-              value={branchFile?.find(item => item.Code === searchCriteria.Branch_End) ? {
-                value: searchCriteria.Branch_End,
-                label: `${searchCriteria.Branch_End}-${branchFile.find(item => item.Code === searchCriteria.Branch_End)?.Name}`
-              } : null}
-              onChange={option =>
-                setSearchCriteria({
-                  ...searchCriteria,
-                  Branch_End: option ? option.value : ""
-                })
-              }
-              isClearable
-              placeholder="สาขาสิ้นสุด"
-              classNamePrefix="react-select"
-              styles={{
-                control: (base) => ({
-                  ...base,
-                  borderRadius: '0.5rem',
-                  minHeight: '40px',
-                  borderColor: getThemeClasses("input", currentTheme),
-                  boxShadow: 'none',
-                  fontSize: '1rem'
-                }),
-                menu: (base) => ({
-                  ...base,
-                  zIndex: 20
-                })
-              }}
-            />
-          </div>
-          <div>
-            <label
-              className={`block text-sm font-medium ${getThemeClasses(
-                "textSecondary",
-                currentTheme
-              )} mb-2`}
-            >
-              กลุ่มสินค้าเริ่มต้น
-            </label>
-            <Select
-              options={[
-                { value: "", label: "ทุกกลุ่มสินค้า" },
-                ...(groupFile ? groupFile.map(item => ({
-                  value: item.GroupCode,
-                  label: `${item.GroupCode}-${item.GroupName}`
-                })) : [])
-              ]}
-              value={(() => {
-                if (searchCriteria.GroupCode1 === "") return { value: "", label: "ทุกกลุ่มสินค้า" };
-                const found = groupFile?.find(item => item.GroupCode === searchCriteria.GroupCode1);
-                return found ? { value: found.GroupCode, label: `${found.GroupCode}-${found.GroupName}` } : null;
-              })()}
-              onChange={option =>
-                setSearchCriteria({
-                  ...searchCriteria,
-                  GroupCode1: option ? option.value : ""
-                })
-              }
-              isClearable
-              placeholder="กลุ่มเริ่มต้น"
-              classNamePrefix="react-select"
-              styles={{
-                control: (base) => ({
-                  ...base,
-                  borderRadius: '0.5rem',
-                  minHeight: '40px',
-                  borderColor: getThemeClasses("input", currentTheme),
-                  boxShadow: 'none',
-                  fontSize: '1rem'
-                }),
-                menu: (base) => ({
-                  ...base,
-                  zIndex: 20
-                })
-              }}
-            />
-          </div>
-          <div>
-            <label
-              className={`block text-sm font-medium ${getThemeClasses(
-                "textSecondary",
-                currentTheme
-              )} mb-2`}
-            >
-              กลุ่มสินค้าสิ้นสุด
-            </label>
-            <Select
-              options={[
-                { value: "", label: "ทุกกลุ่มสินค้า" },
-                ...(groupFile ? groupFile.map(item => ({
-                  value: item.GroupCode,
-                  label: `${item.GroupCode}-${item.GroupName}`
-                })) : [])
-              ]}
-              value={(() => {
-                if (searchCriteria.GroupCode2 === "") return { value: "", label: "ทุกกลุ่มสินค้า" };
-                const found = groupFile?.find(item => item.GroupCode === searchCriteria.GroupCode2);
-                return found ? { value: found.GroupCode, label: `${found.GroupCode}-${found.GroupName}` } : null;
-              })()}
-              onChange={option =>
-                setSearchCriteria({
-                  ...searchCriteria,
-                  GroupCode2: option ? option.value : ""
-                })
-              }
-              isClearable
-              placeholder="กลุ่มสิ้นสุด"
-              classNamePrefix="react-select"
-              styles={{
-                control: (base) => ({
-                  ...base,
-                  borderRadius: '0.5rem',
-                  minHeight: '40px',
-                  borderColor: getThemeClasses("input", currentTheme),
-                  boxShadow: 'none',
-                  fontSize: '1rem'
-                }),
-                menu: (base) => ({
-                  ...base,
-                  zIndex: 20
-                })
-              }}
-            />
-          </div>
-          <div>
-            <label
-              className={`block text-sm font-medium ${getThemeClasses(
-                "textSecondary",
-                currentTheme
-              )} mb-2`}
-            >
-              คลังสินค้า
-            </label>
-            <Select
-              options={[{ value: "", label: "ทุกคลัง" }, { value: "A1", label: "คลังสินค้าหลัก" }]}
-              value={(() => {
-                if (searchCriteria.S_Stk === "") return { value: "", label: "ทุกคลัง" };
-                if (searchCriteria.S_Stk === "A1") return { value: "A1", label: "คลังสินค้าหลัก" };
-                return null;
-              })()}
-              onChange={option =>
-                setSearchCriteria({
-                  ...searchCriteria,
-                  S_Stk: option ? option.value : ""
-                })
-              }
-              isClearable
-              placeholder="ทุกคลัง"
-              classNamePrefix="react-select"
-              styles={{
-                control: (base) => ({
-                  ...base,
-                  borderRadius: '0.5rem',
-                  minHeight: '40px',
-                  borderColor: getThemeClasses("input", currentTheme),
-                  boxShadow: 'none',
-                  fontSize: '1rem'
-                }),
-                menu: (base) => ({
-                  ...base,
-                  zIndex: 20
-                })
-              }}
-            />
-          </div>
-          <div>
-            <label
-              className={`block text-sm font-medium ${getThemeClasses(
-                "textSecondary",
-                currentTheme
-              )} mb-2`}
-            >
-              รหัสสินค้า
-            </label>
-            <input
-              type="text"
-              value={searchCriteria.BPCode}
-              onChange={(e) =>
-                setSearchCriteria({
-                  ...searchCriteria,
-                  BPCode: e.target.value
-                })
-              }
-              className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
-                "input",
-                currentTheme
-              )}`}
-              placeholder="ค้นหารหัสสินค้า"
-            />
-          </div>
-        </div>
+      <div>
+        <label
+          className={`block text-sm font-medium ${getThemeClasses(
+            "textSecondary",
+            currentTheme
+          )} mb-2`}
+        >
+          สาขาสิ้นสุด
+        </label>
+        <Select
+          options={[
+            { value: "", label: "ทุกสาขา" },
+            ...(branchFile ? branchFile.map(item => ({
+              value: item.Code,
+              label: `${item.Code}-${item.Name}`
+            })) : [])
+          ]}
+          value={(() => {
+            if (searchCriteria.Branch_Start === "") return { value: "", label: "ทุกสาขา" };
+            const found = branchFile?.find(item => item.Code === searchCriteria.Branch_Start);
+            return found ? { value: found.Code, label: `${found.Code}-${found.Name}` } : null;
+          })()}
+          onChange={option =>
+            setSearchCriteria({
+              ...searchCriteria,
+              Branch_Start: option ? option.value : ""
+            })
+          }
+          isClearable
+          placeholder="ทุกสาขา"
+          classNamePrefix="react-select"
+          styles={{
+            control: (base) => ({
+              ...base,
+              borderRadius: '0.5rem',
+              minHeight: '40px',
+              borderColor: getThemeClasses("input", currentTheme),
+              boxShadow: 'none',
+              fontSize: '1rem'
+            }),
+            menu: (base) => ({
+              ...base,
+              zIndex: 20
+            })
+          }}
+        />
+      </div>
+      <div>
+        <label
+          className={`block text-sm font-medium ${getThemeClasses(
+            "textSecondary",
+            currentTheme
+          )} mb-2`}
+        >
+          สาขาเริ่มต้น
+        </label>
+        <Select
+          options={[
+            { value: "", label: "ทุกสาขา" },
+            ...(branchFile ? branchFile.map(item => ({
+              value: item.Code,
+              label: `${item.Code}-${item.Name}`
+            })) : [])
+          ]}
+          value={(() => {
+            if (searchCriteria.Branch_End === "") return { value: "", label: "ทุกสาขา" };
+            const found = branchFile?.find(item => item.Code === searchCriteria.Branch_End);
+            return found ? { value: found.Code, label: `${found.Code}-${found.Name}` } : null;
+          })()}
+          onChange={option =>
+            setSearchCriteria({
+              ...searchCriteria,
+              Branch_End: option ? option.value : ""
+            })
+          }
+          isClearable
+          placeholder="ทุกสาขา"
+          classNamePrefix="react-select"
+          styles={{
+            control: (base) => ({
+              ...base,
+              borderRadius: '0.5rem',
+              minHeight: '40px',
+              borderColor: getThemeClasses("input", currentTheme),
+              boxShadow: 'none',
+              fontSize: '1rem'
+            }),
+            menu: (base) => ({
+              ...base,
+              zIndex: 20
+            })
+          }}
+        />
+      </div>
+
+      <div>
+        <label
+          className={`block text-sm font-medium ${getThemeClasses(
+            "textSecondary",
+            currentTheme
+          )} mb-2`}
+        >
+          กลุ่มสินค้าเริ่มต้น
+        </label>
+        <Select
+          options={[
+            { value: "", label: "ทุกกลุ่มสินค้า" },
+            ...(groupFile ? groupFile.map(item => ({
+              value: item.GroupCode,
+              label: `${item.GroupCode}-${item.GroupName}`
+            })) : [])
+          ]}
+          value={(() => {
+            if (searchCriteria.GroupCode1 === "") return { value: "", label: "ทุกกลุ่มสินค้า" };
+            const found = groupFile?.find(item => item.GroupCode === searchCriteria.GroupCode1);
+            return found ? { value: found.GroupCode, label: `${found.GroupCode}-${found.GroupName}` } : null;
+          })()}
+          onChange={option =>
+            setSearchCriteria({
+              ...searchCriteria,
+              GroupCode1: option ? option.value : ""
+            })
+          }
+          isClearable
+          placeholder="กลุ่มเริ่มต้น"
+          classNamePrefix="react-select"
+          styles={{
+            control: (base) => ({
+              ...base,
+              borderRadius: '0.5rem',
+              minHeight: '40px',
+              borderColor: getThemeClasses("input", currentTheme),
+              boxShadow: 'none',
+              fontSize: '1rem'
+            }),
+            menu: (base) => ({
+              ...base,
+              zIndex: 20
+            })
+          }}
+        />
+      </div>
+      <div>
+        <label
+          className={`block text-sm font-medium ${getThemeClasses(
+            "textSecondary",
+            currentTheme
+          )} mb-2`}
+        >
+          กลุ่มสินค้าสิ้นสุด
+        </label>
+        <Select
+          options={[
+            { value: "", label: "ทุกกลุ่มสินค้า" },
+            ...(groupFile ? groupFile.map(item => ({
+              value: item.GroupCode,
+              label: `${item.GroupCode}-${item.GroupName}`
+            })) : [])
+          ]}
+          value={(() => {
+            if (searchCriteria.GroupCode2 === "") return { value: "", label: "ทุกกลุ่มสินค้า" };
+            const found = groupFile?.find(item => item.GroupCode === searchCriteria.GroupCode2);
+            return found ? { value: found.GroupCode, label: `${found.GroupCode}-${found.GroupName}` } : null;
+          })()}
+          onChange={option =>
+            setSearchCriteria({
+              ...searchCriteria,
+              GroupCode2: option ? option.value : ""
+            })
+          }
+          isClearable
+          placeholder="กลุ่มสิ้นสุด"
+          classNamePrefix="react-select"
+          styles={{
+            control: (base) => ({
+              ...base,
+              borderRadius: '0.5rem',
+              minHeight: '40px',
+              borderColor: getThemeClasses("input", currentTheme),
+              boxShadow: 'none',
+              fontSize: '1rem'
+            }),
+            menu: (base) => ({
+              ...base,
+              zIndex: 20
+            })
+          }}
+        />
+      </div>
+      <div>
+        <label
+          className={`block text-sm font-medium ${getThemeClasses(
+            "textSecondary",
+            currentTheme
+          )} mb-2`}
+        >
+          คลังสินค้า
+        </label>
+        <Select
+          options={[{ value: "", label: "ทุกคลัง" }, { value: "A1", label: "คลังสินค้าหลัก" }]}
+          value={(() => {
+            if (searchCriteria.S_Stk === "") return { value: "", label: "ทุกคลัง" };
+            if (searchCriteria.S_Stk === "A1") return { value: "A1", label: "คลังสินค้าหลัก" };
+            return null;
+          })()}
+          onChange={option =>
+            setSearchCriteria({
+              ...searchCriteria,
+              S_Stk: option ? option.value : ""
+            })
+          }
+          isClearable
+          placeholder="ทุกคลัง"
+          classNamePrefix="react-select"
+          styles={{
+            control: (base) => ({
+              ...base,
+              borderRadius: '0.5rem',
+              minHeight: '40px',
+              borderColor: getThemeClasses("input", currentTheme),
+              boxShadow: 'none',
+              fontSize: '1rem'
+            }),
+            menu: (base) => ({
+              ...base,
+              zIndex: 20
+            })
+          }}
+        />
+      </div>
+      <div>
+        <label
+          className={`block text-sm font-medium ${getThemeClasses(
+            "textSecondary",
+            currentTheme
+          )} mb-2`}
+        >
+          รหัสสินค้า
+        </label>
+        <input
+          type="text"
+          value={searchCriteria.BPCode}
+          onChange={(e) =>
+            setSearchCriteria({
+              ...searchCriteria,
+              BPCode: e.target.value
+            })
+          }
+          className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
+            "input",
+            currentTheme
+          )}`}
+          placeholder="ค้นหารหัสสินค้า"
+        />
+      </div>
+      </div>
 
         {/* Search Actions */}
         <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">

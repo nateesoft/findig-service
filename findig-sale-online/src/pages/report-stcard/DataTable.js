@@ -47,7 +47,7 @@ const DataTable = ({
       }
       acc[branchCode].items.push(item);
       acc[branchCode].totalItems += 1;
-      acc[branchCode].totalQty += Number(item.S_Que || 0);
+      acc[branchCode].totalQty += Number(item.S_Out || 0);
       return acc;
     }, {});
     
@@ -68,7 +68,7 @@ const DataTable = ({
       }
       acc[groupName].items.push(item);
       acc[groupName].totalItems += 1;
-      acc[groupName].totalQty += Number(item.S_Que || 0);
+      acc[groupName].totalQty += Number(item.S_Out || 0);
       return acc;
     }, {});
     
@@ -227,7 +227,7 @@ const DataTable = ({
                     <td>${item.S_Rem || ''}</td>
                     <td>${item.S_PCode || ''}</td>
                     <td>${item.PDesc || ''}</td>
-                    <td class="text-center">${item.S_Que || ''}</td>
+                    <td class="text-center">${item.S_Out || ''}</td>
                     <td class="text-center">${item.S_Stk || ''}</td>
                   </tr>
                 `).join('')}
@@ -270,7 +270,7 @@ const DataTable = ({
             item.S_Rem || '',
             item.S_PCode || '',
             `"${item.PDesc || ''}"`,
-            item.S_Que || '',
+            item.S_Out || '',
             item.S_Stk || ''
           ].join(','))
         ])
@@ -656,7 +656,7 @@ const DataTable = ({
                                       <span>{item.S_Rem}</span>
                                       <span>{item.S_PCode}</span>
                                       <span className="truncate" title={item.PDesc}>{item.PDesc}</span>
-                                      <span>{item.S_Que}</span>
+                                      <span>{item.S_Out}</span>
                                       <span>{item.S_Stk}</span>
                                     </div>
                                   </td>

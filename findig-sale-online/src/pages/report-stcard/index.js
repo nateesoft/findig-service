@@ -9,11 +9,13 @@ import { Modal } from '../../components/Modals';
 import { loadAllBranch } from '../../api/branchApi';
 import { loadAllGroupfile } from '../../api/groupfileApi';
 import { loadStcardReport } from '../../api/reportApi';
+import { loadAllSaleRem } from '../../api/saleRemApi';
 
 const Sales = () => {
   const [activeModal, setActiveModal] = useState(null);
   const [branchFile, setBranchFile] = useState([])
   const [groupFile, setGroupFile] = useState([])
+  const [saleRem, setSaleRem] = useState([])
 
   const { appData } = useContext(AppContext)
   const { currentTheme, branchCode } = appData
@@ -163,8 +165,29 @@ const Sales = () => {
         });
       }
     }
+    const initLoadAllSaleTypeRem = async () => {
+      const { data, error } = await loadAllSaleRem()
+      if(data) {
+        setSaleRem(data)
+      }
+      if(error) {
+        setActiveModal({
+          type: 'error',
+          title: 'แสดงข้อมูลประเภทการขายทั้งหมด',
+          message: error || 'พบปัญหาในการแสดงรายการประเภทการขายทั้งหมด',
+          actions: [
+            {
+              label: 'ตกลง',
+              onClick: () => setActiveModal(null)
+            }
+          ]
+        });
+      }
+    }
+
     initLoadAllbranch()
     initLoadAllGroupfile()
+    initLoadAllSaleTypeRem()
   }, [])
 
   return (
@@ -195,6 +218,7 @@ const Sales = () => {
           isLoading={isLoading}
           branchFile={branchFile}
           groupFile={groupFile}
+          saleRem={saleRem}
         />
       )}
 
