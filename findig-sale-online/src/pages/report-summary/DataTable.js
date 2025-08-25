@@ -11,6 +11,7 @@ import {
   Printer,
   Download
 } from 'lucide-react';
+import * as XLSX from 'xlsx';
 
 const DataTable = ({
   getThemeClasses,
@@ -142,35 +143,35 @@ const DataTable = ({
 
   // ฟังก์ชันสำหรับ export Excel
   const handleExportExcel = () => {
-    // สร้างข้อมูล CSV
-    const headers = [
-      'สาขา', 'กลุ่มสินค้า', 'รหัสสินค้า', 'ชื่อสินค้า', 'คงเหลือล่าสุด', 'คลัง'
-    ];
+    // สร้างข้อมูล Excel
+    const worksheetData = [];
     
-    const csvContent = [
-      headers.join(','),
-      ...sortedSales.map(item => [
+    // เพิ่ม headers
+    worksheetData.push([
+      'สาขา', 'กลุ่มสินค้า', 'รหัสสินค้า', 'ชื่อสินค้า', 'คงเหลือล่าสุด', 'คลัง'
+    ]);
+    
+    // เพิ่มข้อมูล
+    sortedSales.forEach(item => {
+      worksheetData.push([
         item.Branch || '',
         item.PGroup || '',
         item.BPCode || '',
-        `"${item.PDesc || ''}"`,
+        item.PDesc || '',
         item.BQty24 || '',
         item.BStk || ''
-      ].join(','))
-    ].join('\n');
+      ]);
+    });
 
-    // สร้างไฟล์และดาวน์โหลด
-    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    if (link.download !== undefined) {
-      const url = URL.createObjectURL(blob);
-      link.setAttribute('href', url);
-      link.setAttribute('download', `รายงานภาพรวมสินค้า_${new Date().toISOString().split('T')[0]}.csv`);
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
+    // สร้าง worksheet
+    const ws = XLSX.utils.aoa_to_sheet(worksheetData);
+    
+    // สร้าง workbook
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'รายงานภาพรวมสินค้า');
+    
+    // ดาวน์โหลดไฟล์
+    XLSX.writeFile(wb, `รายงานภาพรวมสินค้า_${new Date().toISOString().split('T')[0]}.xlsx`);
   };
 
   // ฟังก์ชันสำหรับแสดงไอคอน sort

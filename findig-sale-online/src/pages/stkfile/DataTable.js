@@ -11,6 +11,7 @@ import {
   Printer,
   Download
 } from 'lucide-react';
+import * as XLSX from 'xlsx';
 
 const SaleTable = ({
     getThemeClasses,
@@ -138,18 +139,21 @@ const SaleTable = ({
 
   // ฟังก์ชันสำหรับ export Excel
   const handleExportExcel = () => {
-    // สร้างข้อมูล CSV
-    const headers = [
-      'สาขา', 'กลุ่ม', 'รหัสสินค้า', 'ชื่อสินค้า', 'M24', 'คลัง', 'M13', 'M14', 'M15', 'M16', 'M17', 'M18', 'M19', 'M20', 'M21', 'M22', 'M23', 'Sync Data'
-    ];
+    // สร้างข้อมูล Excel
+    const worksheetData = [];
     
-    const csvContent = [
-      headers.join(','),
-      ...sortedSales.map(item => [
+    // เพิ่ม headers
+    worksheetData.push([
+      'สาขา', 'กลุ่ม', 'รหัสสินค้า', 'ชื่อสินค้า', 'M24', 'คลัง', 'M13', 'M14', 'M15', 'M16', 'M17', 'M18', 'M19', 'M20', 'M21', 'M22', 'M23', 'Sync Data'
+    ]);
+    
+    // เพิ่มข้อมูล
+    sortedSales.forEach(item => {
+      worksheetData.push([
         item.Branch || '',
         item.GroupName || '',
         item.BPCode || '',
-        `"${item.PDesc || ''}"`,
+        item.PDesc || '',
         item.BQty24 || '',
         item.BStk || '',
         item.BQty13 || '',
@@ -164,21 +168,18 @@ const SaleTable = ({
         item.BQty22 || '',
         item.BQty23 || '',
         item.SendToPOS || ''
-      ].join(','))
-    ].join('\n');
+      ]);
+    });
 
-    // สร้างไฟล์และดาวน์โหลด
-    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    if (link.download !== undefined) {
-      const url = URL.createObjectURL(blob);
-      link.setAttribute('href', url);
-      link.setAttribute('download', `ข้อมูลสินค้าคงเหลือ_${new Date().toISOString().split('T')[0]}.csv`);
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
+    // สร้าง worksheet
+    const ws = XLSX.utils.aoa_to_sheet(worksheetData);
+    
+    // สร้าง workbook
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'ข้อมูลสินค้าคงเหลือ');
+    
+    // ดาวน์โหลดไฟล์
+    XLSX.writeFile(wb, `ข้อมูลสินค้าคงเหลือ_${new Date().toISOString().split('T')[0]}.xlsx`);
   };
 
   // ฟังก์ชันสำหรับแสดงไอคอน sort

@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import moment from 'moment';
 import { useState, useEffect } from 'react';
+import * as XLSX from 'xlsx';
 
 const DataTable = ({
     getThemeClasses,
@@ -162,35 +163,35 @@ const DataTable = ({
 
   // ฟังก์ชันสำหรับ export Excel
   const handleExportExcel = () => {
-    // สร้างข้อมูล CSV
-    const headers = [
-      'เลขที่ใบเสร็จ', 'วันที่สร้างเอกสาร', 'จำนวนสินค้า', 'พนักงานทำรายการ', 'สาขา', 'สถานะ POST'
-    ];
+    // สร้างข้อมูล Excel
+    const worksheetData = [];
     
-    const csvContent = [
-      headers.join(','),
-      ...sortedSales.map(item => [
+    // เพิ่ม headers
+    worksheetData.push([
+      'เลขที่ใบเสร็จ', 'วันที่สร้างเอกสาร', 'จำนวนสินค้า', 'พนักงานทำรายการ', 'สาขา', 'สถานะ POST'
+    ]);
+    
+    // เพิ่มข้อมูล
+    sortedSales.forEach(item => {
+      worksheetData.push([
         item.billno || '',
         moment(item.document_date).format('DD/MM/YYYY HH:mm:ss'),
         item.total_item || '',
         item.emp_code || '',
         item.branch_code || '',
         item.post_status || ''
-      ].join(','))
-    ].join('\n');
+      ]);
+    });
 
-    // สร้างไฟล์และดาวน์โหลด
-    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    if (link.download !== undefined) {
-      const url = URL.createObjectURL(blob);
-      link.setAttribute('href', url);
-      link.setAttribute('download', `รายการข้อมูลการขาย_${new Date().toISOString().split('T')[0]}.csv`);
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
+    // สร้าง worksheet
+    const ws = XLSX.utils.aoa_to_sheet(worksheetData);
+    
+    // สร้าง workbook
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'รายการข้อมูลการขาย');
+    
+    // ดาวน์โหลดไฟล์
+    XLSX.writeFile(wb, `รายการข้อมูลการขาย_${new Date().toISOString().split('T')[0]}.xlsx`);
   };
 
   // ฟังก์ชันสำหรับแสดงไอคอน sort

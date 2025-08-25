@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import moment from 'moment';
 import React from 'react';
+import * as XLSX from 'xlsx';
 
 const DataTable = ({
     getThemeClasses,
@@ -251,44 +252,54 @@ const DataTable = ({
 
   // ฟังก์ชันสำหรับ export Excel
   const handleExportExcel = () => {
-    // สร้างข้อมูล CSV
-    const headers = [
-      'สาขา', 'กลุ่มสินค้า', 'วันที่', 'เลขที่บิล', 'ประเภท', 'รหัสสินค้า', 'ชื่อสินค้า', 'จำนวน', 'คลัง'
-    ];
+    // สร้างข้อมูล Excel
+    const worksheetData = [];
     
-    const csvContent = [
-      headers.join(','),
-      ...sortedGroups.flatMap(group => [
-        [`สาขา: ${group.branchCode}`, `${group.totalItems} รายการ`, `รวม ${group.totalQty} ชิ้น`, '', '', '', '', '', ''].join(','),
-        ...groupByProductGroup(group.items).flatMap(productGroup => [
-          [`  กลุ่ม: ${productGroup.groupName}`, `${productGroup.totalItems} รายการ`, `รวม ${productGroup.totalQty} ชิ้น`, '', '', '', '', '', ''].join(','),
-          ...productGroup.items.map(item => [
+    // เพิ่ม headers
+    worksheetData.push([
+      'สาขา', 'กลุ่มสินค้า', 'วันที่', 'เลขที่บิล', 'ประเภท', 'รหัสสินค้า', 'ชื่อสินค้า', 'จำนวน', 'คลัง'
+    ]);
+    
+    // เพิ่มข้อมูล
+    sortedGroups.forEach(group => {
+      // แถวสรุปสาขา
+      worksheetData.push([
+        `สาขา: ${group.branchCode}`, `${group.totalItems} รายการ`, `รวม ${group.totalQty} ชิ้น`, '', '', '', '', '', ''
+      ]);
+      
+      // กลุ่มสินค้าแต่ละกลุ่ม
+      groupByProductGroup(group.items).forEach(productGroup => {
+        // แถวสรุปกลุ่มสินค้า
+        worksheetData.push([
+          `  กลุ่ม: ${productGroup.groupName}`, `${productGroup.totalItems} รายการ`, `รวม ${productGroup.totalQty} ชิ้น`, '', '', '', '', '', ''
+        ]);
+        
+        // รายการสินค้าในกลุ่ม
+        productGroup.items.forEach(item => {
+          worksheetData.push([
             item.S_Bran || '',
             item.GroupName || '',
             moment(item.S_Date).format('DD/MM/YYYY'),
             item.S_No || '',
             item.S_Rem || '',
             item.S_PCode || '',
-            `"${item.PDesc || ''}"`,
+            item.PDesc || '',
             item.S_Out || '',
             item.S_Stk || ''
-          ].join(','))
-        ])
-      ])
-    ].join('\n');
+          ]);
+        });
+      });
+    });
 
-    // สร้างไฟล์และดาวน์โหลด
-    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    if (link.download !== undefined) {
-      const url = URL.createObjectURL(blob);
-      link.setAttribute('href', url);
-      link.setAttribute('download', `รายงานความเคลื่อนไหวสินค้า_${new Date().toISOString().split('T')[0]}.csv`);
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
+    // สร้าง worksheet
+    const ws = XLSX.utils.aoa_to_sheet(worksheetData);
+    
+    // สร้าง workbook
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'รายงานความเคลื่อนไหวสินค้า');
+    
+    // ดาวน์โหลดไฟล์
+    XLSX.writeFile(wb, `รายงานความเคลื่อนไหวสินค้า_${new Date().toISOString().split('T')[0]}.xlsx`);
   };
 
   // ฟังก์ชันสำหรับแสดงไอคอน sort

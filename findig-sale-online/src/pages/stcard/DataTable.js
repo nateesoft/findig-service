@@ -12,6 +12,7 @@ import {
   Download
 } from 'lucide-react';
 import moment from 'moment';
+import * as XLSX from 'xlsx';
 
 const DataTable = ({
     getThemeClasses,
@@ -157,39 +158,39 @@ const DataTable = ({
 
   // ฟังก์ชันสำหรับ export Excel
   const handleExportExcel = () => {
-    // สร้างข้อมูล CSV
-    const headers = [
-      'สาขา', 'วันที่สร้าง', 'เลขที่บิล', 'กลุ่มสินค้า', 'รหัสสินค้า', 'ชื่อสินค้า', 'จำนวน', 'คลัง', 'ประเภท', 'Sync Data'
-    ];
+    // สร้างข้อมูล Excel
+    const worksheetData = [];
     
-    const csvContent = [
-      headers.join(','),
-      ...sortedSales.map(item => [
+    // เพิ่ม headers
+    worksheetData.push([
+      'สาขา', 'วันที่สร้าง', 'เลขที่บิล', 'กลุ่มสินค้า', 'รหัสสินค้า', 'ชื่อสินค้า', 'จำนวน', 'คลัง', 'ประเภท', 'Sync Data'
+    ]);
+    
+    // เพิ่มข้อมูล
+    sortedSales.forEach(item => {
+      worksheetData.push([
         item.S_Bran || '',
         moment(item.S_Date).format('DD/MM/YYYY'),
         item.S_No || '',
         item.GroupName || '',
         item.S_PCode || '',
-        `"${item.PDesc || ''}"`,
+        item.PDesc || '',
         item.S_Out || '',
         item.S_Stk || '',
         item.S_Rem || '',
         item.Data_Sync || ''
-      ].join(','))
-    ].join('\n');
+      ]);
+    });
 
-    // สร้างไฟล์และดาวน์โหลด
-    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    if (link.download !== undefined) {
-      const url = URL.createObjectURL(blob);
-      link.setAttribute('href', url);
-      link.setAttribute('download', `ข้อมูลความเคลื่อนไหวสินค้า_${new Date().toISOString().split('T')[0]}.csv`);
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
+    // สร้าง worksheet
+    const ws = XLSX.utils.aoa_to_sheet(worksheetData);
+    
+    // สร้าง workbook
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'ข้อมูลความเคลื่อนไหวสินค้า');
+    
+    // ดาวน์โหลดไฟล์
+    XLSX.writeFile(wb, `ข้อมูลความเคลื่อนไหวสินค้า_${new Date().toISOString().split('T')[0]}.xlsx`);
   };
 
   // ฟังก์ชันสำหรับแสดงไอคอน sort

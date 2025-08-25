@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import moment from 'moment';
 import React, { useState, useEffect } from 'react';
+import * as XLSX from 'xlsx';
 
 const DataTable = ({
     getThemeClasses,
@@ -209,41 +210,63 @@ const DataTable = ({
 
   // ฟังก์ชันสำหรับ export Excel
   const handleExportExcel = () => {
-    // สร้างข้อมูล CSV
-    const headers = [
-      'เลขที่ใบเสร็จ', 'วันที่ออกใบเสร็จ', 'เวลา', 'จำนวนขาย', 'รหัสสินค้า', 'ชื่อสินค้า', 'หมวดสินค้า', 'สาขา', 'พนักงาน'
-    ];
+    // สร้างข้อมูลสำหรับ Excel
+    const data = [];
     
-    const csvContent = [
-      headers.join(','),
-      ...sortedGroups.flatMap(group => [
-        [`สาขา: ${group.branch_code}`, `${group.totalBills} บิล`, `รวม ${group.totalItems} สินค้า`, '', '', '', '', '', ''].join(','),
-        ...group.items.map(item => [
+    // เพิ่ม header
+    data.push([
+      'เลขที่ใบเสร็จ', 'วันที่ออกใบเสร็จ', 'เวลา', 'จำนวนขาย', 'รหัสสินค้า', 'ชื่อสินค้า', 'หมวดสินค้า', 'สาขา', 'พนักงาน'
+    ]);
+    
+    // เพิ่มข้อมูลแต่ละสาขา
+    sortedGroups.forEach(group => {
+      // เพิ่มแถวหัวสาขา
+      data.push([
+        `สาขา: ${group.branch_code}`, `${group.totalBills} บิล`, `รวม ${group.totalItems} สินค้า`, '', '', '', '', '', ''
+      ]);
+      
+      // เพิ่มข้อมูลรายการในสาขา
+      group.items.forEach(item => {
+        data.push([
           item.billno || '',
           moment(item.document_date).format('DD/MM/YYYY'),
           moment(item.document_date).format('HH:mm:ss'),
           item.qty || '',
           item.barcode || '',
-          `"${item.product_name || ''}"`,
+          item.product_name || '',
           item.PGroup || '',
           item.branch_code || '',
           item.emp_code || ''
-        ].join(','))
-      ])
-    ].join('\n');
+        ]);
+      });
+    });
 
-    // สร้างไฟล์และดาวน์โหลด
-    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    if (link.download !== undefined) {
-      const url = URL.createObjectURL(blob);
-      link.setAttribute('href', url);
-      link.setAttribute('download', `รายงานการเปิดบิลด้วยมือ แยกตามสาขา_${new Date().toISOString().split('T')[0]}.csv`);
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
+    // สร้าง workbook และ worksheet
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    
+    // กำหนดความกว้างของคอลัมน์
+    const colWidths = [
+      { wch: 15 }, // เลขที่ใบเสร็จ
+      { wch: 12 }, // วันที่ออกใบเสร็จ
+      { wch: 10 }, // เวลา
+      { wch: 10 }, // จำนวนขาย
+      { wch: 15 }, // รหัสสินค้า
+      { wch: 30 }, // ชื่อสินค้า
+      { wch: 15 }, // หมวดสินค้า
+      { wch: 10 }, // สาขา
+      { wch: 10 }  // พนักงาน
+    ];
+    ws['!cols'] = colWidths;
+    
+    // เพิ่ม worksheet เข้า workbook
+    XLSX.utils.book_append_sheet(wb, ws, 'รายงานการเปิดบิลด้วยมือ');
+    
+    // สร้างชื่อไฟล์
+    const filename = `รายงานการเปิดบิลด้วยมือ แยกตามสาขา_${new Date().toISOString().split('T')[0]}.xlsx`;
+    
+    // ดาวน์โหลดไฟล์
+    XLSX.writeFile(wb, filename);
   };
 
   // ฟังก์ชันสำหรับแสดงไอคอน sort
