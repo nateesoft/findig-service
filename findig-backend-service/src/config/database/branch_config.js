@@ -5,21 +5,21 @@ module.exports = [
     driver: 'mysql',
     databases: {
       pos: {
-        host: 'findigrealtime.dyndns.biz',
+        host: '183.88.210.11',
         user: 'root',
         password: 'P@ssword!#',
         database: 'MyRetail652findigColo',
         port: '3326'
       },
       crm: {
-        host: 'findigrealtime.dyndns.biz',
+        host: '183.88.210.11',
         user: 'root',
         password: 'P@ssword!#',
         database: 'MyCrmBranch',
         port: '3326'
       },
       bor: {
-        host: 'findigrealtime.dyndns.biz',
+        host: '183.88.210.11',
         user: 'root',
         password: 'P@ssword!#',
         database: 'MyBorLocal',

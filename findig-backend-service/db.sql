@@ -1,0 +1,627 @@
+-- MyRetail652findigColo.stcard definition
+
+CREATE TABLE `stcard` (
+  `S_Date` date NOT NULL,
+  `S_No` varchar(20) NOT NULL default '',
+  `S_SubNo` varchar(15) default NULL,
+  `S_Que` int(10) unsigned NOT NULL default '0',
+  `S_PCode` varchar(16) NOT NULL default '',
+  `S_Stk` char(3) NOT NULL default '',
+  `S_In` float(10,3) NOT NULL default '0.000',
+  `S_Out` float(10,3) NOT NULL default '0.000',
+  `S_InCost` float(10,2) NOT NULL default '0.00',
+  `S_OutCost` float(10,2) NOT NULL default '0.00',
+  `S_ACost` float(10,2) NOT NULL default '0.00',
+  `S_Rem` varchar(5) NOT NULL default '',
+  `S_User` varchar(6) NOT NULL default '',
+  `S_EntryDate` date NOT NULL,
+  `S_EntryTime` varchar(10) NOT NULL default '',
+  `S_Link` varchar(80) default NULL,
+  `S_Bran` varchar(20) default NULL,
+  `Data_Sync` varchar(1) default 'N',
+  `Source_Data` varchar(30) default 'POS'
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- MyRetail652findigColo.stkfile definition
+
+CREATE TABLE `stkfile` (
+  `BPCode` varchar(16) NOT NULL default '',
+  `BStk` char(4) NOT NULL default '',
+  `BQty` float(12,3) NOT NULL default '0.000',
+  `BAmt` float(12,2) NOT NULL default '0.00',
+  `BTotalAmt` float(12,2) NOT NULL default '0.00',
+  `BQty0` float(12,3) NOT NULL default '0.000',
+  `BQty1` float(12,3) NOT NULL default '0.000',
+  `BQty2` float(12,3) NOT NULL default '0.000',
+  `BQty3` float(12,3) NOT NULL default '0.000',
+  `BQty4` float(12,3) NOT NULL default '0.000',
+  `BQty5` float(12,3) NOT NULL default '0.000',
+  `BQty6` float(12,3) NOT NULL default '0.000',
+  `BQty7` float(12,3) NOT NULL default '0.000',
+  `BQty8` float(12,3) NOT NULL default '0.000',
+  `BQty9` float(12,3) NOT NULL default '0.000',
+  `BQty10` float(12,3) NOT NULL default '0.000',
+  `BQty11` float(12,3) NOT NULL default '0.000',
+  `BQty12` float(12,3) NOT NULL default '0.000',
+  `BQty13` float(12,3) NOT NULL default '0.000',
+  `BQty14` float(12,3) NOT NULL default '0.000',
+  `BQty15` float(12,3) NOT NULL default '0.000',
+  `BQty16` float(12,3) NOT NULL default '0.000',
+  `BQty17` float(12,3) NOT NULL default '0.000',
+  `BQty18` float(12,3) NOT NULL default '0.000',
+  `BQty19` float(12,3) NOT NULL default '0.000',
+  `BQty20` float(12,3) NOT NULL default '0.000',
+  `BQty21` float(12,3) NOT NULL default '0.000',
+  `BQty22` float(12,3) NOT NULL default '0.000',
+  `BQty23` float(12,3) NOT NULL default '0.000',
+  `BQty24` float(12,3) NOT NULL default '0.000',
+  `Branch` char(10) NOT NULL default '',
+  `LastUpdate` varchar(10) default '0000:00:00',
+  `LastTimeUpdate` varchar(8) default '00:00:00',
+  `SendToPOS` char(1) default 'N',
+  PRIMARY KEY  (`BPCode`,`BStk`,`Branch`),
+  KEY `idx_stkfile_BPCode` (`BPCode`),
+  KEY `idx_stkfile_Branch` (`Branch`),
+  KEY `idx_stkfile_BStk` (`BStk`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- MyRetail652findigColo.product definition
+
+CREATE TABLE `product` (
+  `PCode` varchar(16) NOT NULL default '',
+  `PBarCode` varchar(13) default NULL,
+  `PFix` char(1) NOT NULL default 'F',
+  `PReferent` varchar(15) default '',
+  `PActive` char(1) NOT NULL default 'Y',
+  `PAccNo` varchar(10) default NULL,
+  `PGroup` varchar(4) NOT NULL default '',
+  `PVender` varchar(6) NOT NULL,
+  `ptype` char(1) NOT NULL default '1',
+  `PAccCost` float(12,2) NOT NULL default '0.00',
+  `PNormal` char(1) NOT NULL default 'C',
+  `PRemark` varchar(50) default NULL,
+  `PDiscount` char(1) NOT NULL default 'Y',
+  `PService` char(1) NOT NULL default 'Y',
+  `PStatus` char(1) NOT NULL default 'P',
+  `PStock` char(1) NOT NULL default 'Y',
+  `PSet` char(1) NOT NULL default 'N',
+  `PVat` char(1) NOT NULL default 'V',
+  `PDesc` varchar(250) default NULL,
+  `PUnit1` varchar(10) default '',
+  `PPack1` int(11) default '0',
+  `PArea` varchar(15) default '',
+  `PKic` char(1) NOT NULL default '0',
+  `PPrice11` float(13,2) NOT NULL default '0.00',
+  `PPrice12` float(13,2) NOT NULL default '0.00',
+  `PPrice13` float(13,2) NOT NULL default '0.00',
+  `PPrice14` float(13,2) NOT NULL default '0.00',
+  `PPrice15` float(13,2) NOT NULL default '0.00',
+  `PPromotion1` char(3) default '',
+  `PPromotion2` char(3) default '',
+  `PPromotion3` char(3) default NULL,
+  `PMax` float(13,4) NOT NULL default '0.0000',
+  `PMin` float(13,4) NOT NULL default '0.0000',
+  `PBUnit` varchar(10) default '',
+  `PBPack` float(13,4) default NULL,
+  `PLCost` float(13,4) NOT NULL default '0.0000',
+  `PSCost` float(13,4) NOT NULL default '0.0000',
+  `PACost` float(13,4) default NULL,
+  `PLink1` varchar(13) default '',
+  `PLink2` varchar(13) default '',
+  `PLastUpdate` date,
+  `PLastTime` time default '00:00:00',
+  `PUserUpdate` varchar(6) default '',
+  `PAbDept` varchar(4) default NULL,
+  `PAbType` char(1) NOT NULL default 'F',
+  `Flage` char(1) NOT NULL default 'N',
+  `FGCode` varchar(16) default NULL,
+  `PSPVat` char(1) NOT NULL default 'N',
+  `PSPVatAmt` float(13,2) NOT NULL default '0.00',
+  `PMemSum` char(1) NOT NULL default 'N',
+  `PLastSale` date default NULL,
+  `POSStk` char(1) NOT NULL default '0',
+  `MSStk` char(3) NOT NULL default 'A1',
+  `POrder` char(1) NOT NULL default '0',
+  `PTimeCharge` float(10,2) NOT NULL default '0.00',
+  `PFoodType` char(1) NOT NULL default '0',
+  `PChkDate` date NOT NULL,
+  `PPackOld` int(3) unsigned NOT NULL default '0',
+  `PSelectItem` char(1) NOT NULL default 'N',
+  `PSelectNum` int(10) unsigned NOT NULL default '0',
+  `PSelectShow` char(1) NOT NULL default 'N',
+  `PVatBase` varchar(10) default NULL,
+  `PExChange` char(1) default 'N',
+  PRIMARY KEY  (`PCode`),
+  UNIQUE KEY `Porduct_PCode` (`PCode`),
+  KEY `idx_product_PCode` (`PCode`),
+  KEY `idx_product_PGroup` (`PGroup`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- MyRetail652findigColo.groupfile definition
+
+CREATE TABLE `groupfile` (
+  `GroupCode` varchar(4) NOT NULL default '',
+  `GroupName` varchar(50) default NULL,
+  PRIMARY KEY  (`GroupCode`),
+  KEY `idx_groupfile_GroupCode` (`GroupCode`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- MyRetail652findigColo.branfile definition
+
+CREATE TABLE `branfile` (
+  `Code` char(4) NOT NULL default 'XXXX',
+  `Name` varchar(50) NOT NULL default 'New Branch',
+  `BType` char(2) NOT NULL default '00',
+  `BStk` char(3) default NULL,
+  `BArea` char(2) default NULL,
+  `BSize` char(2) default NULL,
+  `BPlane` char(2) default NULL,
+  `BStore` char(2) default NULL,
+  `CrArea` char(2) default NULL,
+  `CrType` char(1) NOT NULL default '1',
+  `RjArea` char(2) default NULL,
+  `ACArea` char(2) default NULL,
+  `AddressNo` varchar(150) default NULL,
+  `Locality` varchar(30) default NULL,
+  `SubProvince` varchar(30) default NULL,
+  `Province` varchar(30) default NULL,
+  `Post` varchar(5) default NULL,
+  `Tel_No` varchar(30) default NULL,
+  `Fax_No` varchar(30) default NULL,
+  `E_Mail` varchar(50) default NULL,
+  `Manager` varchar(50) default NULL,
+  `Location_Area` char(2) default NULL,
+  `Ser_Area` float(10,2) NOT NULL default '0.00',
+  `Cou_Area` float(10,2) NOT NULL default '0.00',
+  `Kic_Area` float(10,2) NOT NULL default '0.00',
+  `Tot_Area` float(10,2) NOT NULL default '0.00',
+  `Cost` float(10,2) NOT NULL default '0.00',
+  `Charge` float(10,2) NOT NULL default '0.00',
+  `FlageCost` char(1) NOT NULL default 'N',
+  `Gp` float(10,2) NOT NULL default '0.00',
+  `GP2` float(10,2) NOT NULL default '0.00',
+  `FlageGp` char(1) NOT NULL default 'N',
+  `TMac1` varchar(20) default NULL,
+  `Remark` text,
+  `TMac2` varchar(20) default NULL,
+  `TMac3` varchar(20) default NULL,
+  `BVatType` char(1) default 'I',
+  `BGCode` char(3) default NULL,
+  `PT1` varchar(13) default NULL,
+  `PT2` varchar(13) default NULL,
+  `PT3` varchar(13) default NULL,
+  `PT4` varchar(13) default NULL,
+  `PT5` varchar(13) default NULL,
+  `TMacNo1` char(3) default NULL,
+  `TMacNo2` char(3) default NULL,
+  `TMacNo3` char(3) default NULL,
+  `BVat` float NOT NULL default '7',
+  `CustomerCode` varchar(10) default NULL,
+  `Inventory` varchar(10) default NULL,
+  `Location` varchar(10) default NULL,
+  PRIMARY KEY  (`Code`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- MyRetail652findigColo.branch definition
+
+CREATE TABLE `branch` (
+  `Code` char(4) default NULL,
+  `Name` varchar(50) NOT NULL default 'New Branch',
+  `AddressNo` varchar(50) default NULL,
+  `Locality` varchar(30) default NULL,
+  `SubProvince` varchar(30) default NULL,
+  `Province` varchar(30) default NULL,
+  `Post` varchar(5) default NULL,
+  `Tel_No` varchar(30) default NULL,
+  `Fax_No` varchar(30) default NULL,
+  `E_Mail` varchar(50) default NULL,
+  `Manager` varchar(50) default NULL,
+  `Location_Area` char(2) default NULL,
+  `Ser_Area` float(10,2) NOT NULL default '0.00',
+  `Cou_Area` float(10,2) NOT NULL default '0.00',
+  `Kic_Area` float(10,2) NOT NULL default '0.00',
+  `Tot_Area` float(10,2) NOT NULL default '0.00',
+  `Cost` float(10,2) NOT NULL default '0.00',
+  `Charge` float(10,2) NOT NULL default '0.00',
+  `FlageCost` char(1) NOT NULL default 'N',
+  `Gp` float(10,2) NOT NULL default '0.00',
+  `FlageGp` char(1) NOT NULL default 'N',
+  `Remark` varchar(200) default NULL,
+  `ArBillNo` float(7,0) NOT NULL default '1',
+  `EarneatBillNo` float(7,0) NOT NULL default '1',
+  `ReturnBillNo` float(7,0) NOT NULL default '1',
+  `PrintAutoSumDate` date default NULL,
+  `SaveOrder` char(1) NOT NULL default 'N',
+  `SaveOrderCopy` char(1) NOT NULL default 'N',
+  `SaveOrderChk` char(1) NOT NULL default 'N',
+  `KIC1` char(1) NOT NULL default 'N',
+  `KIC2` char(1) NOT NULL default 'N',
+  `KIC3` char(1) NOT NULL default 'N',
+  `KIC4` char(1) NOT NULL default 'N',
+  `KIC5` char(1) NOT NULL default 'N',
+  `KIC6` char(1) NOT NULL default 'N',
+  `KIC7` char(1) NOT NULL default 'N',
+  `KIC8` char(1) NOT NULL default 'N',
+  `KIC9` char(1) NOT NULL default 'N',
+  `SmartCard` char(1) NOT NULL default 'N',
+  `GetFile` varchar(30) default NULL,
+  `RetFile` varchar(30) default NULL,
+  `PointFile` varchar(30) default NULL,
+  `CntLoop` int(10) default NULL,
+  `InvNo` float NOT NULL default '1',
+  `InvCashNo` float NOT NULL default '1',
+  `InvCash` float NOT NULL default '1',
+  `InvActive` char(1) NOT NULL default 'Y',
+  `CreditAct` char(3) default NULL,
+  `PromotionGP` varchar(30) default NULL,
+  `LockTime` int(11) NOT NULL default '0',
+  `KicItemNo` int(11) NOT NULL default '0',
+  `PT1` varchar(13) default NULL,
+  `PT2` varchar(13) default NULL,
+  `PT3` varchar(13) default NULL,
+  `PT4` varchar(13) default NULL,
+  `PT5` varchar(13) default NULL,
+  `PONO` int(10) NOT NULL default '1',
+  `PrintKicForm` char(1) NOT NULL default '1',
+  `PrintInvForm` char(1) NOT NULL default '1',
+  `PSelectStk` char(1) NOT NULL default 'P',
+  `PStkChk` char(1) NOT NULL default 'N',
+  `PMinStkChk` char(1) NOT NULL default 'N',
+  `RoundUpTime` float NOT NULL default '0',
+  `GiftStatusChk` char(1) NOT NULL default 'N',
+  `KICCopy1` char(1) NOT NULL default '1',
+  `KICCopy2` char(1) NOT NULL default '1',
+  `KICCopy3` char(1) NOT NULL default '1',
+  `KICCopy4` char(1) NOT NULL default '1',
+  `KICCopy5` char(1) NOT NULL default '1',
+  `KICCopy6` char(1) NOT NULL default '1',
+  `KICCopy7` char(1) NOT NULL default '1',
+  `KICCopy8` char(1) NOT NULL default '1',
+  `KICCopy9` char(1) NOT NULL default '1',
+  `KICChk1` char(1) NOT NULL default 'N',
+  `KICChk2` char(1) NOT NULL default 'N',
+  `KICChk3` char(1) NOT NULL default 'N',
+  `KICChk4` char(1) NOT NULL default 'N',
+  `KICChk5` char(1) NOT NULL default 'N',
+  `KICChk6` char(1) NOT NULL default 'N',
+  `KICChk7` char(1) NOT NULL default 'N',
+  `KICChk8` char(1) NOT NULL default 'N',
+  `KICChk9` char(1) NOT NULL default 'N',
+  `UpdateBranchPoint` char(1) NOT NULL default 'Y',
+  `KicName1` varchar(15) default NULL,
+  `KicName2` varchar(15) default NULL,
+  `KicName3` varchar(15) default NULL,
+  `KicName4` varchar(15) default NULL,
+  `KicName5` varchar(15) default NULL,
+  `KicName6` varchar(15) default NULL,
+  `KicName7` varchar(15) default NULL,
+  `KicName8` varchar(15) default NULL,
+  `KicName9` varchar(15) default NULL,
+  `KicPrintOnReceipt1` char(1) default NULL,
+  `KicPrintOnReceipt2` char(1) default NULL,
+  `KicPrintOnReceipt3` char(1) default NULL,
+  `KicPrintOnReceipt4` char(1) default NULL,
+  `KicPrintOnReceipt5` char(1) default NULL,
+  `KicPrintOnReceipt6` char(1) default NULL,
+  `KicPrintOnReceipt7` char(1) default NULL,
+  `KicPrintOnReceipt8` char(1) default NULL,
+  `KicPrintOnReceipt9` char(1) default NULL,
+  `KicQue` int(5) unsigned default NULL,
+  `KIC10` char(1) default NULL,
+  `KICChk10` char(1) default NULL,
+  `KicName10` varchar(15) default NULL,
+  `KicPrintOnReceipt10` char(1) default NULL,
+  `Kic11` char(1) default NULL,
+  `Kic12` char(1) default NULL,
+  `Kic13` char(1) default NULL,
+  `Kic14` char(1) default NULL,
+  `Kic15` char(1) default NULL,
+  `Kic16` char(1) default NULL,
+  `Kic17` char(1) default NULL,
+  `Kic18` char(1) default NULL,
+  `Kic19` char(1) default NULL,
+  `Kic20` char(1) default NULL,
+  `KicCopy11` char(1) default NULL,
+  `KicCopy12` char(1) default NULL,
+  `KicCopy13` char(1) default NULL,
+  `KicCopy14` char(1) default NULL,
+  `KicCopy15` char(1) default NULL,
+  `KicCopy16` char(1) default NULL,
+  `KicCopy17` char(1) default NULL,
+  `KicCopy18` char(1) default NULL,
+  `KicCopy19` char(1) default NULL,
+  `KicCopy20` char(1) default NULL,
+  `KicChk11` char(1) default NULL,
+  `KicChk12` char(1) default NULL,
+  `KicChk13` char(1) default NULL,
+  `KicChk14` char(1) default NULL,
+  `KicChk15` char(1) default NULL,
+  `KicChk16` char(1) default NULL,
+  `KicChk17` char(1) default NULL,
+  `KicChk18` char(1) default NULL,
+  `KicChk19` char(1) default NULL,
+  `KicChk20` char(1) default NULL,
+  `KicCopy10` char(1) default NULL,
+  `IMG_HOME_PATH` varchar(100) default NULL,
+  `INVHead` char(3) default NULL,
+  `INVCheckAuto` char(1) default NULL,
+  `taxid` varchar(15) default NULL,
+  `KicCopy` int(2) unsigned default NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- MyRetail652findigColo.posuser definition
+
+CREATE TABLE `posuser` (
+  `UserName` varchar(6) NOT NULL default '0',
+  `Password` varchar(20) NOT NULL default '',
+  `Name` varchar(40) default NULL,
+  `UserGroup` varchar(15) default NULL,
+  `OnACT` char(1) NOT NULL default 'N',
+  `MacNo` char(3) default NULL,
+  `Sale1` char(1) NOT NULL default 'N',
+  `Sale2` char(1) NOT NULL default 'N',
+  `Sale3` char(1) NOT NULL default 'N',
+  `Sale4` char(1) NOT NULL default 'N',
+  `Sale5` char(1) NOT NULL default 'N',
+  `Sale6` char(1) NOT NULL default 'N',
+  `Sale7` char(1) NOT NULL default 'N',
+  `Sale8` char(1) NOT NULL default 'N',
+  `Sale9` char(1) NOT NULL default 'N',
+  `Sale10` char(1) NOT NULL default 'N',
+  `Sale11` char(1) NOT NULL default 'N',
+  `Sale12` char(1) NOT NULL default 'N',
+  `Sale13` char(1) NOT NULL default 'N',
+  `Sale14` char(1) NOT NULL default 'N',
+  `Sale15` char(1) NOT NULL default 'N',
+  `Sale16` char(1) NOT NULL default 'N',
+  `Sale17` char(1) NOT NULL default 'N',
+  `Sale18` char(1) NOT NULL default 'N',
+  `Sale19` char(1) NOT NULL default 'N',
+  `Sale20` char(1) NOT NULL default 'N',
+  `Sale21` char(1) NOT NULL default 'N',
+  `Sale22` char(1) NOT NULL default 'N',
+  `Sale23` char(1) NOT NULL default 'N',
+  `Sale24` char(1) NOT NULL default 'N',
+  `Sale25` char(1) NOT NULL default 'N',
+  `Sale26` char(1) NOT NULL default 'N',
+  `Sale27` char(1) NOT NULL default 'N',
+  `Sale28` char(1) NOT NULL default 'N',
+  `Sale29` char(1) NOT NULL default 'N',
+  `Sale30` char(1) NOT NULL default 'N',
+  `Sale31` char(1) NOT NULL default 'N',
+  `Sale32` char(1) NOT NULL default 'N',
+  `Sale33` char(1) NOT NULL default 'N',
+  `Sale34` char(1) NOT NULL default 'N',
+  `Sale35` char(1) NOT NULL default 'N',
+  `Sale36` char(1) NOT NULL default 'N',
+  `Cont0` char(1) NOT NULL default 'N',
+  `Cont1` char(1) NOT NULL default 'N',
+  `Cont2` char(1) NOT NULL default 'N',
+  `Cont3` char(1) NOT NULL default 'N',
+  `Cont4` char(1) NOT NULL default 'N',
+  `Cont5` char(1) NOT NULL default 'N',
+  `Cont6` char(1) NOT NULL default 'N',
+  `Cont7` char(1) NOT NULL default 'N',
+  `Cont8` char(1) NOT NULL default 'N',
+  `Cont9` char(1) NOT NULL default 'N',
+  `Cont10` char(1) NOT NULL default 'N',
+  `Cont11` char(1) NOT NULL default 'N',
+  `Cont12` char(1) NOT NULL default 'N',
+  `Cont13` char(1) NOT NULL default 'N',
+  `Cont14` char(1) NOT NULL default 'N',
+  `Cont15` char(1) NOT NULL default 'N',
+  `Stock0` char(1) NOT NULL default 'N',
+  `Stock0_1` char(1) NOT NULL default 'N',
+  `Stock1` char(1) NOT NULL default 'N',
+  `Stock2` char(1) NOT NULL default 'N',
+  `Stock3` char(1) NOT NULL default 'N',
+  `Stock4` char(1) NOT NULL default 'N',
+  `Stock5` char(1) NOT NULL default 'N',
+  `Stock6` char(1) NOT NULL default 'N',
+  `Stock7` char(1) NOT NULL default 'N',
+  `Stock8` char(1) NOT NULL default 'N',
+  `Stock9` char(1) NOT NULL default 'N',
+  `Stock10` char(1) NOT NULL default 'N',
+  `Stock11` char(1) NOT NULL default 'N',
+  `Stock12` char(1) NOT NULL default 'N',
+  `Stock13` char(1) NOT NULL default 'N',
+  `Stock14` char(1) NOT NULL default 'N',
+  `Stock15` char(1) NOT NULL default 'N',
+  `Stock16` char(1) NOT NULL default 'N',
+  `Stock17` char(1) NOT NULL default 'N',
+  `Stock18` char(1) NOT NULL default 'N',
+  `Stock19` char(1) NOT NULL default 'N',
+  `Stock20` char(1) NOT NULL default 'N',
+  `Stock21` char(1) NOT NULL default 'N',
+  `Stock22` char(1) NOT NULL default 'N',
+  `Stock23` char(1) NOT NULL default 'N',
+  `Stock24` char(1) NOT NULL default 'N',
+  `Stock25` char(1) NOT NULL default 'N',
+  `Stock26` char(1) NOT NULL default 'N',
+  `Stock27` char(1) NOT NULL default 'N',
+  `Stock28` char(1) NOT NULL default 'N',
+  `Stock29` char(1) NOT NULL default 'N',
+  `Stock30` char(1) NOT NULL default 'N',
+  `Stock31` char(1) NOT NULL default 'N',
+  `Stock32` char(1) NOT NULL default 'N',
+  `Stock33` char(1) NOT NULL default 'N',
+  `Stock34` char(1) NOT NULL default 'N',
+  `Stock35` char(1) NOT NULL default 'N',
+  `Stock36` char(1) NOT NULL default 'N',
+  `Stock37` char(1) NOT NULL default 'N',
+  `Stock38` char(1) NOT NULL default 'N',
+  `Stock39` char(1) NOT NULL default 'N',
+  `Stock40` char(1) NOT NULL default 'N',
+  `Stock41` char(1) NOT NULL default 'N',
+  `Stock42` char(1) NOT NULL default 'N',
+  `Stock43` char(1) NOT NULL default 'N',
+  `Stock44` char(1) NOT NULL default 'N',
+  `Stock45` char(1) NOT NULL default 'N',
+  `Stock46` char(1) NOT NULL default 'N',
+  `Stock47` char(1) NOT NULL default 'N',
+  `Stock48` char(1) NOT NULL default 'N',
+  `Stock49` char(1) NOT NULL default 'N',
+  `Stock50` char(1) NOT NULL default 'N',
+  `Stock51` char(1) NOT NULL default 'N',
+  `Stock52` char(1) NOT NULL default 'N',
+  `Stock53` char(1) NOT NULL default 'N',
+  `Stock54` char(1) NOT NULL default 'N',
+  `Stock55` char(1) NOT NULL default 'N',
+  `Stock56` char(1) NOT NULL default 'N',
+  `Stock57` char(1) NOT NULL default 'N',
+  `Stock58` char(1) NOT NULL default 'N',
+  `Stock59` char(1) NOT NULL default 'N',
+  `Stock60` char(1) NOT NULL default 'N',
+  `Stock61` char(1) NOT NULL default 'N',
+  `Stock62` char(1) NOT NULL default 'N',
+  `Stock63` char(1) NOT NULL default 'N',
+  `Stock64` char(1) NOT NULL default 'N',
+  `Stock65` char(1) NOT NULL default 'N',
+  `Stock66` char(1) NOT NULL default 'N',
+  `Stock67` char(1) NOT NULL default 'N',
+  `Stock68` char(1) NOT NULL default 'N',
+  `Stock69` char(1) NOT NULL default 'N',
+  `Stock70` char(1) NOT NULL default 'N',
+  `Stock71` char(1) NOT NULL default 'N',
+  `Stock72` char(1) NOT NULL default 'N',
+  `Stock73` char(1) NOT NULL default 'N',
+  `Stock74` char(1) NOT NULL default 'N',
+  `Cont16` char(1) NOT NULL default 'N',
+  `Cont17` char(1) NOT NULL default 'N',
+  `Cont18` char(1) NOT NULL default 'N',
+  `Cont19` char(1) NOT NULL default 'N',
+  `Cont20` char(1) NOT NULL default 'N',
+  `Cont21` char(1) NOT NULL default 'N',
+  `Cont22` char(1) NOT NULL default 'N',
+  `Cont23` char(1) NOT NULL default 'N',
+  `Cont24` char(1) NOT NULL default 'N',
+  `Cont25` char(1) NOT NULL default 'N',
+  `Cont26` char(1) NOT NULL default 'N',
+  `Cont27` char(1) NOT NULL default 'N',
+  `Cont28` char(1) NOT NULL default 'N',
+  `Cont29` char(1) NOT NULL default 'N',
+  `Cont30` char(1) NOT NULL default 'N',
+  `Cont31` char(1) NOT NULL default 'N',
+  `Cont32` char(1) NOT NULL default 'N',
+  `Cont33` char(1) NOT NULL default 'N',
+  `Cont34` char(1) NOT NULL default 'N',
+  `Cont35` char(1) NOT NULL default 'N',
+  `Cont36` char(1) NOT NULL default 'N',
+  `Cont37` char(1) NOT NULL default 'N',
+  `Cont38` char(1) NOT NULL default 'N',
+  `Cont39` char(1) NOT NULL default 'N',
+  `Cont40` char(1) NOT NULL default 'N',
+  `Cont41` char(1) NOT NULL default 'N',
+  `Cont42` char(1) NOT NULL default 'N',
+  `Cont43` char(1) NOT NULL default 'N',
+  `Cont44` char(1) NOT NULL default 'N',
+  `Cont45` char(1) NOT NULL default 'N',
+  `Cont46` char(1) NOT NULL default 'N',
+  `Cont47` char(1) default NULL,
+  `Sale37` char(1) default NULL,
+  `Sale38` char(1) default NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- MyRetail652findigColo.draft_sale definition
+
+CREATE TABLE `draft_sale` (
+  `id` varchar(250) NOT NULL,
+  `billno` varchar(100) NOT NULL,
+  `document_date` datetime default NULL,
+  `branch_code` varchar(10) NOT NULL,
+  `post_status` varchar(1) default NULL,
+  `emp_code` varchar(100) NOT NULL,
+  `update_date` datetime default NULL,
+  `total_item` int(11) NOT NULL,
+  `emp_code_update` varchar(100) NOT NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- MyRetail652findigColo.draft_sale_details definition
+
+CREATE TABLE `draft_sale_details` (
+  `id` varchar(250) NOT NULL,
+  `billno` varchar(100) NOT NULL,
+  `create_date` datetime default NULL,
+  `barcode` varchar(20) NOT NULL,
+  `product_name` varchar(250) default NULL,
+  `stock_code` varchar(10) NOT NULL,
+  `qty` int(11) NOT NULL,
+  `update_date` datetime default NULL,
+  `emp_code` varchar(100) NOT NULL,
+  `emp_code_update` varchar(100) NOT NULL,
+  `can_stock` varchar(1) default '',
+  `can_set` varchar(1) default '',
+  PRIMARY KEY  (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+INSERT INTO posuser
+(UserName, Password, Name, UserGroup, OnACT, MacNo, Sale1, Sale2, Sale3, Sale4, Sale5, Sale6, Sale7, Sale8, Sale9, Sale10, Sale11, Sale12, Sale13, Sale14, Sale15, Sale16, Sale17, Sale18, Sale19, Sale20, Sale21, Sale22, Sale23, Sale24, Sale25, Sale26, Sale27, Sale28, Sale29, Sale30, Sale31, Sale32, Sale33, Sale34, Sale35, Sale36, Cont0, Cont1, Cont2, Cont3, Cont4, Cont5, Cont6, Cont7, Cont8, Cont9, Cont10, Cont11, Cont12, Cont13, Cont14, Cont15, Stock0, Stock0_1, Stock1, Stock2, Stock3, Stock4, Stock5, Stock6, Stock7, Stock8, Stock9, Stock10, Stock11, Stock12, Stock13, Stock14, Stock15, Stock16, Stock17, Stock18, Stock19, Stock20, Stock21, Stock22, Stock23, Stock24, Stock25, Stock26, Stock27, Stock28, Stock29, Stock30, Stock31, Stock32, Stock33, Stock34, Stock35, Stock36, Stock37, Stock38, Stock39, Stock40, Stock41, Stock42, Stock43, Stock44, Stock45, Stock46, Stock47, Stock48, Stock49, Stock50, Stock51, Stock52, Stock53, Stock54, Stock55, Stock56, Stock57, Stock58, Stock59, Stock60, Stock61, Stock62, Stock63, Stock64, Stock65, Stock66, Stock67, Stock68, Stock69, Stock70, Stock71, Stock72, Stock73, Stock74, Cont16, Cont17, Cont18, Cont19, Cont20, Cont21, Cont22, Cont23, Cont24, Cont25, Cont26, Cont27, Cont28, Cont29, Cont30, Cont31, Cont32, Cont33, Cont34, Cont35, Cont36, Cont37, Cont38, Cont39, Cont40, Cont41, Cont42, Cont43, Cont44, Cont45, Cont46, Cont47, Sale37, Sale38)
+VALUES('9999', '9999', 'Softpos', 'IT', 'N', '', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', NULL, NULL, NULL);
+
+INSERT INTO branch
+(Code, Name, AddressNo, Locality, SubProvince, Province, Post, Tel_No, Fax_No, E_Mail, Manager, Location_Area, Ser_Area, Cou_Area, Kic_Area, Tot_Area, Cost, Charge, FlageCost, Gp, FlageGp, Remark, ArBillNo, EarneatBillNo, ReturnBillNo, PrintAutoSumDate, SaveOrder, SaveOrderCopy, SaveOrderChk, KIC1, KIC2, KIC3, KIC4, KIC5, KIC6, KIC7, KIC8, KIC9, SmartCard, GetFile, RetFile, PointFile, CntLoop, InvNo, InvCashNo, InvCash, InvActive, CreditAct, PromotionGP, LockTime, KicItemNo, PT1, PT2, PT3, PT4, PT5, PONO, PrintKicForm, PrintInvForm, PSelectStk, PStkChk, PMinStkChk, RoundUpTime, GiftStatusChk, KICCopy1, KICCopy2, KICCopy3, KICCopy4, KICCopy5, KICCopy6, KICCopy7, KICCopy8, KICCopy9, KICChk1, KICChk2, KICChk3, KICChk4, KICChk5, KICChk6, KICChk7, KICChk8, KICChk9, UpdateBranchPoint, KicName1, KicName2, KicName3, KicName4, KicName5, KicName6, KicName7, KicName8, KicName9, KicPrintOnReceipt1, KicPrintOnReceipt2, KicPrintOnReceipt3, KicPrintOnReceipt4, KicPrintOnReceipt5, KicPrintOnReceipt6, KicPrintOnReceipt7, KicPrintOnReceipt8, KicPrintOnReceipt9, KicQue, KIC10, KICChk10, KicName10, KicPrintOnReceipt10, Kic11, Kic12, Kic13, Kic14, Kic15, Kic16, Kic17, Kic18, Kic19, Kic20, KicCopy11, KicCopy12, KicCopy13, KicCopy14, KicCopy15, KicCopy16, KicCopy17, KicCopy18, KicCopy19, KicCopy20, KicChk11, KicChk12, KicChk13, KicChk14, KicChk15, KicChk16, KicChk17, KicChk18, KicChk19, KicChk20, KicCopy10, IMG_HOME_PATH, INVHead, INVCheckAuto, taxid, KicCopy)
+VALUES('909', 'ºÃÔÉÑ· ÍØ´ÁàÍ¡ ¨Ó¡Ñ´ Stock Realtime', '33,35 ¶¹¹µÒ¹Õ  ', 'á¢Ç§µÅÒ´ÂÍ´', ' à¢µ¾ÃÐ¹¤Ã ', ' ¡ÃØ§à·¾Ï ', '10200', '022826344', '', '', '', '01', 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 'N', 0.0, 'N', NULL, 31.0, 0.0, 1.0, '2018-05-30', 'N', '1', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 'N', NULL, NULL, NULL, 1, 1.0, 14.0, 1.0, 'Y', NULL, NULL, 0, 4427, '001', '', '', '', '', 9, '4', '1', 'P', 'N', 'Y', 0.0, 'N', '4', '1', '1', '1', '1', '1', '1', '1', '1', '3', '0', '0', '0', '0', '0', '0', '0', '0', 'Y', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+
+INSERT INTO branfile
+(Code, Name, BType, BStk, BArea, BSize, BPlane, BStore, CrArea, CrType, RjArea, ACArea, AddressNo, Locality, SubProvince, Province, Post, Tel_No, Fax_No, E_Mail, Manager, Location_Area, Ser_Area, Cou_Area, Kic_Area, Tot_Area, Cost, Charge, FlageCost, Gp, GP2, FlageGp, TMac1, Remark, TMac2, TMac3, BVatType, BGCode, PT1, PT2, PT3, PT4, PT5, TMacNo1, TMacNo2, TMacNo3, BVat, CustomerCode, Inventory, Location)
+VALUES('sss', 'Head Office', '00', NULL, NULL, NULL, NULL, NULL, NULL, '1', NULL, NULL, '', '', '', '', '', '', '', '', '', '', 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 'N', 0.0, 0.0, '', NULL, '', NULL, NULL, 'I', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 7.0, NULL, NULL, NULL);
+INSERT INTO branfile
+(Code, Name, BType, BStk, BArea, BSize, BPlane, BStore, CrArea, CrType, RjArea, ACArea, AddressNo, Locality, SubProvince, Province, Post, Tel_No, Fax_No, E_Mail, Manager, Location_Area, Ser_Area, Cou_Area, Kic_Area, Tot_Area, Cost, Charge, FlageCost, Gp, GP2, FlageGp, TMac1, Remark, TMac2, TMac3, BVatType, BGCode, PT1, PT2, PT3, PT4, PT5, TMacNo1, TMacNo2, TMacNo3, BVat, CustomerCode, Inventory, Location)
+VALUES('U01', 'ºÃÔÉÑ· ÍØ´ÁàÍ¡ ¨Ó¡Ñ´', '00', NULL, NULL, NULL, NULL, NULL, NULL, '1', NULL, NULL, '', '', '', '', '', '', '', '', '', '', 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 'N', 0.0, 0.0, '', NULL, '', NULL, NULL, 'I', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 7.0, NULL, NULL, NULL);
+INSERT INTO branfile
+(Code, Name, BType, BStk, BArea, BSize, BPlane, BStore, CrArea, CrType, RjArea, ACArea, AddressNo, Locality, SubProvince, Province, Post, Tel_No, Fax_No, E_Mail, Manager, Location_Area, Ser_Area, Cou_Area, Kic_Area, Tot_Area, Cost, Charge, FlageCost, Gp, GP2, FlageGp, TMac1, Remark, TMac2, TMac3, BVatType, BGCode, PT1, PT2, PT3, PT4, PT5, TMacNo1, TMacNo2, TMacNo3, BVat, CustomerCode, Inventory, Location)
+VALUES('U04', 'ºÃÔÉÑ· à¹»·Ù¹èÒ ¨Ó¡Ñ´(ÊÒ¢Ò11)', '00', NULL, NULL, NULL, NULL, NULL, NULL, '1', NULL, NULL, '', '', '', '', '', '', '', '', '', '', 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 'N', 0.0, 0.0, '', NULL, '', NULL, NULL, 'I', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 7.0, NULL, NULL, NULL);
+INSERT INTO branfile
+(Code, Name, BType, BStk, BArea, BSize, BPlane, BStore, CrArea, CrType, RjArea, ACArea, AddressNo, Locality, SubProvince, Province, Post, Tel_No, Fax_No, E_Mail, Manager, Location_Area, Ser_Area, Cou_Area, Kic_Area, Tot_Area, Cost, Charge, FlageCost, Gp, GP2, FlageGp, TMac1, Remark, TMac2, TMac3, BVatType, BGCode, PT1, PT2, PT3, PT4, PT5, TMacNo1, TMacNo2, TMacNo3, BVat, CustomerCode, Inventory, Location)
+VALUES('U07', 'ºÃÔÉÑ· ÍØ´ÁàÍ¡¡ÃØê» ¨Ó¡Ñ´', '00', NULL, NULL, NULL, NULL, NULL, NULL, '1', NULL, NULL, '', '', '', '', '', '', '', '', '', '', 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 'N', 0.0, 0.0, '', NULL, '', NULL, NULL, 'I', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 7.0, NULL, NULL, NULL);
+INSERT INTO branfile
+(Code, Name, BType, BStk, BArea, BSize, BPlane, BStore, CrArea, CrType, RjArea, ACArea, AddressNo, Locality, SubProvince, Province, Post, Tel_No, Fax_No, E_Mail, Manager, Location_Area, Ser_Area, Cou_Area, Kic_Area, Tot_Area, Cost, Charge, FlageCost, Gp, GP2, FlageGp, TMac1, Remark, TMac2, TMac3, BVatType, BGCode, PT1, PT2, PT3, PT4, PT5, TMacNo1, TMacNo2, TMacNo3, BVat, CustomerCode, Inventory, Location)
+VALUES('U10', 'ºÃÔÉÑ· ÍØ´ÁàÍ¡¡ÃØê» (ÊÒ¢Ò2)', '00', NULL, NULL, NULL, NULL, NULL, NULL, '1', NULL, NULL, '', '', '', '', '', '', '', '', '', '', 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 'N', 0.0, 0.0, '', NULL, '', NULL, NULL, 'I', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 7.0, NULL, NULL, NULL);
+INSERT INTO branfile
+(Code, Name, BType, BStk, BArea, BSize, BPlane, BStore, CrArea, CrType, RjArea, ACArea, AddressNo, Locality, SubProvince, Province, Post, Tel_No, Fax_No, E_Mail, Manager, Location_Area, Ser_Area, Cou_Area, Kic_Area, Tot_Area, Cost, Charge, FlageCost, Gp, GP2, FlageGp, TMac1, Remark, TMac2, TMac3, BVatType, BGCode, PT1, PT2, PT3, PT4, PT5, TMacNo1, TMacNo2, TMacNo3, BVat, CustomerCode, Inventory, Location)
+VALUES('U12', 'ºÃÔÉÑ· ¿Ô¹´Ô¨ ¨Ó¡Ñ´ (ÊÒ¢Ò23)', '00', NULL, NULL, NULL, NULL, NULL, NULL, '1', NULL, NULL, '', '', '', '', '', '', '', '', '', '', 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 'N', 0.0, 0.0, '', NULL, '', NULL, NULL, 'I', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 7.0, NULL, NULL, NULL);
+INSERT INTO branfile
+(Code, Name, BType, BStk, BArea, BSize, BPlane, BStore, CrArea, CrType, RjArea, ACArea, AddressNo, Locality, SubProvince, Province, Post, Tel_No, Fax_No, E_Mail, Manager, Location_Area, Ser_Area, Cou_Area, Kic_Area, Tot_Area, Cost, Charge, FlageCost, Gp, GP2, FlageGp, TMac1, Remark, TMac2, TMac3, BVatType, BGCode, PT1, PT2, PT3, PT4, PT5, TMacNo1, TMacNo2, TMacNo3, BVat, CustomerCode, Inventory, Location)
+VALUES('U15', 'ºÃÔÉÑ· ¿Ô¹´Ô¨¡ÃØê» ¨Ó¡Ñ´', '00', NULL, NULL, NULL, NULL, NULL, NULL, '1', NULL, NULL, '', '', '', '', '', '', '', '', '', '', 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 'N', 0.0, 0.0, '', NULL, '', NULL, NULL, 'I', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 7.0, NULL, NULL, NULL);
+INSERT INTO branfile
+(Code, Name, BType, BStk, BArea, BSize, BPlane, BStore, CrArea, CrType, RjArea, ACArea, AddressNo, Locality, SubProvince, Province, Post, Tel_No, Fax_No, E_Mail, Manager, Location_Area, Ser_Area, Cou_Area, Kic_Area, Tot_Area, Cost, Charge, FlageCost, Gp, GP2, FlageGp, TMac1, Remark, TMac2, TMac3, BVatType, BGCode, PT1, PT2, PT3, PT4, PT5, TMacNo1, TMacNo2, TMacNo3, BVat, CustomerCode, Inventory, Location)
+VALUES('U18', 'ºÃÔÉÑ· ÍØ´ÁàÍ¡¡ÃØê» ¨Ó¡Ñ´(ÊÒ¢Ò 18)', '00', NULL, NULL, NULL, NULL, NULL, NULL, '1', NULL, NULL, '', '', '', '', '', '', '', '', '', '', 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 'N', 0.0, 0.0, '', NULL, '', NULL, NULL, 'I', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 7.0, NULL, NULL, NULL);
+INSERT INTO branfile
+(Code, Name, BType, BStk, BArea, BSize, BPlane, BStore, CrArea, CrType, RjArea, ACArea, AddressNo, Locality, SubProvince, Province, Post, Tel_No, Fax_No, E_Mail, Manager, Location_Area, Ser_Area, Cou_Area, Kic_Area, Tot_Area, Cost, Charge, FlageCost, Gp, GP2, FlageGp, TMac1, Remark, TMac2, TMac3, BVatType, BGCode, PT1, PT2, PT3, PT4, PT5, TMacNo1, TMacNo2, TMacNo3, BVat, CustomerCode, Inventory, Location)
+VALUES('U21', 'ºÃÔÉÑ· à¹»·Ù¹èÒ ¨Ó¡Ñ´(ÊÒ¢Ò3)', '00', NULL, NULL, NULL, NULL, NULL, NULL, '1', NULL, NULL, '', '', '', '', '', '', '', '', '', '', 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 'N', 0.0, 0.0, '', NULL, '', NULL, NULL, 'I', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 7.0, NULL, NULL, NULL);
+INSERT INTO branfile
+(Code, Name, BType, BStk, BArea, BSize, BPlane, BStore, CrArea, CrType, RjArea, ACArea, AddressNo, Locality, SubProvince, Province, Post, Tel_No, Fax_No, E_Mail, Manager, Location_Area, Ser_Area, Cou_Area, Kic_Area, Tot_Area, Cost, Charge, FlageCost, Gp, GP2, FlageGp, TMac1, Remark, TMac2, TMac3, BVatType, BGCode, PT1, PT2, PT3, PT4, PT5, TMacNo1, TMacNo2, TMacNo3, BVat, CustomerCode, Inventory, Location)
+VALUES('U22', 'ÍØ´ÁàÍ¡ ´Õ.âÍ.', '00', NULL, NULL, NULL, NULL, NULL, NULL, '1', NULL, NULL, '', '', '', '', '', '', '', '', '', '', 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 'N', 0.0, 0.0, '', NULL, '', NULL, NULL, 'I', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 7.0, NULL, NULL, NULL);
+
+INSERT INTO groupfile
+(GroupCode, GroupName)
+VALUES('01', 'ÃÍ§à·éÒªÒÂ');
+INSERT INTO groupfile
+(GroupCode, GroupName)
+VALUES('02', 'ÃÍ§à·éÒáµÐªÒÂ');
+INSERT INTO groupfile
+(GroupCode, GroupName)
+VALUES('03', 'ÃÍ§à·éÒË­Ô§¿Ô¹´Ô¨');
+INSERT INTO groupfile
+(GroupCode, GroupName)
+VALUES('04', 'ÃÍ§à·éÒË­Ô§');
+INSERT INTO groupfile
+(GroupCode, GroupName)
+VALUES('05', '¡ÃÐà»ëÒ¿Ô¹´Ô¨');
+INSERT INTO groupfile
+(GroupCode, GroupName)
+VALUES('06', '¡ÃÐà»ëÒªØ´¿Ô¹´Ô¨');
+INSERT INTO groupfile
+(GroupCode, GroupName)
+VALUES('07', '¡ÃÐà»ëÒá¿ªÑ¹');
+INSERT INTO groupfile
+(GroupCode, GroupName)
+VALUES('08', '«ÙÇÕà¹ÕÂ');
+INSERT INTO groupfile
+(GroupCode, GroupName)
+VALUES('09', 'ÃÍ§à·éÒà´ç¡');
+INSERT INTO groupfile
+(GroupCode, GroupName)
+VALUES('10', '¡ÃÐà»ëÒÊµÒ§¤ì');
+
