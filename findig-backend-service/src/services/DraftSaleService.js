@@ -15,32 +15,13 @@ const validatePayload = (payload, requiredFields = []) => {
   }
 }
 
-const generateCacheKey = (functionName, payload) => {
-  const date = getMoment().format('YYYY-MM-DD')
-  const payloadHash = JSON.stringify(payload)
-  return `${functionName}_${date}_${Buffer.from(payloadHash).toString('base64').slice(0, 10)}`
-}
-
 const DraftSaleDetailsService = require("../services/DraftSaleDetailsService")
 const DraftSaleDetailsRepository = require('../repository/DraftSaleDetailsRepository')
 
 const getData = async ({ payload, repository, db }) => {
   try {
-    validatePayload(payload)
-    
-    const cacheKey = generateCacheKey('getData', payload)
-    const cached = cache.get(cacheKey)
-    if (cached) {
-      console.log('🔄 Cache hit for getData')
-      return cached
-    }
-
-    console.log('🚀 Cache miss, querying DB for getData')
-    
     const results = await repository.getData({ payload, db })
     const mapped = mappingResultData(results)
-    
-    cache.set(cacheKey, mapped, 300) // 5 minutes TTL
     return mapped
   } catch (error) {
     throw new Error(`Service error in getData: ${error.message}`)
@@ -49,21 +30,8 @@ const getData = async ({ payload, repository, db }) => {
 
 const getDataForDashboard = async ({ payload, repository, db }) => {
   try {
-    validatePayload(payload)
-    
-    const cacheKey = generateCacheKey('getDataForDashboard', payload)
-    const cached = cache.get(cacheKey)
-    if (cached) {
-      console.log('🔄 Cache hit for getDataForDashboard')
-      return cached
-    }
-
-    console.log('🚀 Cache miss, querying DB for getDataForDashboard')
-    
     const results = await repository.getDataForDashboard({ payload, db })
     const mapped = mappingResultData(results)
-    
-    cache.set(cacheKey, mapped, 300) // 5 minutes TTL
     return mapped
   } catch (error) {
     throw new Error(`Service error in getDataForDashboard: ${error.message}`)
@@ -72,17 +40,6 @@ const getDataForDashboard = async ({ payload, repository, db }) => {
 
 const getDataById = async ({ payload, repository, db }) => {
   try {
-    validatePayload(payload)
-    
-    const cacheKey = generateCacheKey('getDataById', payload)
-    const cached = cache.get(cacheKey)
-    if (cached) {
-      console.log('🔄 Cache hit for getDataById')
-      return cached
-    }
-
-    console.log('🚀 Cache miss, querying DB for getDataById')
-    
     const results = await repository.getDataById({ payload, db })
     if(results.length > 0) {
       const resultDetails = await DraftSaleDetailsService.getSaleDetailsByBillNo({ 
@@ -131,7 +88,6 @@ const getDataById = async ({ payload, repository, db }) => {
     }
 
     const emptyResult = []
-    cache.set(cacheKey, emptyResult, 300)
     return emptyResult
   } catch (error) {
     throw new Error(`Service error in getDataById: ${error.message}`)
@@ -234,21 +190,8 @@ const deleteData = async ({ payload, repository, db }) => {
 
 const searchSaleData = async ({ repository, db, payload }) => {
   try {
-    validatePayload(payload)
-    
-    const cacheKey = generateCacheKey('searchSaleData', payload)
-    const cached = cache.get(cacheKey)
-    if (cached) {
-      console.log('🔄 Cache hit for searchSaleData')
-      return cached
-    }
-
-    console.log('🚀 Cache miss, querying DB for searchSaleData')
-    
     const results = await repository.searchSaleData({db, payload })
     const mapped = mappingResultDataList(results)
-    
-    cache.set(cacheKey, mapped, 300) // 5 minutes TTL
     return mapped
   } catch (error) {
     throw new Error(`Service error in searchSaleData: ${error.message}`)

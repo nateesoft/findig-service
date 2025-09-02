@@ -89,8 +89,15 @@ const Sales = () => {
     if (productSearchTerm && productSearchTerm.length >= 2) {
       const filtered = searchProducts(productSearchTerm);
       setFilteredProducts(filtered);
-      setShowAutocomplete(filtered.length > 0);
-      setSelectedProductIndex(-1);
+      
+      // Auto-select if only one result found
+      if (filtered.length === 1) {
+        selectProduct(filtered[0]);
+        setShowAutocomplete(false);
+      } else {
+        setShowAutocomplete(filtered.length > 0);
+        setSelectedProductIndex(-1);
+      }
     } else {
       setFilteredProducts([]);
       setShowAutocomplete(false);
@@ -154,22 +161,42 @@ const Sales = () => {
     }, 50);
   };
 
-  const handleBarcodeChange = async (e) => {
+  const handleBarcodeChange = (e) => {
     const value = e.target.value;
-    setCurrentItem({...currentItem, barcode: value});
+    setCurrentItem({
+      ...currentItem, 
+      barcode: value,
+      productName: '', // Clear product name when barcode changes
+      stock: '',       // Clear stock as well
+      canStock: null,
+      canSet: null
+    });
+    setProductSearchTerm(value);
     
-    await initLoadProduct(value)
-    
-    const exactMatch = productList.find(product => product.barcode === value);
-    if (exactMatch) {
-      setCurrentItem({
-        barcode: exactMatch.PCode,
-        productName: exactMatch.PDesc,
-        canStock: exactMatch.PStock,
-        canSet: exactMatch.PSet
-      });
-      setShowAutocomplete(false);
+    // Clear previous timeout
+    if (window.barcodeSearchTimeout) {
+      clearTimeout(window.barcodeSearchTimeout);
     }
+    
+    // Set delay before search
+    window.barcodeSearchTimeout = setTimeout(async () => {
+      if (value) {
+        await initLoadProduct(value);
+        
+        // Check for exact barcode match first
+        const exactMatch = productList.find(product => product.barcode === value);
+        if (exactMatch) {
+          selectProduct(exactMatch);
+          return;
+        }
+        
+        // If no exact match, check search results and auto-select if only one
+        const searchResults = searchProducts(value);
+        if (searchResults.length === 1) {
+          selectProduct(searchResults[0]);
+        }
+      }
+    }, 500); // 500ms delay
   };
 
   const resetNewSaleForm = () => {
@@ -194,12 +221,12 @@ const Sales = () => {
 
   const resetCurrentItem = () => {
     setCurrentItem({
-      billno: '',
-      document_date_start: '',
-      document_date_end: '',
-      branch_code: branchCode || '',
-      emp_code: '',
-      post_status: ''
+      barcode: '',
+      productName: '',
+      stock: '',
+      qty: 0,
+      canStock: null,
+      canSet: null
     });
   };
 
@@ -227,6 +254,13 @@ const Sales = () => {
     setSaleItems(prev => [...prev, newItem]);
     resetCurrentItem();
     setProductSearchTerm('');
+    
+    // Focus back to barcode input after adding item
+    setTimeout(() => {
+      if (barcodeInputRef.current) {
+        barcodeInputRef.current.focus();
+      }
+    }, 100);
   };
 
   const removeItemFromSale = (itemId) => {
@@ -531,8 +565,15 @@ const Sales = () => {
       setCurrentProcessingItem(null);
       setPostStatus('completed');
       
-      setTimeout(() => {
-        initLoadData();
+      setTimeout(async () => {
+        // Reload draft sale data
+        await initLoadData();
+        
+        // Also reload search results to refresh the filtered data
+        if (searchCriteria.billno || searchCriteria.document_date_start || searchCriteria.document_date_end || 
+            searchCriteria.emp_code || searchCriteria.post_status) {
+          await handleSearch();
+        }
       }, 1000);
       
     } catch (error) {
@@ -624,6 +665,14 @@ const Sales = () => {
       }
       initLoadAllbranch()
     }, [])
+
+  useEffect(() => {
+    return () => {
+      if (window.barcodeSearchTimeout) {
+        clearTimeout(window.barcodeSearchTimeout);
+      }
+    };
+  }, [])
 
   return (
     <div className="space-y-6">

@@ -17,9 +17,9 @@ const searchProduct = async ({ db, searchText }) => {
       throw new Error('Database connection not available');
     }
     const sql = `SELECT PCode, PDesc, PStock, PSet FROM product 
-      where PCode like ? or PDesc like ? 
+      where PCode like '%${searchText}%' or PDesc like '%${searchText}%' 
       limit 10`
-    const results = await db.pos.query(sql, [`%${searchText}%`, `%${searchText}%`])
+    const results = await db.pos.query(sql)
     return results
   } catch (error) {
     throw new Error(`Database query failed: ${error.message}`);

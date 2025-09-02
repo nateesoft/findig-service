@@ -43,12 +43,14 @@ const DataTable = ({
           branchCode: branchCode,
           items: [],
           totalItems: 0,
-          totalQty: 0
+          totalQtyIn: 0,
+          totalQtyOut: 0
         };
       }
       acc[branchCode].items.push(item);
       acc[branchCode].totalItems += 1;
-      acc[branchCode].totalQty += Number(item.S_Out || 0);
+      acc[branchCode].totalQtyIn += Number(item.S_In || 0);
+      acc[branchCode].totalQtyOut += Number(item.S_Out || 0);
       return acc;
     }, {});
     
@@ -64,12 +66,14 @@ const DataTable = ({
           groupName: groupName,
           items: [],
           totalItems: 0,
-          totalQty: 0
+          totalQtyIn: 0,
+          totalQtyOut: 0
         };
       }
       acc[groupName].items.push(item);
       acc[groupName].totalItems += 1;
-      acc[groupName].totalQty += Number(item.S_Out || 0);
+      acc[groupName].totalQtyIn += Number(item.S_In || 0);
+      acc[groupName].totalQtyOut += Number(item.S_Out || 0);
       return acc;
     }, {});
     
@@ -124,9 +128,12 @@ const DataTable = ({
     } else if (sortField === 'totalItems') {
       aValue = a.totalItems;
       bValue = b.totalItems;
-    } else if (sortField === 'totalQty') {
-      aValue = a.totalQty;
-      bValue = b.totalQty;
+    } else if (sortField === 'totalQtyIn') {
+      aValue = a.totalQtyIn;
+      bValue = b.totalQtyIn;
+    } else if (sortField === 'totalQtyOut') {
+      aValue = a.totalQtyOut;
+      bValue = b.totalQtyOut;
     } else {
       return 0;
     }
@@ -210,13 +217,13 @@ const DataTable = ({
             ${sortedGroups.map(group => `
               <tr style="background-color: #f8fafc; font-weight: bold;">
                 <td colspan="9" style="padding: 12px;">
-                  สาขา: ${group.branchCode} (${group.totalItems} รายการ, รวม ${group.totalQty} ชิ้น)
+                  สาขา: ${group.branchCode} (${group.totalItems} รายการ, รวมรับเข้า ${group.totalQtyIn}, รวมจ่ายออก ${group.totalQtyOut})
                 </td>
               </tr>
               ${groupByProductGroup(group.items).map(productGroup => `
                 <tr style="background-color: #f1f5f9; font-weight: bold;">
                   <td colspan="9" style="padding-left: 20px;">
-                    กลุ่ม: ${productGroup.groupName} (${productGroup.totalItems} รายการ, รวม ${productGroup.totalQty} ชิ้น)
+                    กลุ่ม: ${productGroup.groupName} (${productGroup.totalItems} รายการ, รวมรับเข้า ${productGroup.totalQtyIn}, รวมจ่ายออก ${productGroup.totalQtyOut})
                   </td>
                 </tr>
                 ${productGroup.items.map(item => `
@@ -228,7 +235,7 @@ const DataTable = ({
                     <td>${item.S_Rem || ''}</td>
                     <td>${item.S_PCode || ''}</td>
                     <td>${item.PDesc || ''}</td>
-                    <td class="text-center">${item.S_Out || ''}</td>
+                    <td class="text-right">${item.S_Out>0?item.S_Out:item.S_In || ''}</td>
                     <td class="text-center">${item.S_Stk || ''}</td>
                   </tr>
                 `).join('')}
@@ -259,19 +266,21 @@ const DataTable = ({
     worksheetData.push([
       'สาขา', 'กลุ่มสินค้า', 'วันที่', 'เลขที่บิล', 'ประเภท', 'รหัสสินค้า', 'ชื่อสินค้า', 'จำนวน', 'คลัง'
     ]);
+
+    console.log('sortedGroups:', sortedGroups)
     
     // เพิ่มข้อมูล
     sortedGroups.forEach(group => {
       // แถวสรุปสาขา
       worksheetData.push([
-        `สาขา: ${group.branchCode}`, `${group.totalItems} รายการ`, `รวม ${group.totalQty} ชิ้น`, '', '', '', '', '', ''
+        `สาขา: ${group.branchCode}`, `${group.totalItems} รายการ`, `รวมรับเข้า ${group.totalQtyIn}`, `รวมจ่ายออก ${group.totalQtyOut}`, '', '', '', '', '', ''
       ]);
       
       // กลุ่มสินค้าแต่ละกลุ่ม
       groupByProductGroup(group.items).forEach(productGroup => {
         // แถวสรุปกลุ่มสินค้า
         worksheetData.push([
-          `  กลุ่ม: ${productGroup.groupName}`, `${productGroup.totalItems} รายการ`, `รวม ${productGroup.totalQty} ชิ้น`, '', '', '', '', '', ''
+          `  กลุ่ม: ${productGroup.groupName}`, `${productGroup.totalItems} รายการ`, `รวมรับเข้า ${productGroup.totalQtyIn}`, `รวมจ่ายออก ${group.totalQtyOut}`, '', '', '', '', '', ''
         ]);
         
         // รายการสินค้าในกลุ่ม
@@ -284,7 +293,7 @@ const DataTable = ({
             item.S_Rem || '',
             item.S_PCode || '',
             item.PDesc || '',
-            item.S_Out || '',
+            item.S_Out > 0 ? item.S_Out : item.S_In,
             item.S_Stk || ''
           ]);
         });
@@ -487,11 +496,26 @@ const DataTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('totalQty')}
+                onClick={() => handleSort('totalQtyIn')}
               >
                 <div className="flex items-center justify-center">
-                  รวมจำนวน
-                  {getSortIcon('totalQty')}
+                  รวมรับเข้า
+                  {getSortIcon('totalQtyIn')}
+                </div>
+              </th>
+              <th
+                className={`px-6 py-3 text-center text-xs font-medium ${getThemeClasses(
+                  "textMuted",
+                  currentTheme
+                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
+                  "textPrimary",
+                  currentTheme
+                )} ${getThemeClasses("transition", currentTheme)}`}
+                onClick={() => handleSort('totalQtyOut')}
+              >
+                <div className="flex items-center justify-center">
+                  รวมจ่ายออก
+                  {getSortIcon('totalQtyOut')}
                 </div>
               </th>
               <th
@@ -540,7 +564,15 @@ const DataTable = ({
                         currentTheme
                       )}`}
                     >
-                      {branchGroup.totalQty.toLocaleString()} ชิ้น
+                      {branchGroup.totalQtyIn.toLocaleString()}
+                    </td>
+                    <td
+                      className={`px-6 py-4 text-center text-sm font-medium ${getThemeClasses(
+                        "textPrimary",
+                        currentTheme
+                      )}`}
+                    >
+                      {branchGroup.totalQtyOut.toLocaleString()}
                     </td>
                     <td className="px-6 py-4 text-center">
                       <button
@@ -598,7 +630,15 @@ const DataTable = ({
                                 currentTheme
                               )}`}
                             >
-                              {productGroup.totalQty.toLocaleString()} ชิ้น
+                              {productGroup.totalQtyIn.toLocaleString()}
+                            </td>
+                            <td
+                              className={`px-6 py-3 text-center text-sm ${getThemeClasses(
+                                "textSecondary",
+                                currentTheme
+                              )}`}
+                            >
+                              {productGroup.totalQtyOut.toLocaleString()}
                             </td>
                             <td className="px-6 py-3 text-center">
                               <button
@@ -667,7 +707,7 @@ const DataTable = ({
                                       <span>{item.S_Rem}</span>
                                       <span>{item.S_PCode}</span>
                                       <span className="truncate" title={item.PDesc}>{item.PDesc}</span>
-                                      <span>{item.S_Out}</span>
+                                      <span className="text-right">{item.S_Out>0?item.S_Out:item.S_In}</span>
                                       <span>{item.S_Stk}</span>
                                     </div>
                                   </td>

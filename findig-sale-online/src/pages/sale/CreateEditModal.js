@@ -7,6 +7,8 @@ import {
   Trash2,
   Search} from 'lucide-react';
 
+import { useRef } from 'react';
+
 const CreateEditModal = ({
     getThemeClasses,
     currentTheme,
@@ -33,6 +35,46 @@ const CreateEditModal = ({
     resetNewSaleForm,
     handleNewSaleSubmit
 }) => {
+  // Refs for form navigation
+  const billNoInputRef = useRef(null);
+  const productNameInputRef = useRef(null);
+  const stockSelectRef = useRef(null);
+  const qtyInputRef = useRef(null);
+  const handleBarcodePaste = (e) => {
+    // Let the default paste happen first, then trigger search
+    setTimeout(() => {
+      const pastedValue = e.target.value;
+      if (pastedValue) {
+        // Create a synthetic event to trigger handleBarcodeChange
+        const syntheticEvent = {
+          target: { value: pastedValue }
+        };
+        handleBarcodeChange(syntheticEvent);
+      }
+    }, 0);
+  };
+
+  // Handle Enter key navigation between form fields
+  const handleEnterKeyNavigation = (e, nextRef) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (nextRef && nextRef.current) {
+        nextRef.current.focus();
+      }
+    }
+  };
+
+  // Special handler for quantity input - add item if valid
+  const handleQtyEnterKey = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      // Check if all required fields are filled and qty > 0
+      if (currentItem.barcode && currentItem.productName && currentItem.stock && currentItem.qty > 0) {
+        addItemToSale();
+      }
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 animate-fade-in">
       <div
@@ -132,18 +174,22 @@ const CreateEditModal = ({
                   เลขที่ใบเสร็จ
                 </label>
                 <input
+                  ref={billNoInputRef}
                   type="text"
                   value={saleHeader.billNo}
                   onChange={(e) =>
                     setSaleHeader({ ...saleHeader, billNo: e.target.value })
                   }
+                  onKeyDown={(e) => handleEnterKeyNavigation(e, barcodeInputRef)}
                   className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
                     "input",
                     currentTheme
                   )}`}
-                  placeholder="เลขที่เอกสาร"
+                  placeholder="เลขที่เอกสาร (3-20 ตัวอักษร)"
                   autoFocus
                   disabled={modalMode === "edit"}
+                  minLength={3}
+                  maxLength={20}
                 />
               </div>
               <div>
@@ -159,13 +205,11 @@ const CreateEditModal = ({
                 <input
                   type="date"
                   value={saleHeader.createDate}
-                  onChange={(e) =>
-                    setSaleHeader({ ...saleHeader, createDate: e.target.value })
-                  }
                   className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
                     "input",
                     currentTheme
                   )}`}
+                  disabled
                 />
               </div>
               <div>
@@ -217,7 +261,16 @@ const CreateEditModal = ({
                     type="text"
                     value={productSearchTerm}
                     onChange={handleBarcodeChange}
-                    onKeyDown={handleBarcodeKeyDown}
+                    onKeyDown={(e) => {
+                      // Handle autocomplete navigation first
+                      if (showAutocomplete && filteredProducts.length > 0) {
+                        handleBarcodeKeyDown(e);
+                      } else if (e.key === 'Enter') {
+                        // If no autocomplete, navigate to next field
+                        handleEnterKeyNavigation(e, productNameInputRef);
+                      }
+                    }}
+                    onPaste={handleBarcodePaste}
                     className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
                       "input",
                       currentTheme
@@ -290,6 +343,7 @@ const CreateEditModal = ({
                   ชื่อสินค้า
                 </label>
                 <input
+                  ref={productNameInputRef}
                   type="text"
                   value={currentItem.productName}
                   onChange={(e) =>
@@ -298,6 +352,7 @@ const CreateEditModal = ({
                       productName: e.target.value
                     })
                   }
+                  onKeyDown={(e) => handleEnterKeyNavigation(e, stockSelectRef)}
                   className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
                     "input",
                     currentTheme
@@ -316,10 +371,12 @@ const CreateEditModal = ({
                   คลังสินค้า
                 </label>
                 <select
+                  ref={stockSelectRef}
                   value={currentItem.stock}
                   onChange={(e) =>
                     setCurrentItem({ ...currentItem, stock: e.target.value })
                   }
+                  onKeyDown={(e) => handleEnterKeyNavigation(e, qtyInputRef)}
                   className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
                     "input",
                     currentTheme
@@ -341,20 +398,25 @@ const CreateEditModal = ({
                 </label>
                 <div className="flex space-x-2">
                   <input
+                    ref={qtyInputRef}
                     type="number"
-                    min="0"
+                    min="1"
                     step="1"
                     value={currentItem.qty}
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      const numValue = value === '' ? 0 : parseFloat(value);
                       setCurrentItem({
                         ...currentItem,
-                        qty: parseFloat(e.target.value) || 0
-                      })
-                    }
+                        qty: isNaN(numValue) ? 0 : Math.max(0, numValue)
+                      });
+                    }}
+                    onKeyDown={handleQtyEnterKey}
                     className={`flex-1 px-3 py-2 border rounded-lg ${getThemeClasses(
                       "input",
                       currentTheme
                     )}`}
+                    onFocus={(e) => e.target.select()}
                     placeholder="0"
                   />
                   <button
@@ -363,7 +425,9 @@ const CreateEditModal = ({
                       !currentItem.barcode ||
                       !currentItem.productName ||
                       !currentItem.stock ||
-                      currentItem.qty <= 0
+                      !currentItem.qty ||
+                      currentItem.qty <= 0 ||
+                      isNaN(currentItem.qty)
                     }
                     className={`px-4 py-2 text-white rounded-lg font-medium ${getThemeClasses(
                       "primaryBtn",

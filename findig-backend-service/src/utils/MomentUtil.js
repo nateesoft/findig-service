@@ -24,9 +24,17 @@ const getYesterday = () => {
     return moment().add(-1, 'day').utc(true)
 }
 
+// Convert DD/MM/YYYY to YYYY-MM-DD for MySQL
+const convertToMySQLDate = (dateStr) => {
+    if (!dateStr) return '';
+    const m = moment(dateStr, 'DD/MM/YYYY', true);
+    return m.isValid() ? m.format('YYYY-MM-DD') : '';
+}
+
 module.exports = {
     getMoment,
     getMomentTime,
     getYesterday,
-    getCurrentTime
+    getCurrentTime,
+    convertToMySQLDate
 }

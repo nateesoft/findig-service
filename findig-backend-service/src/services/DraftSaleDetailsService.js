@@ -15,29 +15,10 @@ const validatePayload = (payload, requiredFields = []) => {
   }
 }
 
-const generateCacheKey = (functionName, payload) => {
-  const date = getMoment().format('YYYY-MM-DD')
-  const payloadHash = JSON.stringify(payload)
-  return `${functionName}_${date}_${Buffer.from(payloadHash).toString('base64').slice(0, 10)}`
-}
-
 const getData = async ({ payload, repository, db }) => {
   try {
-    validatePayload(payload)
-    
-    const cacheKey = generateCacheKey('getData', payload)
-    const cached = cache.get(cacheKey)
-    if (cached) {
-      console.log('🔄 Cache hit for getData')
-      return cached
-    }
-
-    console.log('🚀 Cache miss, querying DB for getData')
-    
     const results = await repository.getData({ payload, db })
     const mapped = mappingResultData(results)
-    
-    cache.set(cacheKey, mapped, 300) // 5 minutes TTL
     return mapped
   } catch (error) {
     throw new Error(`Service error in getData: ${error.message}`)
@@ -46,21 +27,8 @@ const getData = async ({ payload, repository, db }) => {
 
 const getDataById = async ({ payload, repository, db }) => {
   try {
-    validatePayload(payload)
-    
-    const cacheKey = generateCacheKey('getDataById', payload)
-    const cached = cache.get(cacheKey)
-    if (cached) {
-      console.log('🔄 Cache hit for getDataById')
-      return cached
-    }
-
-    console.log('🚀 Cache miss, querying DB for getDataById')
-    
     const results = await repository.getData({ payload, db })
     const mapped = mappingResultData(results)
-    
-    cache.set(cacheKey, mapped, 300) // 5 minutes TTL
     return mapped
   } catch (error) {
     throw new Error(`Service error in getDataById: ${error.message}`)
@@ -69,21 +37,8 @@ const getDataById = async ({ payload, repository, db }) => {
 
 const getSaleDetailsByBillNo = async ({ payload, repository, db }) => {
   try {
-    validatePayload(payload)
-    
-    const cacheKey = generateCacheKey('getSaleDetailsByBillNo', payload)
-    const cached = cache.get(cacheKey)
-    if (cached) {
-      console.log('🔄 Cache hit for getSaleDetailsByBillNo')
-      return cached
-    }
-
-    console.log('🚀 Cache miss, querying DB for getSaleDetailsByBillNo')
-    
     const results = await repository.getDataByBillNo({ payload, db })
     const mapped = mappingResultData(results)
-    
-    cache.set(cacheKey, mapped, 300) // 5 minutes TTL
     return mapped
   } catch (error) {
     throw new Error(`Service error in getSaleDetailsByBillNo: ${error.message}`)
