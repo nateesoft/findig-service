@@ -209,20 +209,23 @@ const DataTable = ({
               <th>ประเภท</th>
               <th>รหัสสินค้า</th>
               <th>ชื่อสินค้า</th>
-              <th class="text-center">จำนวน</th>
+              <th class="text-center">รับเข้า(In)</th>
+              <th class="text-center">มูลค่า</th>
+              <th class="text-center">จ่ายออก(Out)</th>
+              <th class="text-center">มูลค่า</th>
               <th class="text-center">คลัง</th>
             </tr>
           </thead>
           <tbody>
             ${sortedGroups.map(group => `
               <tr style="background-color: #f8fafc; font-weight: bold;">
-                <td colspan="9" style="padding: 12px;">
+                <td colspan="12" style="padding: 12px;">
                   สาขา: ${group.branchCode} (${group.totalItems} รายการ, รวมรับเข้า ${group.totalQtyIn}, รวมจ่ายออก ${group.totalQtyOut})
                 </td>
               </tr>
               ${groupByProductGroup(group.items).map(productGroup => `
                 <tr style="background-color: #f1f5f9; font-weight: bold;">
-                  <td colspan="9" style="padding-left: 20px;">
+                  <td colspan="12" style="padding-left: 20px;">
                     กลุ่ม: ${productGroup.groupName} (${productGroup.totalItems} รายการ, รวมรับเข้า ${productGroup.totalQtyIn}, รวมจ่ายออก ${productGroup.totalQtyOut})
                   </td>
                 </tr>
@@ -235,7 +238,10 @@ const DataTable = ({
                     <td>${item.S_Rem || ''}</td>
                     <td>${item.S_PCode || ''}</td>
                     <td>${item.PDesc || ''}</td>
-                    <td class="text-right">${item.S_Out>0?item.S_Out:item.S_In || ''}</td>
+                    <td class="text-right">${item.S_In || ''}</td>
+                    <td class="text-right">${Number(item.S_InCost || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td class="text-right">${item.S_Out || ''}</td>
+                    <td class="text-right">${Number(item.S_OutCost || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                     <td class="text-center">${item.S_Stk || ''}</td>
                   </tr>
                 `).join('')}
@@ -264,7 +270,7 @@ const DataTable = ({
     
     // เพิ่ม headers
     worksheetData.push([
-      'สาขา', 'กลุ่มสินค้า', 'วันที่', 'เลขที่บิล', 'ประเภท', 'รหัสสินค้า', 'ชื่อสินค้า', 'จำนวน', 'คลัง'
+      'สาขา', 'กลุ่มสินค้า', 'วันที่', 'เลขที่บิล', 'ประเภท', 'รหัสสินค้า', 'ชื่อสินค้า', 'รับเข้า(In)', 'มูลค่า', 'จ่ายออก(Out)', 'มูลค่า', 'คลัง'
     ]);
 
     console.log('sortedGroups:', sortedGroups)
@@ -273,14 +279,14 @@ const DataTable = ({
     sortedGroups.forEach(group => {
       // แถวสรุปสาขา
       worksheetData.push([
-        `สาขา: ${group.branchCode}`, `${group.totalItems} รายการ`, `รวมรับเข้า ${group.totalQtyIn}`, `รวมจ่ายออก ${group.totalQtyOut}`, '', '', '', '', '', ''
+        `สาขา: ${group.branchCode}`, `${group.totalItems} รายการ`, `รวมรับเข้า ${group.totalQtyIn}`, `รวมจ่ายออก ${group.totalQtyOut}`, '', '', '', '', '', '', '', ''
       ]);
       
       // กลุ่มสินค้าแต่ละกลุ่ม
       groupByProductGroup(group.items).forEach(productGroup => {
         // แถวสรุปกลุ่มสินค้า
         worksheetData.push([
-          `  กลุ่ม: ${productGroup.groupName}`, `${productGroup.totalItems} รายการ`, `รวมรับเข้า ${productGroup.totalQtyIn}`, `รวมจ่ายออก ${group.totalQtyOut}`, '', '', '', '', '', ''
+          `  กลุ่ม: ${productGroup.groupName}`, `${productGroup.totalItems} รายการ`, `รวมรับเข้า ${productGroup.totalQtyIn}`, `รวมจ่ายออก ${productGroup.totalQtyOut}`, '', '', '', '', '', '', '', ''
         ]);
         
         // รายการสินค้าในกลุ่ม
@@ -293,7 +299,10 @@ const DataTable = ({
             item.S_Rem || '',
             item.S_PCode || '',
             item.PDesc || '',
-            item.S_Out > 0 ? item.S_Out : item.S_In,
+            item.S_In || '',
+            Number(item.S_InCost || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+            item.S_Out || '',
+            Number(item.S_OutCost || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
             item.S_Stk || ''
           ]);
         });
