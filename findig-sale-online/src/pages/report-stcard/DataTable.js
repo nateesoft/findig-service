@@ -676,13 +676,16 @@ const DataTable = ({
                                     currentTheme
                                   )} uppercase tracking-wider pl-16`}
                                 >
-                                  <div className="grid grid-cols-7 gap-4">
+                                  <div className="grid grid-cols-10 gap-4">
                                     <span>วันที่</span>
                                     <span>เลขที่บิล</span>
                                     <span>ประเภท</span>
                                     <span>รหัสสินค้า</span>
                                     <span>ชื่อสินค้า</span>
-                                    <span>จำนวน</span>
+                                    <span className='text-right'>รับเข้า(In)</span>
+                                    <span className='text-right'>มูลค่า</span>
+                                    <span className='w-28 text-right'>จ่ายออก(Out)</span>
+                                    <span className='text-right'>มูลค่า</span>
                                     <span>คลัง</span>
                                   </div>
                                 </td>
@@ -701,13 +704,16 @@ const DataTable = ({
                                       currentTheme
                                     )} pl-16`}
                                   >
-                                    <div className="grid grid-cols-7 gap-4">
+                                    <div className="grid grid-cols-10 gap-4">
                                       <span>{moment(item.S_Date).format("DD/MM/YYYY")}</span>
                                       <span>{item.S_No}</span>
                                       <span>{item.S_Rem}</span>
                                       <span>{item.S_PCode}</span>
                                       <span className="truncate" title={item.PDesc}>{item.PDesc}</span>
-                                      <span className="text-right">{item.S_Out>0?item.S_Out:item.S_In}</span>
+                                      <span className="text-right">{item.S_In}</span>
+                                      <span className="text-right">{Number(item.S_InCost || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                      <span className="text-right">{item.S_Out}</span>
+                                      <span className="text-right">{Number(item.S_OutCost || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                       <span>{item.S_Stk}</span>
                                     </div>
                                   </td>
