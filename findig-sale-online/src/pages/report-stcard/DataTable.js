@@ -44,13 +44,17 @@ const DataTable = ({
           items: [],
           totalItems: 0,
           totalQtyIn: 0,
-          totalQtyOut: 0
+          totalQtyOut: 0,
+          totalDiscount: 0,
+          totalNettotal: 0
         };
       }
       acc[branchCode].items.push(item);
       acc[branchCode].totalItems += 1;
       acc[branchCode].totalQtyIn += Number(item.S_In || 0);
       acc[branchCode].totalQtyOut += Number(item.S_Out || 0);
+      acc[branchCode].totalDiscount += Number(item.Discount || 0);
+      acc[branchCode].totalNettotal += Number(item.Nettotal || 0);
       return acc;
     }, {});
     
@@ -67,13 +71,17 @@ const DataTable = ({
           items: [],
           totalItems: 0,
           totalQtyIn: 0,
-          totalQtyOut: 0
+          totalQtyOut: 0,
+          totalDiscount: 0,
+          totalNettotal: 0
         };
       }
       acc[groupName].items.push(item);
       acc[groupName].totalItems += 1;
       acc[groupName].totalQtyIn += Number(item.S_In || 0);
       acc[groupName].totalQtyOut += Number(item.S_Out || 0);
+      acc[groupName].totalDiscount += Number(item.Discount || 0);
+      acc[groupName].totalNettotal += Number(item.Nettotal || 0);
       return acc;
     }, {});
     
@@ -134,6 +142,12 @@ const DataTable = ({
     } else if (sortField === 'totalQtyOut') {
       aValue = a.totalQtyOut;
       bValue = b.totalQtyOut;
+    } else if (sortField === 'totalDiscount') {
+      aValue = a.totalDiscount;
+      bValue = b.totalDiscount;
+    } else if (sortField === 'totalNettotal') {
+      aValue = a.totalNettotal;
+      bValue = b.totalNettotal;
     } else {
       return 0;
     }
@@ -214,6 +228,10 @@ const DataTable = ({
               <th class="text-center">จ่ายออก(Out)</th>
               <th class="text-center">มูลค่า</th>
               <th class="text-center">คลัง</th>
+              <th class="text-right">ส่วนลด</th>
+              <th class="text-right">สุทธิ</th>
+              <th class="text-center">ยกเลิกบิล</th>
+              <th class="text-center">เลขที่ใบเสร็จ</th>
             </tr>
           </thead>
           <tbody>
@@ -243,6 +261,10 @@ const DataTable = ({
                     <td class="text-right">${item.S_Out || ''}</td>
                     <td class="text-right">${Number(item.S_OutCost || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                     <td class="text-center">${item.S_Stk || ''}</td>
+                    <td class="text-right">${Number(item.Discount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td class="text-right">${Number(item.Nettotal || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td class="text-center">${item.Refund || ''}</td>
+                    <td class="text-center">${item.RefNo || ''}</td>
                   </tr>
                 `).join('')}
               `).join('')}
@@ -270,7 +292,7 @@ const DataTable = ({
     
     // เพิ่ม headers
     worksheetData.push([
-      'สาขา', 'กลุ่มสินค้า', 'วันที่', 'เลขที่บิล', 'ประเภท', 'รหัสสินค้า', 'ชื่อสินค้า', 'รับเข้า(In)', 'มูลค่า', 'จ่ายออก(Out)', 'มูลค่า', 'คลัง'
+      'สาขา', 'กลุ่มสินค้า', 'วันที่', 'เลขที่บิล', 'ประเภท', 'รหัสสินค้า', 'ชื่อสินค้า', 'รับเข้า(In)', 'มูลค่า', 'จ่ายออก(Out)', 'มูลค่า', 'คลัง', 'ส่วนลด', 'สุทธิ', 'ยกเลิกบิล', 'เลขที่ใบเสร็จ'
     ]);
 
     console.log('sortedGroups:', sortedGroups)
@@ -279,14 +301,14 @@ const DataTable = ({
     sortedGroups.forEach(group => {
       // แถวสรุปสาขา
       worksheetData.push([
-        `สาขา: ${group.branchCode}`, `${group.totalItems} รายการ`, `รวมรับเข้า ${group.totalQtyIn}`, `รวมจ่ายออก ${group.totalQtyOut}`, '', '', '', '', '', '', '', ''
+        `สาขา: ${group.branchCode}`, `${group.totalItems} รายการ`, `รวมรับเข้า ${group.totalQtyIn}`, `รวมจ่ายออก ${group.totalQtyOut}`, '', '', '', '', '', '', '', '', '', '', '', ''
       ]);
       
       // กลุ่มสินค้าแต่ละกลุ่ม
       groupByProductGroup(group.items).forEach(productGroup => {
         // แถวสรุปกลุ่มสินค้า
         worksheetData.push([
-          `  กลุ่ม: ${productGroup.groupName}`, `${productGroup.totalItems} รายการ`, `รวมรับเข้า ${productGroup.totalQtyIn}`, `รวมจ่ายออก ${productGroup.totalQtyOut}`, '', '', '', '', '', '', '', ''
+          `  กลุ่ม: ${productGroup.groupName}`, `${productGroup.totalItems} รายการ`, `รวมรับเข้า ${productGroup.totalQtyIn}`, `รวมจ่ายออก ${productGroup.totalQtyOut}`, '', '', '', '', '', '', '', '', '', '', '', ''
         ]);
         
         // รายการสินค้าในกลุ่ม
@@ -303,7 +325,11 @@ const DataTable = ({
             Number(item.S_InCost || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
             item.S_Out || '',
             Number(item.S_OutCost || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-            item.S_Stk || ''
+            item.S_Stk || '',
+            item.Discount || '',
+            item.Nettotal || '',
+            item.Refund || '',
+            item.RefNo || ''
           ]);
         });
       });
@@ -417,7 +443,7 @@ const DataTable = ({
                 currentTheme
               )}`}
             >
-              รายงานความเคลื่อนไหวสินค้าสินค้า
+              รายงานความเคลื่อนไหวสินค้า
             </h3>
             {sortedGroups.length > 0 && (
               <p className={`text-sm ${getThemeClasses("textMuted", currentTheme)} mt-2`}>
@@ -476,6 +502,7 @@ const DataTable = ({
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
                 onClick={() => handleSort('branchCode')}
+                style={{whiteSpace: 'nowrap'}}
               >
                 <div className="flex items-center">
                   สาขา
@@ -491,6 +518,7 @@ const DataTable = ({
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
                 onClick={() => handleSort('totalItems')}
+                style={{whiteSpace: 'nowrap'}}
               >
                 <div className="flex items-center justify-center">
                   จำนวนรายการ
@@ -506,6 +534,7 @@ const DataTable = ({
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
                 onClick={() => handleSort('totalQtyIn')}
+                style={{whiteSpace: 'nowrap'}}
               >
                 <div className="flex items-center justify-center">
                   รวมรับเข้า
@@ -521,6 +550,7 @@ const DataTable = ({
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
                 onClick={() => handleSort('totalQtyOut')}
+                style={{whiteSpace: 'nowrap'}}
               >
                 <div className="flex items-center justify-center">
                   รวมจ่ายออก
@@ -531,7 +561,40 @@ const DataTable = ({
                 className={`px-6 py-3 text-center text-xs font-medium ${getThemeClasses(
                   "textMuted",
                   currentTheme
+                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
+                  "textPrimary",
+                  currentTheme
+                )} ${getThemeClasses("transition", currentTheme)}`}
+                onClick={() => handleSort('totalDiscount')}
+                style={{whiteSpace: 'nowrap'}}
+              >
+                <div className="flex items-center justify-center">
+                  รวมส่วนลด
+                  {getSortIcon('totalDiscount')}
+                </div>
+              </th>
+              <th
+                className={`px-6 py-3 text-center text-xs font-medium ${getThemeClasses(
+                  "textMuted",
+                  currentTheme
+                )} uppercase tracking-wider cursor-pointer hover:${getThemeClasses(
+                  "textPrimary",
+                  currentTheme
+                )} ${getThemeClasses("transition", currentTheme)}`}
+                onClick={() => handleSort('totalNettotal')}
+                style={{whiteSpace: 'nowrap'}}
+              >
+                <div className="flex items-center justify-center">
+                  รวมสุทธิ
+                  {getSortIcon('totalNettotal')}
+                </div>
+              </th>
+              <th
+                className={`px-6 py-3 text-center text-xs font-medium ${getThemeClasses(
+                  "textMuted",
+                  currentTheme
                 )} uppercase tracking-wider`}
+                style={{whiteSpace: 'nowrap'}}
               >
                 รายละเอียด
               </th>
@@ -583,6 +646,22 @@ const DataTable = ({
                     >
                       {branchGroup.totalQtyOut.toLocaleString()}
                     </td>
+                    <td
+                      className={`px-6 py-4 text-center text-sm font-medium ${getThemeClasses(
+                        "textPrimary",
+                        currentTheme
+                      )}`}
+                    >
+                      {branchGroup.totalDiscount.toLocaleString()}
+                    </td>
+                    <td
+                      className={`px-6 py-4 text-center text-sm font-medium ${getThemeClasses(
+                        "textPrimary",
+                        currentTheme
+                      )}`}
+                    >
+                      {branchGroup.totalNettotal.toLocaleString()}
+                    </td>
                     <td className="px-6 py-4 text-center">
                       <button
                         onClick={() => toggleBranchExpansion(branchGroup.branchCode)}
@@ -620,7 +699,7 @@ const DataTable = ({
                                 currentTheme
                               )} pl-12`}
                             >
-                              <div className="flex items-center">
+                              <div className="flex items-center" style={{whiteSpace: 'nowrap'}}>
                                 <Layers className={`w-4 h-4 mr-2 ${getThemeClasses("secondary", currentTheme)}`} />
                                 {productGroup.groupName}
                               </div>
@@ -648,6 +727,22 @@ const DataTable = ({
                               )}`}
                             >
                               {productGroup.totalQtyOut.toLocaleString()}
+                            </td>
+                            <td
+                              className={`px-6 py-3 text-center text-sm ${getThemeClasses(
+                                "textSecondary",
+                                currentTheme
+                              )}`}
+                            >
+                              {productGroup.totalDiscount.toLocaleString()}
+                            </td>
+                            <td
+                              className={`px-6 py-3 text-center text-sm ${getThemeClasses(
+                                "textSecondary",
+                                currentTheme
+                              )}`}
+                            >
+                              {productGroup.totalNettotal.toLocaleString()}
                             </td>
                             <td className="px-6 py-3 text-center">
                               <button
@@ -677,55 +772,42 @@ const DataTable = ({
                           {expandedGroups.has(`${branchGroup.branchCode}-${productGroup.groupName}`) && (
                             <>
                               {/* Header สำหรับรายละเอียดสินค้า */}
-                              <tr className={`${getThemeClasses("tableHeader", currentTheme)}`}>
-                                <td
-                                  colSpan="4"
-                                  className={`px-6 py-2 text-xs font-medium ${getThemeClasses(
-                                    "textMuted",
-                                    currentTheme
-                                  )} uppercase tracking-wider pl-16`}
-                                >
-                                  <div className="grid grid-cols-10 gap-4">
-                                    <span>วันที่</span>
-                                    <span>เลขที่บิล</span>
-                                    <span>ประเภท</span>
-                                    <span>รหัสสินค้า</span>
-                                    <span>ชื่อสินค้า</span>
-                                    <span className='text-right'>รับเข้า(In)</span>
-                                    <span className='text-right'>มูลค่า</span>
-                                    <span className='w-28 text-right'>จ่ายออก(Out)</span>
-                                    <span className='text-right'>มูลค่า</span>
-                                    <span>คลัง</span>
-                                  </div>
-                                </td>
+                              <tr className={`${getThemeClasses("tableHeader", currentTheme)}`}> 
+                                <td className={`px-2 py-2 text-xs font-medium ${getThemeClasses("textMuted", currentTheme)} uppercase tracking-wider pl-16`} style={{whiteSpace: 'nowrap'}}>วันที่</td>
+                                <td className={`px-2 py-2 text-xs font-medium ${getThemeClasses("textMuted", currentTheme)} uppercase tracking-wider`} style={{whiteSpace: 'nowrap'}}>เลขที่บิล</td>
+                                <td className={`px-2 py-2 text-xs font-medium ${getThemeClasses("textMuted", currentTheme)} uppercase tracking-wider`} style={{whiteSpace: 'nowrap'}}>ประเภท</td>
+                                <td className={`px-2 py-2 text-xs font-medium ${getThemeClasses("textMuted", currentTheme)} uppercase tracking-wider`} style={{whiteSpace: 'nowrap'}}>รหัสสินค้า</td>
+                                <td className={`px-2 py-2 text-xs font-medium ${getThemeClasses("textMuted", currentTheme)} uppercase tracking-wider`} style={{whiteSpace: 'nowrap'}}>ชื่อสินค้า</td>
+                                <td className={`px-2 py-2 text-xs font-medium ${getThemeClasses("textMuted", currentTheme)} uppercase tracking-wider text-right`} style={{whiteSpace: 'nowrap'}}>รับเข้า(In)</td>
+                                <td className={`px-2 py-2 text-xs font-medium ${getThemeClasses("textMuted", currentTheme)} uppercase tracking-wider text-right`} style={{whiteSpace: 'nowrap'}}>มูลค่า</td>
+                                <td className={`px-2 py-2 text-xs font-medium ${getThemeClasses("textMuted", currentTheme)} uppercase tracking-wider text-right`} style={{whiteSpace: 'nowrap'}}>จ่ายออก(Out)</td>
+                                <td className={`px-2 py-2 text-xs font-medium ${getThemeClasses("textMuted", currentTheme)} uppercase tracking-wider text-right`} style={{whiteSpace: 'nowrap'}}>มูลค่า</td>
+                                <td className={`px-2 py-2 text-xs font-medium ${getThemeClasses("textMuted", currentTheme)} uppercase tracking-wider`} style={{whiteSpace: 'nowrap'}}>คลัง</td>
+                                <td className={`px-2 py-2 text-xs font-medium ${getThemeClasses("textMuted", currentTheme)} uppercase tracking-wider text-right`} style={{whiteSpace: 'nowrap'}}>ส่วนลด</td>
+                                <td className={`px-2 py-2 text-xs font-medium ${getThemeClasses("textMuted", currentTheme)} uppercase tracking-wider text-right`} style={{whiteSpace: 'nowrap'}}>สุทธิ</td>
+                                <td className={`px-2 py-2 text-xs font-medium ${getThemeClasses("textMuted", currentTheme)} uppercase tracking-wider`} style={{whiteSpace: 'nowrap'}}>ยกเลิกบิล</td>
+                                <td className={`px-2 py-2 text-xs font-medium ${getThemeClasses("textMuted", currentTheme)} uppercase tracking-wider`} style={{whiteSpace: 'nowrap'}}>เลขที่ใบเสร็จ</td>
                               </tr>
-                              
                               {/* รายการสินค้าในกลุ่ม */}
                               {productGroup.items.map((item, index) => (
                                 <tr
                                   key={`${item.S_No}-${index}`}
                                   className={`${getThemeClasses("tableRow", currentTheme)}`}
                                 >
-                                  <td
-                                    colSpan="4"
-                                    className={`px-6 py-2 text-sm ${getThemeClasses(
-                                      "textSecondary",
-                                      currentTheme
-                                    )} pl-16`}
-                                  >
-                                    <div className="grid grid-cols-10 gap-4">
-                                      <span>{moment(item.S_Date).format("DD/MM/YYYY")}</span>
-                                      <span>{item.S_No}</span>
-                                      <span>{item.S_Rem}</span>
-                                      <span>{item.S_PCode}</span>
-                                      <span className="truncate" title={item.PDesc}>{item.PDesc}</span>
-                                      <span className="text-right">{item.S_In}</span>
-                                      <span className="text-right">{Number(item.S_InCost || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                      <span className="text-right">{item.S_Out}</span>
-                                      <span className="text-right">{Number(item.S_OutCost || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                      <span>{item.S_Stk}</span>
-                                    </div>
-                                  </td>
+                                  <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)} pl-16`}>{moment(item.S_Date).format("DD/MM/YYYY")}</td>
+                                  <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)}`}>{item.S_No}</td>
+                                  <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)}`}>{item.S_Rem}</td>
+                                  <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)}`}>{item.S_PCode}</td>
+                                  <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)} truncate`} title={item.PDesc}>{item.PDesc}</td>
+                                  <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)} text-right`}>{item.S_In}</td>
+                                  <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)} text-right`}>{Number(item.S_InCost || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                                  <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)} text-right`}>{item.S_Out}</td>
+                                  <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)} text-right`}>{Number(item.S_OutCost || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                                  <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)}`}>{item.S_Stk}</td>
+                                  <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)} text-right`}>{Number(item.Discount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                                  <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)} text-right`}>{Number(item.Nettotal || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                                  <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)}`}>{item.Refund}</td>
+                                  <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)}`}>{item.RefNo}</td>
                                 </tr>
                               ))}
                             </>
