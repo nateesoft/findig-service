@@ -19,6 +19,10 @@ import moment from 'moment';
 import React from 'react';
 import * as XLSX from 'xlsx';
 
+function getCurrencyFormat(value) {
+  return Number(value || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
 const DataTable = ({
     getThemeClasses,
     currentTheme,
@@ -46,7 +50,7 @@ const DataTable = ({
           totalQtyIn: 0,
           totalQtyOut: 0,
           totalDiscount: 0,
-          totalNettotal: 0
+          totalNetTotal: 0
         };
       }
       acc[branchCode].items.push(item);
@@ -54,7 +58,7 @@ const DataTable = ({
       acc[branchCode].totalQtyIn += Number(item.S_In || 0);
       acc[branchCode].totalQtyOut += Number(item.S_Out || 0);
       acc[branchCode].totalDiscount += Number(item.Discount || 0);
-      acc[branchCode].totalNettotal += Number(item.Nettotal || 0);
+      acc[branchCode].totalNetTotal += Number(item.NetTotal || 0);
       return acc;
     }, {});
     
@@ -73,7 +77,7 @@ const DataTable = ({
           totalQtyIn: 0,
           totalQtyOut: 0,
           totalDiscount: 0,
-          totalNettotal: 0
+          totalNetTotal: 0
         };
       }
       acc[groupName].items.push(item);
@@ -81,7 +85,7 @@ const DataTable = ({
       acc[groupName].totalQtyIn += Number(item.S_In || 0);
       acc[groupName].totalQtyOut += Number(item.S_Out || 0);
       acc[groupName].totalDiscount += Number(item.Discount || 0);
-      acc[groupName].totalNettotal += Number(item.Nettotal || 0);
+      acc[groupName].totalNetTotal += Number(item.NetTotal || 0);
       return acc;
     }, {});
     
@@ -145,9 +149,9 @@ const DataTable = ({
     } else if (sortField === 'totalDiscount') {
       aValue = a.totalDiscount;
       bValue = b.totalDiscount;
-    } else if (sortField === 'totalNettotal') {
-      aValue = a.totalNettotal;
-      bValue = b.totalNettotal;
+    } else if (sortField === 'totalNetTotal') {
+      aValue = a.totalNetTotal;
+      bValue = b.totalNetTotal;
     } else {
       return 0;
     }
@@ -262,7 +266,7 @@ const DataTable = ({
                     <td class="text-right">${Number(item.S_OutCost || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                     <td class="text-center">${item.S_Stk || ''}</td>
                     <td class="text-right">${Number(item.Discount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                    <td class="text-right">${Number(item.Nettotal || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td class="text-right">${Number(item.NetTotal || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                     <td class="text-center">${item.Refund || ''}</td>
                     <td class="text-center">${item.RefNo || ''}</td>
                   </tr>
@@ -326,8 +330,8 @@ const DataTable = ({
             item.S_Out || '',
             Number(item.S_OutCost || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
             item.S_Stk || '',
-            item.Discount || '',
-            item.Nettotal || '',
+            Number(item.Discount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+            Number(item.NetTotal || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
             item.Refund || '',
             item.RefNo || ''
           ]);
@@ -581,12 +585,12 @@ const DataTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('totalNettotal')}
+                onClick={() => handleSort('totalNetTotal')}
                 style={{whiteSpace: 'nowrap'}}
               >
                 <div className="flex items-center justify-center">
                   รวมสุทธิ
-                  {getSortIcon('totalNettotal')}
+                  {getSortIcon('totalNetTotal')}
                 </div>
               </th>
               <th
@@ -636,7 +640,7 @@ const DataTable = ({
                         currentTheme
                       )}`}
                     >
-                      {branchGroup.totalQtyIn.toLocaleString()}
+                      {getCurrencyFormat(branchGroup.totalQtyIn)}
                     </td>
                     <td
                       className={`px-6 py-4 text-center text-sm font-medium ${getThemeClasses(
@@ -644,7 +648,7 @@ const DataTable = ({
                         currentTheme
                       )}`}
                     >
-                      {branchGroup.totalQtyOut.toLocaleString()}
+                      {getCurrencyFormat(branchGroup.totalQtyOut)}
                     </td>
                     <td
                       className={`px-6 py-4 text-center text-sm font-medium ${getThemeClasses(
@@ -652,7 +656,7 @@ const DataTable = ({
                         currentTheme
                       )}`}
                     >
-                      {branchGroup.totalDiscount.toLocaleString()}
+                      {getCurrencyFormat(branchGroup.totalDiscount)}
                     </td>
                     <td
                       className={`px-6 py-4 text-center text-sm font-medium ${getThemeClasses(
@@ -660,7 +664,7 @@ const DataTable = ({
                         currentTheme
                       )}`}
                     >
-                      {branchGroup.totalNettotal.toLocaleString()}
+                      {getCurrencyFormat(branchGroup.totalNetTotal)}
                     </td>
                     <td className="px-6 py-4 text-center">
                       <button
@@ -718,7 +722,7 @@ const DataTable = ({
                                 currentTheme
                               )}`}
                             >
-                              {productGroup.totalQtyIn.toLocaleString()}
+                              {getCurrencyFormat(productGroup.totalQtyIn)}
                             </td>
                             <td
                               className={`px-6 py-3 text-center text-sm ${getThemeClasses(
@@ -726,7 +730,7 @@ const DataTable = ({
                                 currentTheme
                               )}`}
                             >
-                              {productGroup.totalQtyOut.toLocaleString()}
+                              {getCurrencyFormat(productGroup.totalQtyOut)}
                             </td>
                             <td
                               className={`px-6 py-3 text-center text-sm ${getThemeClasses(
@@ -734,7 +738,7 @@ const DataTable = ({
                                 currentTheme
                               )}`}
                             >
-                              {productGroup.totalDiscount.toLocaleString()}
+                              {getCurrencyFormat(productGroup.totalDiscount)}
                             </td>
                             <td
                               className={`px-6 py-3 text-center text-sm ${getThemeClasses(
@@ -742,7 +746,7 @@ const DataTable = ({
                                 currentTheme
                               )}`}
                             >
-                              {productGroup.totalNettotal.toLocaleString()}
+                              {getCurrencyFormat(productGroup.totalNetTotal)}
                             </td>
                             <td className="px-6 py-3 text-center">
                               <button
@@ -805,7 +809,7 @@ const DataTable = ({
                                   <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)} text-right`}>{Number(item.S_OutCost || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                                   <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)}`}>{item.S_Stk}</td>
                                   <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)} text-right`}>{Number(item.Discount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                                  <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)} text-right`}>{Number(item.Nettotal || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                                  <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)} text-right`}>{Number(item.NetTotal || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                                   <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)}`}>{item.Refund}</td>
                                   <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)}`}>{item.RefNo}</td>
                                 </tr>
