@@ -105,6 +105,7 @@ const processStockFromSale = async (req, res, next) => {
     const { saleInfo } = req.body
     const dataInfo = await StockInProcessService.processStockFromSale({
       payload: { ...saleInfo },
+      repository: StockInRepository,
       db: req.db
     })
     res.json(dataInfo)

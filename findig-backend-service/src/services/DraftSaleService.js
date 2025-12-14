@@ -1,4 +1,3 @@
-const cache = require('../utils/cache')
 const { mappingResultData, mappingResultDataList } = require("../utils/ConvertThai")
 const { getMoment } = require("../utils/MomentUtil")
 const { generateUUID } = require("../utils/StringUtil")

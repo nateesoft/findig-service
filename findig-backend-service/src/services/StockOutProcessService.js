@@ -18,11 +18,11 @@ const StockOutDetailsRepository = require('../repository/StockOutDetailsReposito
 const StcardService = require("./StcardService")
 const StcardRepository = require("../repository/StcardRepository")
 
-const processStockFromSale = async ({ payload, db }) => {
+const processStockFromSale = async ({ payload, repository, db }) => {
   try {
     validatePayload(payload, ['id', 'billno'])
     
-    const { billno } = payload
+    const { id, billno } = payload
 
     const resultDetails = await StockOutDetailsService.getSaleDetailsByBillNo({
       payload: { billno },
@@ -45,7 +45,19 @@ const processStockFromSale = async ({ payload, db }) => {
       stockTranType: 'stock-out'
     })
 
-    return processStcard
+    if(processStcard) {
+      const results = await repository.processStockFromSale({
+          payload: { id },
+          db
+        })
+        if (results) {
+          return results
+        } else {
+          return { error: "Failed to update stock_out." }
+        }
+    } else {
+      return { error: "Failed to update stcard." }
+    }
   } catch (error) {
     throw new Error(`Service error in processStockFromStockOut: ${error.message}`)
   }

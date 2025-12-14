@@ -1,4 +1,3 @@
-const cache = require('../utils/cache')
 const { getMoment } = require("../utils/MomentUtil")
 
 const validatePayload = (payload, requiredFields = []) => {
@@ -11,12 +10,6 @@ const validatePayload = (payload, requiredFields = []) => {
       throw new Error(`Missing required field: ${field}`)
     }
   }
-}
-
-const generateCacheKey = (functionName, payload) => {
-  const date = getMoment().format('YYYY-MM-DD')
-  const payloadHash = JSON.stringify(payload)
-  return `${functionName}_${date}_${Buffer.from(payloadHash).toString('base64').slice(0, 10)}`
 }
 
 const DraftSaleDetailsService = require("../services/DraftSaleDetailsService")
