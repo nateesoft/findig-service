@@ -18,14 +18,11 @@ const StockOutDetailsRepository = require('../repository/StockOutDetailsReposito
 const StcardService = require("./StcardService")
 const StcardRepository = require("../repository/StcardRepository")
 
-const StkfileService = require("./StkfileService")
-const StkfileRepository = require("../repository/StkfileRepository")
-
-const processStockFromSale = async ({ payload, repository, db }) => {
+const processStockFromSale = async ({ payload, db }) => {
   try {
     validatePayload(payload, ['id', 'billno'])
     
-    const { id, billno } = payload
+    const { billno } = payload
 
     const resultDetails = await StockOutDetailsService.getSaleDetailsByBillNo({
       payload: { billno },
@@ -38,48 +35,19 @@ const processStockFromSale = async ({ payload, repository, db }) => {
       S_Date: getMoment().format("YYYY-MM-DD HH:mm:ss")
     }
 
-    const processStcard = await StcardService.processStock({
+    const processStcard = await StcardService.processStockTranfer({
       payload: {
         billInfo: mappingPayload,
         sale_items: resultDetails
       },
       repository: StcardRepository,
-      db
+      db,
+      stockTranType: 'stock-out'
     })
 
-    if (processStcard) {
-      const processStkfile = await StkfileService.processStock({
-        payload: {
-          billInfo: mappingPayload,
-          sale_items: resultDetails
-        },
-        repository: StkfileRepository,
-        db
-      })
-
-      if (processStkfile) {
-        const results = await repository.processStockFromSale({
-          payload: { id },
-          db
-        })
-        if (results) {
-          return results
-        } else {
-          // rollback stkfile
-          // rollback stcard
-          return { error: "Failed to update stock_out." }
-        }
-      } else {
-        // rollback stcard
-        // TODO:
-
-        return { error: "Failed to create stkfile." }
-      }
-    } else {
-      return { error: "Failed to update stcard." }
-    }
+    return processStcard
   } catch (error) {
-    throw new Error(`Service error in processStockFromSale: ${error.message}`)
+    throw new Error(`Service error in processStockFromStockOut: ${error.message}`)
   }
 }
 

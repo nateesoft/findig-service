@@ -233,7 +233,7 @@ const CreateEditModal = ({
                     currentTheme
                   )}`}
                 >
-                  <option value="">ทุกสาขา</option>
+                  <option value="">เลือกสาขา</option>
                   {branchFile && branchFile.map(item=>
                     <option key={item.Code} value={item.Code}>{item.Code}-{item.Name}</option>
                   )}
@@ -672,7 +672,7 @@ const CreateEditModal = ({
             </button>
             <button
               onClick={handleNewSaleSubmit}
-              disabled={!saleHeader.billNo || saleItems.length === 0}
+              disabled={!saleHeader.billNo || saleItems.length === 0 || !branchCode}
               className={`px-6 py-2 text-white rounded-lg font-medium ${getThemeClasses(
                 "primaryBtn",
                 currentTheme

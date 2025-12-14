@@ -105,7 +105,6 @@ const processStockFromSale = async (req, res, next) => {
     const { saleInfo } = req.body
     const dataInfo = await StockOutProcessService.processStockFromSale({
       payload: { ...saleInfo },
-      repository: StockOutRepository,
       db: req.db
     })
     res.json(dataInfo)

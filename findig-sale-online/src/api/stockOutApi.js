@@ -78,6 +78,7 @@ export const loadStockOutById = async (payload) => {
 
 export const createStockOutInfo = async (payload) => {
     try {
+        console.log(payload)
         const response = await apiClient.post(`/api/stock-out`, {...payload})
         return { data: response.data, error: null }
     } catch (error) {

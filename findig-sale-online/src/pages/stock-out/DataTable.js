@@ -136,7 +136,7 @@ const DataTable = ({
                 <td class="text-center">${moment(item.document_date).format('DD/MM/YYYY HH:mm:ss')}</td>
                 <td class="text-right">${item.total_item || ''}</td>
                 <td class="text-center">${item.emp_code || ''}</td>
-                <td class="text-center">${item.branch_stock_out || ''}</td>
+                <td class="text-center">${item.branch_stock_out_code || ''}</td>
                 <td class="text-center">
                   <span class="${
                     item.post_status === 'Y' ? 'status-y' : 
@@ -178,7 +178,7 @@ const DataTable = ({
         moment(item.document_date).format('DD/MM/YYYY HH:mm:ss'),
         item.total_item || '',
         item.emp_code || '',
-        item.branch_stock_out || '',
+        item.branch_stock_out_code || '',
         item.post_status || ''
       ]);
     });
@@ -408,11 +408,11 @@ const DataTable = ({
                   "textPrimary",
                   currentTheme
                 )} ${getThemeClasses("transition", currentTheme)}`}
-                onClick={() => handleSort('branch_stock_out')}
+                onClick={() => handleSort('branch_stock_out_code')}
               >
                 <div className="flex items-center">
                   สาขาที่โอนสินค้าออก
-                  {getSortIcon('branch_stock_out')}
+                  {getSortIcon('branch_stock_out_code')}
                 </div>
               </th>
               <th
@@ -492,7 +492,7 @@ const DataTable = ({
                       currentTheme
                     )}`}
                   >
-                    {stock_out.branch_stock_out}
+                    {stock_out.branch_stock_out_code}
                   </td>
                   <td
                     className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(

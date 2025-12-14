@@ -28,7 +28,7 @@ const POSTModal = ({ currentTheme, postStatus, filteredSales, currentProcessingI
                       POST โอนสินค้าเข้า
                     </h3>
                     <p className={`text-sm ${getThemeClasses('textSecondary', currentTheme)}`}>
-                      ประมวลผลรายการโอนสินค้าเข้าและตัดสต๊อกสินค้า
+                      ประมวลผลรายการโอนสินค้าเข้าและบันทึก Stock Card
                     </p>
                   </div>
                 </div>
@@ -86,20 +86,6 @@ const POSTModal = ({ currentTheme, postStatus, filteredSales, currentProcessingI
                       </div>
                     );
                   })()}
-
-                  <div className={`p-3 rounded-lg ${currentTheme === 'dark' ? 'bg-yellow-900 bg-opacity-20' : 'bg-yellow-50'} border-l-4 border-yellow-400`}>
-                    <div className="flex items-start space-x-3">
-                      <AlertTriangle className="w-5 h-5 text-yellow-600 mt-0.5" />
-                      <div>
-                        <p className={`text-sm font-medium ${getThemeClasses('textPrimary', currentTheme)}`}>
-                          คำเตือน
-                        </p>
-                        <p className={`text-sm ${getThemeClasses('textSecondary', currentTheme)}`}>
-                          การ POST จะตัดสต๊อกสินค้าและไม่สามารถยกเลิกได้ กรุณาตรวจสอบข้อมูลให้ถูกต้องก่อนดำเนินการ
-                        </p>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               )}
 
@@ -244,7 +230,7 @@ const POSTModal = ({ currentTheme, postStatus, filteredSales, currentProcessingI
                       className={`px-6 py-2 text-white rounded-lg font-medium bg-green-500 hover:bg-green-600 ${getThemeClasses('transition', currentTheme)} hover:shadow-lg flex items-center disabled:opacity-50 disabled:cursor-not-allowed`}
                     >
                       <Upload className="w-4 h-4 mr-2" />
-                      เริ่มการ POST
+                      ยืนยันข้อมูลเข้าสู่ระบบ
                     </button>
                   </>
                 )}

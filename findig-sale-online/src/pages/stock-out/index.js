@@ -423,6 +423,7 @@ const Sales = () => {
       } else {
         result = await createStockOutInfo({
           branchCode: saleHeader.branchCode, 
+          branchStockOutCode: saleHeader.branchStockOutCode,
           billNo: saleHeader.billNo, 
           empCode: saleHeader.empCode, 
           totalItem: totalQty,

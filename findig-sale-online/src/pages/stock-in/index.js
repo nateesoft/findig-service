@@ -422,7 +422,8 @@ const Sales = () => {
         });
       } else {
         result = await createStockInInfo({
-          branchCode: saleHeader.branchCode, 
+          branchCode: saleHeader.branchCode,
+          branchStockInCode: saleHeader.branchStockInCode,
           billNo: saleHeader.billNo, 
           empCode: saleHeader.empCode, 
           totalItem: totalQty,

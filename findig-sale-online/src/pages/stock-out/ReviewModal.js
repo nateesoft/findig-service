@@ -47,7 +47,7 @@ const ReviewModal = ({
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   <div>
                     <label className={`block text-sm font-medium ${getThemeClasses('textSecondary', currentTheme)} mb-1`}>
-                      เลขที่ใบเสร็จ
+                      เลขที่เอกสาร
                     </label>
                     <p className={`text-sm ${getThemeClasses('textPrimary', currentTheme)} font-medium`}>
                       {currentSaleData.billNo}
@@ -63,7 +63,7 @@ const ReviewModal = ({
                   </div>
                   <div>
                     <label className={`block text-sm font-medium ${getThemeClasses('textSecondary', currentTheme)} mb-1`}>
-                      สาขา
+                      สาขาที่โอนสินค้าออก
                     </label>
                     <p className={`text-sm ${getThemeClasses('textPrimary', currentTheme)} font-medium`}>
                       {currentSaleData.branchCode}
