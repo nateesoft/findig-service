@@ -15,8 +15,8 @@ const validatePayload = (payload, requiredFields = []) => {
   }
 }
 
-const DraftSaleDetailsService = require("../services/DraftSaleDetailsService")
-const DraftSaleDetailsRepository = require('../repository/DraftSaleDetailsRepository')
+const StockOutDetailsService = require("./StockOutDetailsService")
+const StockOutDetailsRepository = require('../repository/StockOutDetailsRepository')
 
 const getData = async ({ payload, repository, db }) => {
   try {
@@ -42,9 +42,9 @@ const getDataById = async ({ payload, repository, db }) => {
   try {
     const results = await repository.getDataById({ payload, db })
     if(results.length > 0) {
-      const resultDetails = await DraftSaleDetailsService.getSaleDetailsByBillNo({ 
+      const resultDetails = await StockOutDetailsService.getSaleDetailsByBillNo({ 
         payload: { billno: results[0]?.billno },
-        repository: DraftSaleDetailsRepository,
+        repository: StockOutDetailsRepository,
         db
       })
       const list1 = mappingResultData(results)
@@ -106,9 +106,9 @@ const saveData = async ({ payload, repository, db }) => {
     }
     const results = await repository.saveData({ payload: mappingPayload, db })
     if(results) {
-      // save draft sale details
+      // save stock in details
       for (const sale of sale_items) {
-        await DraftSaleDetailsService.saveData({
+        await StockOutDetailsService.saveData({
           payload: {
             billno: billno, 
             barcode: sale.barcode, 
@@ -120,7 +120,7 @@ const saveData = async ({ payload, repository, db }) => {
             can_stock: sale.canStock,
             can_set: sale.canSet
           },
-          repository: DraftSaleDetailsRepository,
+          repository: StockOutDetailsRepository,
           db
         })
       };
@@ -135,24 +135,25 @@ const updateData = async ({ payload, repository, db }) => {
   try {
     validatePayload(payload, ['saleItems', 'billno', 'empCode'])
     
-    const { saleItems, billno, totalItem, empCode } = payload
+    const { saleItems, billno, totalItem, empCode, branchStockOutCode } = payload
     const mappingPayload = {
       ...payload,
       total_item: totalItem,
       emp_code_update: empCode,
+      branch_stock_out_code: branchStockOutCode,
       update_date: getMoment().format('YYYY-MM-DD HH:mm:ss')
     }
     const results = await repository.updateData({ payload: mappingPayload, db })
     if(results) {
       // delete old sale details
-      await DraftSaleDetailsService.deleteDataByBillNo({
+      await StockOutDetailsService.deleteDataByBillNo({
         payload: { billno },
-        repository: DraftSaleDetailsRepository,
+        repository: StockOutDetailsRepository,
         db
       })
-      // save new draft sale details
+      // save new stock in details
       for (const sale of saleItems) {
-        await DraftSaleDetailsService.saveData({
+        await StockOutDetailsService.saveData({
           payload: {
             billno: billno, 
             barcode: sale.barcode, 
@@ -164,7 +165,7 @@ const updateData = async ({ payload, repository, db }) => {
             can_stock: sale.canStock,
             can_set: sale.canSet
           },
-          repository: DraftSaleDetailsRepository,
+          repository: StockOutDetailsRepository,
           db
         })
       };

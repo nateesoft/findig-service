@@ -9,6 +9,14 @@ export const MENU_GROUPS = [
     page: 'dashboard'
   },
   {
+    id: 'stock',
+    label: 'ระบบคลังสินค้า',
+    items: [
+      { id: 'stock-in', label: 'โอนสินค้าเข้า', page: 'stock-in' },
+      { id: 'stock-out', label: 'โอนสินค้าออก', page: 'stock-out' }
+    ]
+  },
+  {
     id: 'sales',
     label: 'กลุ่มเมนูการขาย',
     items: [

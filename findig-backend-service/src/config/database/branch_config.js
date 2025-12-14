@@ -36,7 +36,7 @@ module.exports = [
         host: 'localhost',
         user: 'root',
         password: 'nathee2024',
-        database: 'MyPOS',
+        database: 'MyRetail652findigColo',
         port: '3306'
       },
       crm: {
