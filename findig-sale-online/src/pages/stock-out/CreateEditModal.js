@@ -226,8 +226,8 @@ const CreateEditModal = ({
                   รหัสสาขาที่โอนออก
                 </label>
                 <select
-                  value={branchCode}
-                  onChange={(e) => setBranchCode(e.target.value)}
+                  value={saleHeader.branchStockOutCode}
+                  onChange={(e) => setSaleHeader({ ...saleHeader, branchStockOutCode: e.target.value })}
                   className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
                     "input",
                     currentTheme
@@ -672,7 +672,7 @@ const CreateEditModal = ({
             </button>
             <button
               onClick={handleNewSaleSubmit}
-              disabled={!saleHeader.billNo || saleItems.length === 0 || !branchCode}
+              disabled={!saleHeader.billNo || saleItems.length === 0 || !saleHeader.branchStockOutCode}
               className={`px-6 py-2 text-white rounded-lg font-medium ${getThemeClasses(
                 "primaryBtn",
                 currentTheme

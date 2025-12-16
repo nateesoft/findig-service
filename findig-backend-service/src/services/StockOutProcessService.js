@@ -37,7 +37,10 @@ const processStockFromSale = async ({ payload, repository, db }) => {
 
     const processStcard = await StcardService.processStockTranfer({
       payload: {
-        billInfo: mappingPayload,
+        billInfo: {
+          ...mappingPayload,
+          branch_code: payload.branch_stock_out_code
+        },
         sale_items: resultDetails
       },
       repository: StcardRepository,

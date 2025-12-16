@@ -492,7 +492,7 @@ const DataTable = ({
                       currentTheme
                     )}`}
                   >
-                    {stock_in.branch_stock_in}
+                    {stock_in.branch_stock_in_code}
                   </td>
                   <td
                     className={`px-6 py-4 whitespace-nowrap text-center text-sm ${getThemeClasses(

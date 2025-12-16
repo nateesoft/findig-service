@@ -182,7 +182,7 @@ const CreateEditModal = ({
                   type="text"
                   value={saleHeader.billNo}
                   onChange={(e) =>
-                    setSaleHeader({ ...saleHeader, billNo: e.target.value, branchStockInCode: branchCode})
+                    setSaleHeader({ ...saleHeader, billNo: e.target.value })
                   }
                   onKeyDown={(e) => handleEnterKeyNavigation(e, barcodeInputRef)}
                   className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
@@ -226,8 +226,8 @@ const CreateEditModal = ({
               รหัสสาขาที่โอนเข้า
             </label>
             <select
-              value={branchCode}
-              onChange={(e) => setBranchCode(e.target.value)}
+              value={saleHeader.branchStockInCode}
+              onChange={(e) => setSaleHeader({ ...saleHeader, branchStockInCode: e.target.value })}
               className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
                 "input",
                 currentTheme
@@ -672,7 +672,7 @@ const CreateEditModal = ({
             </button>
             <button
               onClick={handleNewSaleSubmit}
-              disabled={!saleHeader.billNo || saleItems.length === 0 || !branchCode}
+              disabled={!saleHeader.billNo || saleItems.length === 0 || !saleHeader.branchStockInCode}
               className={`px-6 py-2 text-white rounded-lg font-medium ${getThemeClasses(
                 "primaryBtn",
                 currentTheme
