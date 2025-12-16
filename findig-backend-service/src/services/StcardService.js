@@ -167,9 +167,9 @@ const processStockTranfer = async ({ payload, repository, db, stockTranType }) =
 
     let stockRem = null
     if(stockTranType == 'stock-in') {
-      stockRem = 'TRI'
+      stockRem = 'TRI_HQ'
     } else if(stockTranType == 'stock-out') {
-      stockRem = 'TRO'
+      stockRem = 'TRO_HQ'
     } else {
       throw new Error('Invalid stockTranType: must be "stock-in" or "stock-out"')
     }
