@@ -34,7 +34,8 @@ const CreateEditModal = ({
     setShowSaleModal,
     resetNewSaleForm,
     handleNewSaleSubmit,
-    branchFile
+    branchFile,
+    setActiveModal
 }) => {
 
   const [branchCode, setBranchCode] = useState('');
@@ -77,6 +78,39 @@ const CreateEditModal = ({
         addItemToSale();
       }
     }
+  };
+
+  // Validate and show missing fields
+  const handleSubmitClick = () => {
+    const missingFields = [];
+
+    if (!saleHeader.billNo) {
+      missingFields.push('เลขที่เอกสาร');
+    }
+    if (!saleHeader.branchStockInCode) {
+      missingFields.push('รหัสสาขาที่โอนเข้า');
+    }
+    if (saleItems.length === 0) {
+      missingFields.push('รายการสินค้า (ต้องมีอย่างน้อย 1 รายการ)');
+    }
+
+    if (missingFields.length > 0) {
+      setActiveModal({
+        type: 'warning',
+        title: 'ไม่สามารถยืนยันข้อมูลได้',
+        message: `กรุณากรอกข้อมูลให้ครบถ้วน:\n${missingFields.map((field, index) => `${index + 1}. ${field}`).join('\n')}`,
+        actions: [
+          {
+            label: 'ตกลง',
+            onClick: () => setActiveModal(null)
+          }
+        ]
+      });
+      return;
+    }
+
+    // If all validations pass, submit
+    handleNewSaleSubmit();
   };
 
   return (
@@ -249,7 +283,7 @@ const CreateEditModal = ({
               currentTheme
             )} border ${getThemeClasses("cardBorder", currentTheme)}`}
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
               <div className="relative">
                 <label
                   className={`block text-sm font-medium ${getThemeClasses(
@@ -372,6 +406,28 @@ const CreateEditModal = ({
                     currentTheme
                   )} mb-2`}
                 >
+                  ราคา
+                </label>
+                <input
+                  type="number"
+                  value={currentItem.price}
+                  className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
+                    "input",
+                    currentTheme
+                  )} bg-gray-100 dark:bg-gray-700`}
+                  placeholder="0.00"
+                  disabled
+                  readOnly
+                />
+              </div>
+
+              <div>
+                <label
+                  className={`block text-sm font-medium ${getThemeClasses(
+                    "textSecondary",
+                    currentTheme
+                  )} mb-2`}
+                >
                   คลังสินค้า
                 </label>
                 <select
@@ -416,10 +472,11 @@ const CreateEditModal = ({
                       });
                     }}
                     onKeyDown={handleQtyEnterKey}
-                    className={`flex-1 px-3 py-2 border rounded-lg ${getThemeClasses(
+                    className={`px-3 py-2 border rounded-lg ${getThemeClasses(
                       "input",
                       currentTheme
                     )}`}
+                    style={{ width: '140px' }}
                     onFocus={(e) => e.target.select()}
                     placeholder="0"
                   />
@@ -486,6 +543,14 @@ const CreateEditModal = ({
                         ชื่อสินค้า
                       </th>
                       <th
+                        className={`px-4 py-2 text-right text-xs font-medium ${getThemeClasses(
+                          "textMuted",
+                          currentTheme
+                        )} uppercase tracking-wider`}
+                      >
+                        ราคา
+                      </th>
+                      <th
                         className={`px-4 py-2 text-center text-xs font-medium ${getThemeClasses(
                           "textMuted",
                           currentTheme
@@ -540,6 +605,14 @@ const CreateEditModal = ({
                           )}`}
                         >
                           {item.productName}
+                        </td>
+                        <td
+                          className={`px-4 py-3 text-right text-sm ${getThemeClasses(
+                            "textSecondary",
+                            currentTheme
+                          )}`}
+                        >
+                          {item.price ? item.price.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'}
                         </td>
                         <td
                           className={`px-4 py-3 text-center text-sm ${getThemeClasses(
@@ -671,15 +744,14 @@ const CreateEditModal = ({
               ล้างข้อมูล
             </button>
             <button
-              onClick={handleNewSaleSubmit}
-              disabled={!saleHeader.billNo || saleItems.length === 0 || !saleHeader.branchStockInCode}
+              onClick={handleSubmitClick}
               className={`px-6 py-2 text-white rounded-lg font-medium ${getThemeClasses(
                 "primaryBtn",
                 currentTheme
               )} ${getThemeClasses(
                 "transition",
                 currentTheme
-              )} hover:shadow-lg transform hover:scale-105 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none`}
+              )} hover:shadow-lg transform hover:scale-105 flex items-center justify-center`}
             >
               {modalMode === "edit" ? (
                 <Edit className="w-4 h-4 mr-2" />

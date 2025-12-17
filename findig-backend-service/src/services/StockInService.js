@@ -119,7 +119,8 @@ const saveData = async ({ payload, repository, db }) => {
             emp_code: emp_code,
             emp_code_update: emp_code,
             can_stock: sale.canStock,
-            can_set: sale.canSet
+            can_set: sale.canSet,
+            product_price: sale.price
           },
           repository: StockInDetailsRepository,
           db
@@ -164,7 +165,8 @@ const updateData = async ({ payload, repository, db }) => {
             emp_code: empCode,
             emp_code_update: empCode,
             can_stock: sale.canStock,
-            can_set: sale.canSet
+            can_set: sale.canSet,
+            product_price: sale.price
           },
           repository: StockInDetailsRepository,
           db

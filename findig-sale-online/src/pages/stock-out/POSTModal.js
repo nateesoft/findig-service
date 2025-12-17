@@ -77,10 +77,10 @@ const POSTModal = ({ currentTheme, postStatus, filteredSales, currentProcessingI
                         </div>
                         <div className="text-center p-4 rounded-lg border-2 border-green-200 dark:border-green-700">
                           <div className="text-2xl font-bold text-green-600">{totalItems}</div>
-                          <div className={`text-sm ${getThemeClasses('textSecondary', currentTheme)}`}>รายการสินค้า</div>
+                          <div className={`text-sm ${getThemeClasses('textSecondary', currentTheme)}`}>จำนวนสินค้า</div>
                         </div>
                         <div className="text-center p-4 rounded-lg border-2 border-purple-200 dark:border-purple-700">
-                          <div className="text-2xl font-bold text-purple-600">{tempSales.length > 0 ? tempSales[0].branch_code || 'หลายสาขา' : '-'}</div>
+                          <div className="text-2xl font-bold text-purple-600">{tempSales.length > 0 ? tempSales[0].branch_stock_out_code || 'หลายสาขา' : '-'}</div>
                           <div className={`text-sm ${getThemeClasses('textSecondary', currentTheme)}`}>สาขา</div>
                         </div>
                       </div>

@@ -187,12 +187,14 @@ const processStockTranfer = async ({ payload, repository, db, stockTranType }) =
 
       let stockInQty = 0
       let stockOutQty = 0
+      let inCost = 0
+      let outCost = 0
       if(stockTranType == 'stock-in') {
-        stockInQty = item.qty
-        stockOutQty = 0
+        stockInQty = item.qty || 0
+        inCost = item.product_price || 0
       } else if(stockTranType == 'stock-out') {
-        stockInQty = 0
-        stockOutQty = item.qty
+        stockOutQty = item.qty || 0
+        outCost = item.product_price || 0
       }
 
       const stcard = {
@@ -205,8 +207,8 @@ const processStockTranfer = async ({ payload, repository, db, stockTranType }) =
         S_Stk: item.stock_code,
         S_In: stockInQty,
         S_Out: stockOutQty,
-        S_InCost: 0,
-        S_OutCost: 0,
+        S_InCost: inCost,
+        S_OutCost: outCost,
         S_ACost: 0,
         S_Rem: stockRem,
         S_User: item.emp_code_update,

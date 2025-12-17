@@ -48,14 +48,16 @@ const Sales = () => {
   });
 
   const [productSearchTerm, setProductSearchTerm] = useState('');
-  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [searchResults, setSearchResults] = useState([]);
   const [showAutocomplete, setShowAutocomplete] = useState(false);
   const [selectedProductIndex, setSelectedProductIndex] = useState(-1);
 
-  const [productList, setProductList] = useState([])
+  const [isSearching, setIsSearching] = useState(false);
   
   const barcodeInputRef = useRef(null);
   const autocompleteRef = useRef(null);
+  const searchTimeoutRef = useRef(null);
+  const latestSearchRef = useRef('');
   
   const [saleHeader, setSaleHeader] = useState({
     billNo: '',
@@ -68,6 +70,7 @@ const Sales = () => {
   const [currentItem, setCurrentItem] = useState({
     barcode: '',
     productName: '',
+    price: 0,
     stock: '',
     qty: 0,
     canStock: null,
@@ -76,34 +79,60 @@ const Sales = () => {
 
   const [saleItems, setSaleItems] = useState([]);
 
-  const searchProducts = (term) => {
-    if (!term) return [];
-    const searchTerm = term.toLowerCase();
-    return productList.filter(product => 
-      product.PCode.toLowerCase().includes(searchTerm) || 
-      product.PDesc.toLowerCase().includes(searchTerm)
-    ).slice(0, 10); // จำกัดผลลัพธ์ 10 รายการ
-  };
-
-  useEffect(() => {
-    if (productSearchTerm && productSearchTerm.length >= 2) {
-      const filtered = searchProducts(productSearchTerm);
-      setFilteredProducts(filtered);
-      
-      // Auto-select if only one result found
-      if (filtered.length === 1) {
-        selectProduct(filtered[0]);
-        setShowAutocomplete(false);
-      } else {
-        setShowAutocomplete(filtered.length > 0);
-        setSelectedProductIndex(-1);
-      }
-    } else {
-      setFilteredProducts([]);
+  // Debounced search with API call
+  const performSearch = async (searchTerm) => {
+    if (!searchTerm || searchTerm.trim().length === 0) {
+      setSearchResults([]);
       setShowAutocomplete(false);
-      setSelectedProductIndex(-1);
+      setIsSearching(false);
+      return;
     }
-  }, [productSearchTerm]);
+
+    // Store latest search term in ref to prevent race condition
+    latestSearchRef.current = searchTerm;
+    setIsSearching(true);
+
+    try {
+      const { data } = await loadAllProduct(searchTerm);
+
+      // Only update if this is still the latest search
+      if (latestSearchRef.current === searchTerm) {
+        if (data && data.length > 0) {
+          setSearchResults(data);
+
+          // Check for exact match
+          const exactMatch = data.find(product =>
+            product.PCode.toLowerCase() === searchTerm.toLowerCase()
+          );
+
+          if (exactMatch) {
+            // Exact match found - auto select
+            selectProduct(exactMatch);
+            setShowAutocomplete(false);
+          } else if (data.length === 1) {
+            // Only one result - auto select
+            selectProduct(data[0]);
+            setShowAutocomplete(false);
+          } else {
+            // Multiple results - show autocomplete
+            setShowAutocomplete(true);
+            setSelectedProductIndex(-1);
+          }
+        } else {
+          // No results
+          setSearchResults([]);
+          setShowAutocomplete(false);
+        }
+        setIsSearching(false);
+      }
+    } catch (error) {
+      if (latestSearchRef.current === searchTerm) {
+        setSearchResults([]);
+        setShowAutocomplete(false);
+        setIsSearching(false);
+      }
+    }
+  };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -118,13 +147,13 @@ const Sales = () => {
   }, []);
 
   const handleBarcodeKeyDown = (e) => {
-    if (!showAutocomplete || filteredProducts.length === 0) return;
+    if (!showAutocomplete) return;
 
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
         setSelectedProductIndex(prev => 
-          prev < filteredProducts.length - 1 ? prev + 1 : prev
+          prev < searchResults.length - 1 ? prev + 1 : prev
         );
         break;
       case 'ArrowUp':
@@ -134,7 +163,7 @@ const Sales = () => {
       case 'Enter':
         if (selectedProductIndex >= 0) {
           e.preventDefault();
-          selectProduct(filteredProducts[selectedProductIndex]);
+          selectProduct(searchResults[selectedProductIndex]);
         }
         break;
       case 'Escape':
@@ -148,8 +177,9 @@ const Sales = () => {
     setCurrentItem({
       barcode: product.PCode,
       productName: product.PDesc,
-      stock: product.stock,
-      qty: product.qty,
+      price: product.PPrice11 || 0,
+      stock: currentItem.stock || '',
+      qty: currentItem.qty || 0,
       canStock: product.PStock,
       canSet: product.PSet
     });
@@ -163,40 +193,39 @@ const Sales = () => {
 
   const handleBarcodeChange = (e) => {
     const value = e.target.value;
+
+    // Update search term immediately
+    setProductSearchTerm(value);
+
+    // Always clear current item when typing
     setCurrentItem({
-      ...currentItem, 
       barcode: value,
       productName: '', // Clear product name when barcode changes
+      price: 0,
       stock: '',       // Clear stock as well
+      qty: 0,
       canStock: null,
       canSet: null
     });
-    setProductSearchTerm(value);
-    
+
     // Clear previous timeout
-    if (window.barcodeSearchTimeout) {
-      clearTimeout(window.barcodeSearchTimeout);
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
     }
-    
-    // Set delay before search
-    window.barcodeSearchTimeout = setTimeout(async () => {
-      if (value) {
-        await initLoadProduct(value);
-        
-        // Check for exact barcode match first
-        const exactMatch = productList.find(product => product.barcode === value);
-        if (exactMatch) {
-          selectProduct(exactMatch);
-          return;
-        }
-        
-        // If no exact match, check search results and auto-select if only one
-        const searchResults = searchProducts(value);
-        if (searchResults.length === 1) {
-          selectProduct(searchResults[0]);
-        }
-      }
-    }, 500); // 500ms delay
+
+    // If empty, clear everything immediately
+    if (!value || value.trim().length === 0) {
+      setSearchResults([]);
+      setShowAutocomplete(false);
+      setIsSearching(false);
+      latestSearchRef.current = '';
+      return;
+    }
+
+    // Debounce search - wait for user to stop typing
+    searchTimeoutRef.current = setTimeout(() => {
+      performSearch(value.trim());
+    }, 300);
   };
 
   const resetNewSaleForm = () => {
@@ -210,6 +239,7 @@ const Sales = () => {
     setCurrentItem({
       barcode: '',
       productName: '',
+      price: 0,
       stock: '',
       qty: 0,
       canStock: null,
@@ -224,11 +254,22 @@ const Sales = () => {
     setCurrentItem({
       barcode: '',
       productName: '',
+      price: 0,
       stock: '',
       qty: 0,
       canStock: null,
       canSet: null
     });
+    setProductSearchTerm('');
+    setSearchResults([]);
+    setShowAutocomplete(false);
+    setIsSearching(false);
+    latestSearchRef.current = '';
+
+    // Clear any pending search
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
   };
 
   const addItemToSale = () => {
@@ -272,41 +313,8 @@ const Sales = () => {
     const itemToEdit = saleItems.find(item => item.id === itemId);
     if (itemToEdit) {
       setCurrentItem({ ...itemToEdit});
+      setProductSearchTerm(itemToEdit.barcode || '');
       removeItemFromSale(itemId);
-    }
-  };
-
-  const initLoadProduct = async (searchText) => {
-    try {
-      const { data, error } = await loadAllProduct(searchText);
-      if (data) {
-        setProductList(data)
-        setProductSearchTerm(searchText);
-      } else {
-        setActiveModal({
-          type: 'error',
-          title: 'ไม่สามารถแสดงข้อมูลได้',
-          message: error || 'กรุณาลองใหม่อีกครั้ง',
-          actions: [
-            {
-              label: 'ตกลง',
-              onClick: () => setActiveModal(null)
-            }
-          ]
-        });
-      }
-    } catch (error) {
-      setActiveModal({
-        type: 'error',
-        title: 'ไม่สามารถแสดงข้อมูลได้',
-        message: error || 'กรุณาลองใหม่อีกครั้ง',
-        actions: [
-          {
-            label: 'ตกลง',
-            onClick: () => setActiveModal(null)
-          }
-        ]
-      });
     }
   };
 
@@ -668,13 +676,14 @@ const Sales = () => {
       initLoadAllbranch()
     }, [])
 
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (window.barcodeSearchTimeout) {
-        clearTimeout(window.barcodeSearchTimeout);
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
       }
     };
-  }, [])
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -761,7 +770,7 @@ const Sales = () => {
           currentItem={currentItem}
           setCurrentItem={setCurrentItem}
           productSearchTerm={productSearchTerm}
-          filteredProducts={filteredProducts}
+          filteredProducts={searchResults}
           showAutocomplete={showAutocomplete}
           selectedProductIndex={selectedProductIndex}
           barcodeInputRef={barcodeInputRef}
@@ -776,6 +785,7 @@ const Sales = () => {
           resetNewSaleForm={resetNewSaleForm}
           handleNewSaleSubmit={handleNewSaleSubmit}
           branchFile={branchFile}
+          setActiveModal={setActiveModal}
         />
       )}
 
