@@ -6,7 +6,7 @@ import {
 
 import { getThemeClasses } from '../../utils/themes';
 import { AppContext } from '../../contexts';
-import { createDraftSaleInfo, loadDraftSaleById, loadDraftSaleInfo, processStockFromSale, searchData, updateDraftSaleInfo } from '../../api/saleApi';
+import { createStockInInfo, loadStockInById, loadStockInInfo, processStockFromSale, searchData, updateStockInInfo } from '../../api/stockInApi';
 import { loadAllProduct } from '../../api/productApi';
 import POSTModal from './POSTModal';
 import ReviewModal from './ReviewModal';
@@ -23,7 +23,7 @@ const Sales = () => {
   const { appData } = useContext(AppContext)
   const { currentTheme, branchCode, userInfo } = appData
 
-  const [draftSale, setDraftSale] = useState([])
+  const [stockIn, setStockInSale] = useState([])
   const [filteredSales, setFilteredSales] = useState([])
   const [showSaleModal, setShowSaleModal] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
@@ -51,25 +51,25 @@ const Sales = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [showAutocomplete, setShowAutocomplete] = useState(false);
   const [selectedProductIndex, setSelectedProductIndex] = useState(-1);
-
   const [isSearching, setIsSearching] = useState(false);
-  
+
   const barcodeInputRef = useRef(null);
   const autocompleteRef = useRef(null);
   const searchTimeoutRef = useRef(null);
   const latestSearchRef = useRef('');
   
   const [saleHeader, setSaleHeader] = useState({
-    branchCode: '',
     billNo: '',
     empCode: userInfo.UserName,
     createDate: new Date().toISOString().split('T')[0],
-    branchCode: branchCode
+    branchCode: branchCode,
+    branchStockInCode: ''
   });
 
   const [currentItem, setCurrentItem] = useState({
     barcode: '',
     productName: '',
+    price: 0,
     stock: '',
     qty: 0,
     canStock: null,
@@ -176,6 +176,7 @@ const Sales = () => {
     setCurrentItem({
       barcode: product.PCode,
       productName: product.PDesc,
+      price: product.PPrice11 || 0,
       stock: currentItem.stock || '',
       qty: currentItem.qty || 0,
       canStock: product.PStock,
@@ -183,7 +184,7 @@ const Sales = () => {
     });
     setProductSearchTerm(product.PCode);
     setSelectedProductIndex(-1);
-    
+
     setTimeout(() => {
       setShowAutocomplete(false);
     }, 50);
@@ -191,20 +192,21 @@ const Sales = () => {
 
   const handleBarcodeChange = (e) => {
     const value = e.target.value;
+
     // Update search term immediately
     setProductSearchTerm(value);
 
     // Always clear current item when typing
-
     setCurrentItem({
       barcode: value,
-      productName: '', // Clear product name when barcode changes
-      stock: '',       // Clear stock as well
+      productName: '',
+      price: 0,
+      stock: '',
       qty: 0,
       canStock: null,
       canSet: null
     });
-    
+
     // Clear previous timeout
     if (searchTimeoutRef.current) {
       clearTimeout(searchTimeoutRef.current);
@@ -223,12 +225,12 @@ const Sales = () => {
     searchTimeoutRef.current = setTimeout(() => {
       performSearch(value.trim());
     }, 300);
-
   };
 
   const resetNewSaleForm = () => {
     setSaleHeader({
       branchCode: branchCode,
+      branchStockInCode: '',
       billNo: '',
       empCode: userInfo.UserName,
       createDate: new Date().toISOString().split('T')[0],
@@ -236,6 +238,7 @@ const Sales = () => {
     setCurrentItem({
       barcode: '',
       productName: '',
+      price: 0,
       stock: '',
       qty: 0,
       canStock: null,
@@ -250,6 +253,7 @@ const Sales = () => {
     setCurrentItem({
       barcode: '',
       productName: '',
+      price: 0,
       stock: '',
       qty: 0,
       canStock: null,
@@ -290,7 +294,7 @@ const Sales = () => {
 
     setSaleItems(prev => [...prev, newItem]);
     resetCurrentItem();
-    
+
     // Focus back to barcode input after adding item
     setTimeout(() => {
       if (barcodeInputRef.current) {
@@ -314,7 +318,7 @@ const Sales = () => {
 
   const handleReviewSale = async (id) => {
     try {
-      const { data, error } = await loadDraftSaleById({ id });
+      const { data, error } = await loadStockInById({ id });
       
       if (data) {
         setCurrentSaleData(data);
@@ -350,7 +354,7 @@ const Sales = () => {
 
   const handleEditSale = async (id) => {
     try {
-      const { data, error } = await loadDraftSaleById({ id });
+      const { data, error } = await loadStockInById({ id });
       
       if (data) {
         setSaleHeader({
@@ -417,14 +421,15 @@ const Sales = () => {
     try {
       let result;
       if (modalMode === 'edit') {
-        result = await updateDraftSaleInfo({
+        result = await updateStockInInfo({
           ...saleHeader,
           totalItem: totalQty,
           saleItems
         });
       } else {
-        result = await createDraftSaleInfo({
-          branchCode: saleHeader.branchCode, 
+        result = await createStockInInfo({
+          branchCode: saleHeader.branchCode,
+          branchStockInCode: saleHeader.branchStockInCode,
           billNo: saleHeader.billNo, 
           empCode: saleHeader.empCode, 
           totalItem: totalQty,
@@ -471,12 +476,12 @@ const Sales = () => {
     try {
       setIsLoading(true)
 
-      const { data, error } = await loadDraftSaleInfo({
+      const { data, error } = await loadStockInInfo({
         branchCode: branchCode
       })
 
       if(data) {
-        setDraftSale(data)
+        setStockInSale(data)
       }else {
         setActiveModal({
           type: 'error',
@@ -569,7 +574,7 @@ const Sales = () => {
       setPostStatus('completed');
       
       setTimeout(async () => {
-        // Reload draft sale data
+        // Reload stock in data
         await initLoadData();
         
         // Also reload search results to refresh the filtered data
@@ -620,12 +625,12 @@ const Sales = () => {
       empCode: '',
       postStatus: ''
     });
-    setFilteredSales(draftSale);
+    setFilteredSales(stockIn);
   };
 
   useEffect(() => {
-    setFilteredSales(draftSale);
-  }, [draftSale]);
+    setFilteredSales(stockIn);
+  }, [stockIn]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -676,12 +681,12 @@ const Sales = () => {
         clearTimeout(searchTimeoutRef.current);
       }
     };
-  }, [])
+  }, []);
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-        <h1 className={`text-2xl font-bold ${getThemeClasses('textPrimary', currentTheme)}`}>เมนูบันทึกการขาย</h1>
+        <h1 className={`text-2xl font-bold ${getThemeClasses('textPrimary', currentTheme)}`}>เมนูโอนสินค้าเข้า</h1>
         <div className="mt-4 sm:mt-0 flex space-x-3">
           <button 
             onClick={() => setShowSearchForm(!showSearchForm)}
@@ -694,7 +699,7 @@ const Sales = () => {
             onClick={handlePostStock}
             className={`text-white px-4 py-2 rounded-lg font-medium bg-green-500 hover:bg-green-600 hover:shadow-lg transform hover:scale-105 transition-all duration-300 ease-in-out flex items-center`}>
             <Upload className="w-4 h-4 mr-2" />
-            POST ตัดสต๊อก
+            POST โอนสินค้าเข้า
           </button>
           <button 
             onClick={handleCreateNew}
@@ -712,7 +717,7 @@ const Sales = () => {
           searchCriteria={searchCriteria}
           setSearchCriteria={setSearchCriteria}
           filteredSales={filteredSales}
-          draftSale={draftSale}
+          stockIn={stockIn}
           resetSearch={resetSearch}
           handleSearch={handleSearch}
           branchFile={branchFile}
@@ -777,6 +782,8 @@ const Sales = () => {
           setShowSaleModal={setShowSaleModal}
           resetNewSaleForm={resetNewSaleForm}
           handleNewSaleSubmit={handleNewSaleSubmit}
+          branchFile={branchFile}
+          setActiveModal={setActiveModal}
         />
       )}
 

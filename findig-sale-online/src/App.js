@@ -20,6 +20,8 @@ import ProtectedRoute from "./components/Auth/ProtectedRoute"
 
 import Dashboard from "./pages/Dashboard"
 
+import StockIn from "./pages/stock-in"
+import StockOut from "./pages/stock-out"
 import Sales from "./pages/sale"
 import StcardPage from "./pages/stcard"
 import StkfilePage from "./pages/stkfile"
@@ -340,6 +342,60 @@ const AppContent = () => {
                 sidebarOpen={sidebarOpen}
               >
                 <Dashboard currentTheme={currentTheme} />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/stock-in"
+          element={
+            <ProtectedRoute user={user} isInitialized={isInitialized}>
+              <AppLayout
+                user={user}
+                currentTheme={currentTheme}
+                setSidebarOpen={setSidebarOpen}
+                setShowLogoutConfirm={setShowLogoutConfirm}
+                expandedMenus={expandedMenus}
+                setExpandedMenus={setExpandedMenus}
+                sidebarOpen={sidebarOpen}
+              >
+                <StockIn
+                  currentTheme={currentTheme}
+                  searchTerm={searchTerm}
+                  setSearchTerm={setSearchTerm}
+                  selectedCustomer={selectedCustomer}
+                  setSelectedCustomer={setSelectedCustomer}
+                  cart={cart}
+                  setCart={setCart}
+                />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/stock-out"
+          element={
+            <ProtectedRoute user={user} isInitialized={isInitialized}>
+              <AppLayout
+                user={user}
+                currentTheme={currentTheme}
+                setSidebarOpen={setSidebarOpen}
+                setShowLogoutConfirm={setShowLogoutConfirm}
+                expandedMenus={expandedMenus}
+                setExpandedMenus={setExpandedMenus}
+                sidebarOpen={sidebarOpen}
+              >
+                <StockOut
+                  currentTheme={currentTheme}
+                  searchTerm={searchTerm}
+                  setSearchTerm={setSearchTerm}
+                  selectedCustomer={selectedCustomer}
+                  setSelectedCustomer={setSelectedCustomer}
+                  cart={cart}
+                  setCart={setCart}
+                />
               </AppLayout>
             </ProtectedRoute>
           }

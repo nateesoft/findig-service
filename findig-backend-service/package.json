@@ -6,6 +6,7 @@
     "start": "node ./bin/www",
     "dev": "node --env-file=.env.local ./bin/www",
     "ics": "node --env-file=.env.prod ./bin/www",
+    "ics:test": "node --env-file=.env.test ./bin/www",
     "local:watch": "nodemon --trace-warnings ./bin/www",
     "start:watch": "nodemon ./bin/www"
   },

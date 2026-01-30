@@ -161,10 +161,82 @@ const processStock = async ({ payload, repository, db }) => {
   }
 }
 
+const processStockTranfer = async ({ payload, repository, db, stockTranType }) => {
+  try {
+    validatePayload(payload, ['billInfo', 'sale_items'])
+
+    let stockRem = null
+    if(stockTranType == 'stock-in') {
+      stockRem = 'TRI_HQ'
+    } else if(stockTranType == 'stock-out') {
+      stockRem = 'TRO_HQ'
+    } else {
+      throw new Error('Invalid stockTranType: must be "stock-in" or "stock-out"')
+    }
+    
+    const { billInfo, sale_items } = payload
+    for (const [index, item] of sale_items.entries()) {
+      const existing = await repository.findByBillNoPCode({
+        payload: {
+          S_Bran: billInfo.branch_code,
+          S_No: billInfo.billno,
+          S_PCode: item.barcode
+        },
+        db
+      })
+
+      let stockInQty = 0
+      let stockOutQty = 0
+      let inCost = 0
+      let outCost = 0
+      if(stockTranType == 'stock-in') {
+        stockInQty = item.qty || 0
+        inCost = item.product_price || 0
+      } else if(stockTranType == 'stock-out') {
+        stockOutQty = item.qty || 0
+        outCost = item.product_price || 0
+      }
+
+      const stcard = {
+        S_Bran: billInfo.branch_code,
+        S_Date: getMoment(item.create_date).format('YYYY-MM-DD HH:mm:ss'),
+        S_No: billInfo.billno,
+        S_SubNo: "",
+        S_Que: (index + 1),
+        S_PCode: item.barcode,
+        S_Stk: item.stock_code,
+        S_In: stockInQty,
+        S_Out: stockOutQty,
+        S_InCost: inCost,
+        S_OutCost: outCost,
+        S_ACost: 0,
+        S_Rem: stockRem,
+        S_User: item.emp_code_update,
+        S_EntryDate: getMoment().format('YYYY-MM-DD'),
+        S_EntryTime: getMoment().format('HH:mm:ss'),
+        S_Link: "",
+        Source_Data: "WEB",
+        Data_Sync: "N"
+      }
+
+      if (existing) {
+        await repository.updateStcard({ payload: { ...stcard }, db })
+      } else {
+        await repository.createStcard({ payload: { ...stcard }, db })
+      }
+    }
+
+    return true
+  } catch (error) {
+    throw new Error(`Service error in processStock: ${error.message}`)
+  }
+}
+
 module.exports = {
   getSTCard,
   getAllSTCard,
   processStock,
   searchStCardData,
-  getReportStcard
+  getReportStcard,
+  processStockTranfer
 }

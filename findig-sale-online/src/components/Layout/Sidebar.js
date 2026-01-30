@@ -10,7 +10,8 @@ import {
   ChevronDown,
   ChevronRight,
   Settings,
-  Box
+  Box,
+  BaggageClaim
 } from 'lucide-react';
 import { getThemeClasses, themes } from '../../utils/themes';
 import { MENU_GROUPS } from '../../utils/constants';
@@ -29,6 +30,7 @@ const Sidebar = ({
   
   const iconMap = {
     dashboard: Home,
+    stock: BaggageClaim,
     sales: ShoppingCart,
     postSales: Box,
     reports: BarChart3,
@@ -44,6 +46,8 @@ const Sidebar = ({
 
   const pageToPath = {
     'dashboard': '/dashboard',
+    'stock-in': '/stock-in',
+    'stock-out': '/stock-out',
     'sales': '/sales',
     'stcard': '/stcard',
     'stkfile': '/stkfile',

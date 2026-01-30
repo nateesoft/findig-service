@@ -6,7 +6,7 @@ import {
 
 import { getThemeClasses } from '../../utils/themes';
 import { AppContext } from '../../contexts';
-import { createDraftSaleInfo, loadDraftSaleById, loadDraftSaleInfo, processStockFromSale, searchData, updateDraftSaleInfo } from '../../api/saleApi';
+import { createStockOutInfo, loadStockOutById, loadStockOutInfo, processStockFromSale, searchData, updateStockOutInfo } from '../../api/stockOutApi';
 import { loadAllProduct } from '../../api/productApi';
 import POSTModal from './POSTModal';
 import ReviewModal from './ReviewModal';
@@ -23,7 +23,7 @@ const Sales = () => {
   const { appData } = useContext(AppContext)
   const { currentTheme, branchCode, userInfo } = appData
 
-  const [draftSale, setDraftSale] = useState([])
+  const [stockOut, setStockOut] = useState([])
   const [filteredSales, setFilteredSales] = useState([])
   const [showSaleModal, setShowSaleModal] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
@@ -60,16 +60,17 @@ const Sales = () => {
   const latestSearchRef = useRef('');
   
   const [saleHeader, setSaleHeader] = useState({
-    branchCode: '',
     billNo: '',
     empCode: userInfo.UserName,
     createDate: new Date().toISOString().split('T')[0],
-    branchCode: branchCode
+    branchCode: branchCode,
+    branchStockOutCode: ''
   });
 
   const [currentItem, setCurrentItem] = useState({
     barcode: '',
     productName: '',
+    price: 0,
     stock: '',
     qty: 0,
     canStock: null,
@@ -176,6 +177,7 @@ const Sales = () => {
     setCurrentItem({
       barcode: product.PCode,
       productName: product.PDesc,
+      price: product.PPrice11 || 0,
       stock: currentItem.stock || '',
       qty: currentItem.qty || 0,
       canStock: product.PStock,
@@ -191,20 +193,21 @@ const Sales = () => {
 
   const handleBarcodeChange = (e) => {
     const value = e.target.value;
+
     // Update search term immediately
     setProductSearchTerm(value);
 
     // Always clear current item when typing
-
     setCurrentItem({
       barcode: value,
       productName: '', // Clear product name when barcode changes
+      price: 0,
       stock: '',       // Clear stock as well
       qty: 0,
       canStock: null,
       canSet: null
     });
-    
+
     // Clear previous timeout
     if (searchTimeoutRef.current) {
       clearTimeout(searchTimeoutRef.current);
@@ -223,12 +226,12 @@ const Sales = () => {
     searchTimeoutRef.current = setTimeout(() => {
       performSearch(value.trim());
     }, 300);
-
   };
 
   const resetNewSaleForm = () => {
     setSaleHeader({
       branchCode: branchCode,
+      branchStockOutCode: '',
       billNo: '',
       empCode: userInfo.UserName,
       createDate: new Date().toISOString().split('T')[0],
@@ -236,6 +239,7 @@ const Sales = () => {
     setCurrentItem({
       barcode: '',
       productName: '',
+      price: 0,
       stock: '',
       qty: 0,
       canStock: null,
@@ -250,6 +254,7 @@ const Sales = () => {
     setCurrentItem({
       barcode: '',
       productName: '',
+      price: 0,
       stock: '',
       qty: 0,
       canStock: null,
@@ -290,6 +295,7 @@ const Sales = () => {
 
     setSaleItems(prev => [...prev, newItem]);
     resetCurrentItem();
+    setProductSearchTerm('');
     
     // Focus back to barcode input after adding item
     setTimeout(() => {
@@ -314,7 +320,7 @@ const Sales = () => {
 
   const handleReviewSale = async (id) => {
     try {
-      const { data, error } = await loadDraftSaleById({ id });
+      const { data, error } = await loadStockOutById({ id });
       
       if (data) {
         setCurrentSaleData(data);
@@ -350,7 +356,7 @@ const Sales = () => {
 
   const handleEditSale = async (id) => {
     try {
-      const { data, error } = await loadDraftSaleById({ id });
+      const { data, error } = await loadStockOutById({ id });
       
       if (data) {
         setSaleHeader({
@@ -417,14 +423,15 @@ const Sales = () => {
     try {
       let result;
       if (modalMode === 'edit') {
-        result = await updateDraftSaleInfo({
+        result = await updateStockOutInfo({
           ...saleHeader,
           totalItem: totalQty,
           saleItems
         });
       } else {
-        result = await createDraftSaleInfo({
+        result = await createStockOutInfo({
           branchCode: saleHeader.branchCode, 
+          branchStockOutCode: saleHeader.branchStockOutCode,
           billNo: saleHeader.billNo, 
           empCode: saleHeader.empCode, 
           totalItem: totalQty,
@@ -471,12 +478,12 @@ const Sales = () => {
     try {
       setIsLoading(true)
 
-      const { data, error } = await loadDraftSaleInfo({
+      const { data, error } = await loadStockOutInfo({
         branchCode: branchCode
       })
 
       if(data) {
-        setDraftSale(data)
+        setStockOut(data)
       }else {
         setActiveModal({
           type: 'error',
@@ -569,7 +576,7 @@ const Sales = () => {
       setPostStatus('completed');
       
       setTimeout(async () => {
-        // Reload draft sale data
+        // Reload stock out data
         await initLoadData();
         
         // Also reload search results to refresh the filtered data
@@ -620,12 +627,12 @@ const Sales = () => {
       empCode: '',
       postStatus: ''
     });
-    setFilteredSales(draftSale);
+    setFilteredSales(stockOut);
   };
 
   useEffect(() => {
-    setFilteredSales(draftSale);
-  }, [draftSale]);
+    setFilteredSales(stockOut);
+  }, [stockOut]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -676,12 +683,12 @@ const Sales = () => {
         clearTimeout(searchTimeoutRef.current);
       }
     };
-  }, [])
+  }, []);
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-        <h1 className={`text-2xl font-bold ${getThemeClasses('textPrimary', currentTheme)}`}>เมนูบันทึกการขาย</h1>
+        <h1 className={`text-2xl font-bold ${getThemeClasses('textPrimary', currentTheme)}`}>เมนูโอนสินค้าออก</h1>
         <div className="mt-4 sm:mt-0 flex space-x-3">
           <button 
             onClick={() => setShowSearchForm(!showSearchForm)}
@@ -694,7 +701,7 @@ const Sales = () => {
             onClick={handlePostStock}
             className={`text-white px-4 py-2 rounded-lg font-medium bg-green-500 hover:bg-green-600 hover:shadow-lg transform hover:scale-105 transition-all duration-300 ease-in-out flex items-center`}>
             <Upload className="w-4 h-4 mr-2" />
-            POST ตัดสต๊อก
+            POST โอนสินค้าออก
           </button>
           <button 
             onClick={handleCreateNew}
@@ -712,7 +719,7 @@ const Sales = () => {
           searchCriteria={searchCriteria}
           setSearchCriteria={setSearchCriteria}
           filteredSales={filteredSales}
-          draftSale={draftSale}
+          stockOut={stockOut}
           resetSearch={resetSearch}
           handleSearch={handleSearch}
           branchFile={branchFile}
@@ -777,6 +784,8 @@ const Sales = () => {
           setShowSaleModal={setShowSaleModal}
           resetNewSaleForm={resetNewSaleForm}
           handleNewSaleSubmit={handleNewSaleSubmit}
+          branchFile={branchFile}
+          setActiveModal={setActiveModal}
         />
       )}
 
