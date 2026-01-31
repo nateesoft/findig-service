@@ -113,16 +113,16 @@ const createStcard = async ({ payload, db }) => {
     }
     const { S_Bran, S_Date, S_No, S_SubNo, S_Que, 
       S_PCode, S_Stk, S_In, S_Out, S_InCost, S_OutCost, S_ACost, S_Rem, 
-      S_User, S_EntryDate, S_EntryTime, S_Link, Source_Data, Data_Sync } = payload
+      S_User, S_EntryDate, S_EntryTime, S_Link, Source_Data, Data_Sync, NetTotal=0 } = payload
     const sql = `INSERT INTO stcard
     (S_Bran, S_Date, S_No, S_SubNo, S_Que, S_PCode, S_Stk, S_In, S_Out, 
     S_InCost, S_OutCost, S_ACost, S_Rem, S_User, S_EntryDate, S_EntryTime, S_Link, 
-    Source_Data, Data_Sync)
-    VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    Source_Data, Data_Sync, NetTotal)
+    VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     const results = await db.pos.query(sql, [
       S_Bran, S_Date, S_No, S_SubNo, S_Que, S_PCode, S_Stk, S_In, S_Out, 
       S_InCost, S_OutCost, S_ACost, S_Rem, S_User, S_EntryDate, S_EntryTime, S_Link, 
-      Source_Data, Data_Sync])
+      Source_Data, Data_Sync, NetTotal])
     return results
   } catch (error) {
     throw new Error(`Database query failed: ${error.message}`);
@@ -136,16 +136,16 @@ const updateStcard = async ({ payload, db }) => {
     }
     const { S_Bran, S_Date, S_No, S_SubNo, S_Que, 
       S_PCode, S_Stk, S_In, S_Out, S_InCost, S_OutCost, S_ACost, S_Rem, 
-      S_User, S_EntryDate, S_EntryTime, S_Link, Source_Data, Data_Sync } = payload
+      S_User, S_EntryDate, S_EntryTime, S_Link, Source_Data, Data_Sync, NetTotal=0 } = payload
     const sql = `UPDATE stcard
         SET S_Date=?, S_SubNo=?, S_Que=?, S_Stk=?, 
         S_In=?, S_Out=?, S_InCost=?, S_OutCost=?, S_ACost=?, S_Rem=?, 
-        S_User=?, S_EntryDate=?, S_EntryTime=?, S_Link=?, Source_Data=?, Data_Sync=? 
+        S_User=?, S_EntryDate=?, S_EntryTime=?, S_Link=?, Source_Data=?, Data_Sync=?, NetTotal=? 
         WHERE S_Bran=? AND S_No=? AND S_PCode=?`
     const results = await db.pos.query(sql, [
       S_Date, S_SubNo, S_Que, S_Stk, 
       S_In, S_Out, S_InCost, S_OutCost, S_ACost, S_Rem, 
-      S_User, S_EntryDate, S_EntryTime, S_Link, Source_Data, Data_Sync, 
+      S_User, S_EntryDate, S_EntryTime, S_Link, Source_Data, Data_Sync, NetTotal,
       S_Bran, S_No, S_PCode])
     return results
   } catch (error) {

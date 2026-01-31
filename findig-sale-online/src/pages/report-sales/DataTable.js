@@ -682,7 +682,7 @@ const DataTable = ({
             ) : (
               <tr>
                 <td
-                  colSpan="4"
+                  colSpan="7"
                   className={`px-6 py-8 text-center text-sm ${getThemeClasses(
                     "textMuted",
                     currentTheme

@@ -75,7 +75,8 @@ const getDataById = async ({ payload, repository, db }) => {
         empCode: item.emp_code,
         empCodeUpdate: item.emp_code_update,
         canStock: item.can_stock,
-        canSet: item.can_set
+        canSet: item.can_set,
+        price: item.product_price
       }))
 
       const mapped = {
