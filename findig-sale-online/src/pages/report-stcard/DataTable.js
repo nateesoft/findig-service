@@ -261,9 +261,9 @@ const DataTable = ({
                     <td>${item.S_PCode || ''}</td>
                     <td>${item.PDesc || ''}</td>
                     <td class="text-right">${item.S_In || ''}</td>
-                    <td class="text-right">${Number(item.S_InCost || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td class="text-right">${Number(item.S_InCost ? item.UnitPrice : 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                     <td class="text-right">${item.S_Out || ''}</td>
-                    <td class="text-right">${Number(item.S_OutCost || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td class="text-right">${Number(item.S_OutCost ? item.UnitPrice : 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                     <td class="text-center">${item.S_Stk || ''}</td>
                     <td class="text-right">${Number(item.Discount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                     <td class="text-right">${Number(item.NetTotal || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
@@ -326,9 +326,9 @@ const DataTable = ({
             item.S_PCode || '',
             item.PDesc || '',
             item.S_In || '',
-            Number(item.S_InCost || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+            Number(item.S_InCost ? item.UnitPrice : 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
             item.S_Out || '',
-            Number(item.S_OutCost || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+            Number(item.S_OutCost ? item.UnitPrice : 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
             item.S_Stk || '',
             Number(item.Discount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
             Number(item.NetTotal || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
@@ -804,9 +804,9 @@ const DataTable = ({
                                   <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)}`}>{item.S_PCode}</td>
                                   <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)} truncate`} title={item.PDesc}>{item.PDesc}</td>
                                   <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)} text-right`}>{item.S_In}</td>
-                                  <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)} text-right`}>{Number(item.S_InCost || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                                  <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)} text-right`}>{Number(item.S_InCost ? item.UnitPrice : 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                                   <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)} text-right`}>{item.S_Out}</td>
-                                  <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)} text-right`}>{Number(item.S_OutCost || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                                  <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)} text-right`}>{Number(item.S_OutCost ? item.UnitPrice : 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                                   <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)}`}>{item.S_Stk}</td>
                                   <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)} text-right`}>{Number(item.Discount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                                   <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)} text-right`}>{Number(item.NetTotal || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
