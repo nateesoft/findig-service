@@ -33,7 +33,10 @@ const CreateEditModal = ({
     removeItemFromSale,
     setShowSaleModal,
     resetNewSaleForm,
-    handleNewSaleSubmit
+    handleNewSaleSubmit,
+    discount,
+    setDiscount,
+    calculateDiscount
 }) => {
   // Refs for form navigation
   const billNoInputRef = useRef(null);
@@ -205,11 +208,13 @@ const CreateEditModal = ({
                 <input
                   type="date"
                   value={saleHeader.createDate}
+                  onChange={(e) =>
+                    setSaleHeader({ ...saleHeader, createDate: e.target.value })
+                  }
                   className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
                     "input",
                     currentTheme
                   )}`}
-                  disabled
                 />
               </div>
               <div>
@@ -498,6 +503,24 @@ const CreateEditModal = ({
                         จำนวน
                       </th>
                       <th
+                        className={`px-4 py-2 text-right text-xs font-medium ${getThemeClasses(
+                          "textMuted",
+                          currentTheme
+                        )} uppercase tracking-wider`}
+                      >
+                        ราคา
+                      </th>
+                      {saleItems.some(item => item.discount > 0) && (
+                        <th
+                          className={`px-4 py-2 text-right text-xs font-medium ${getThemeClasses(
+                            "textMuted",
+                            currentTheme
+                          )} uppercase tracking-wider`}
+                        >
+                          ส่วนลด
+                        </th>
+                      )}
+                      <th
                         className={`px-4 py-2 text-center text-xs font-medium ${getThemeClasses(
                           "textMuted",
                           currentTheme
@@ -553,6 +576,21 @@ const CreateEditModal = ({
                         >
                           {item.qty}
                         </td>
+                        <td
+                          className={`px-4 py-3 text-right text-sm ${getThemeClasses(
+                            "textSecondary",
+                            currentTheme
+                          )}`}
+                        >
+                          {item.price ? item.price.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'}
+                        </td>
+                        {saleItems.some(i => i.discount > 0) && (
+                          <td
+                            className={`px-4 py-3 text-right text-sm text-red-500`}
+                          >
+                            {item.discount ? item.discount.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'}
+                          </td>
+                        )}
                         <td className={`px-4 py-3 text-center text-sm`}>
                           <div className="flex justify-center space-x-2">
                             <button
@@ -594,32 +632,68 @@ const CreateEditModal = ({
                   currentTheme === "dark" ? "bg-gray-800" : "bg-gray-50"
                 } border-t ${getThemeClasses("cardBorder", currentTheme)}`}
               >
-                <div className="flex justify-between items-center">
-                  <span
-                    className={`text-sm font-medium ${getThemeClasses(
-                      "textSecondary",
-                      currentTheme
-                    )}`}
-                  >
-                    สรุปรายการ
-                  </span>
-                  <div className="text-right">
-                    <div
-                      className={`text-lg font-bold ${getThemeClasses(
-                        "textPrimary",
-                        currentTheme
-                      )}`}
-                    >
-                      รวม {saleItems.reduce((sum, item) => sum + item.qty, 0)}{" "}
-                      ชิ้น
-                    </div>
-                    <div
-                      className={`text-sm ${getThemeClasses(
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                  <div className="flex flex-col gap-2">
+                    <span
+                      className={`text-sm font-medium ${getThemeClasses(
                         "textSecondary",
                         currentTheme
                       )}`}
                     >
-                      {saleItems.length} รายการ
+                      ส่วนลดท้ายใบเสร็จ
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={discount}
+                        onChange={(e) => setDiscount(e.target.value)}
+                        onFocus={(e) => e.target.select()}
+                        className={`w-36 px-3 py-2 border rounded-lg text-right ${getThemeClasses(
+                          "input",
+                          currentTheme
+                        )}`}
+                        placeholder="0.00"
+                      />
+                      <span className={`text-sm ${getThemeClasses("textSecondary", currentTheme)}`}>บาท</span>
+                      <button
+                        onClick={calculateDiscount}
+                        disabled={!discount || parseFloat(discount) <= 0}
+                        className={`px-4 py-2 text-white rounded-lg text-sm font-medium ${getThemeClasses(
+                          "primaryBtn",
+                          currentTheme
+                        )} disabled:opacity-50 disabled:cursor-not-allowed`}
+                      >
+                        คำนวณ
+                      </button>
+                    </div>
+                  </div>
+                  <div className="text-right space-y-1">
+                    <div className={`text-sm ${getThemeClasses("textSecondary", currentTheme)}`}>
+                      {saleItems.length} รายการ / รวม {saleItems.reduce((sum, item) => sum + item.qty, 0)} ชิ้น
+                    </div>
+                    <div className={`text-sm ${getThemeClasses("textSecondary", currentTheme)}`}>
+                      รวมราคา{" "}
+                      <span className={`font-medium ${getThemeClasses("textPrimary", currentTheme)}`}>
+                        {saleItems.reduce((sum, item) => sum + (item.price || 0), 0).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>{" "}บาท
+                    </div>
+                    {saleItems.some(item => item.discount > 0) && (
+                      <div className="text-sm text-red-500">
+                        ส่วนลด{" "}
+                        <span className="font-medium">
+                          -{saleItems.reduce((sum, item) => sum + (item.discount || 0), 0).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </span>{" "}บาท
+                      </div>
+                    )}
+                    <div className={`text-lg font-bold ${getThemeClasses("textPrimary", currentTheme)}`}>
+                      ยอดสุทธิ{" "}
+                      {(
+                        saleItems.reduce((sum, item) => sum + (item.price || 0), 0) -
+                        saleItems.reduce((sum, item) => sum + (item.discount || 0), 0)
+                      ).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}{" "}
+                      บาท
                     </div>
                   </div>
                 </div>

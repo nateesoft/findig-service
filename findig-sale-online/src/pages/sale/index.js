@@ -72,11 +72,13 @@ const Sales = () => {
     productName: '',
     stock: '',
     qty: 0,
+    price: 0,
     canStock: null,
     canSet: null
   });
 
   const [saleItems, setSaleItems] = useState([]);
+  const [discount, setDiscount] = useState(0);
 
   // Debounced search with API call
   const performSearch = async (searchTerm) => {
@@ -178,6 +180,7 @@ const Sales = () => {
       productName: product.PDesc,
       stock: currentItem.stock || '',
       qty: currentItem.qty || 0,
+      price: product.PPrice11 || 0,
       canStock: product.PStock,
       canSet: product.PSet
     });
@@ -201,6 +204,7 @@ const Sales = () => {
       productName: '', // Clear product name when barcode changes
       stock: '',       // Clear stock as well
       qty: 0,
+      price: 0,
       canStock: null,
       canSet: null
     });
@@ -238,10 +242,12 @@ const Sales = () => {
       productName: '',
       stock: '',
       qty: 0,
+      price: 0,
       canStock: null,
       canSet: null
     });
     setSaleItems([]);
+    setDiscount(0);
     setCurrentSaleData(null);
     setProductSearchTerm('');
   };
@@ -252,6 +258,7 @@ const Sales = () => {
       productName: '',
       stock: '',
       qty: 0,
+      price: 0,
       canStock: null,
       canSet: null
     });
@@ -310,6 +317,28 @@ const Sales = () => {
       setProductSearchTerm(itemToEdit.barcode || '');
       removeItemFromSale(itemId);
     }
+  };
+
+  const calculateDiscount = () => {
+    const discountAmount = parseFloat(discount) || 0;
+    if (discountAmount <= 0 || saleItems.length === 0) return;
+
+    const totalPrice = saleItems.reduce((sum, item) => sum + (item.price || 0), 0);
+    if (totalPrice === 0) return;
+
+    let remaining = parseFloat(discountAmount.toFixed(2));
+    const updatedItems = saleItems.map((item, index) => {
+      let itemDiscount;
+      if (index === saleItems.length - 1) {
+        itemDiscount = parseFloat(remaining.toFixed(2));
+      } else {
+        itemDiscount = parseFloat(((item.price || 0) / totalPrice * discountAmount).toFixed(2));
+        remaining = parseFloat((remaining - itemDiscount).toFixed(2));
+      }
+      return { ...item, discount: itemDiscount };
+    });
+
+    setSaleItems(updatedItems);
   };
 
   const handleReviewSale = async (id) => {
@@ -777,6 +806,9 @@ const Sales = () => {
           setShowSaleModal={setShowSaleModal}
           resetNewSaleForm={resetNewSaleForm}
           handleNewSaleSubmit={handleNewSaleSubmit}
+          discount={discount}
+          setDiscount={setDiscount}
+          calculateDiscount={calculateDiscount}
         />
       )}
 
