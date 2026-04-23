@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sed -n '106,114p' /Users/nateelive/Documents/Projects/GithubProject/findig-service/findig-backend-service/src/services/DraftSaleDetailsService.js)",
+      "Bash(sed -n '115,123p' /Users/nateelive/Documents/Projects/GithubProject/findig-service/findig-backend-service/src/repository/DraftSaleDetailsRepository.js)"
+    ]
+  }
+}

@@ -17,6 +17,9 @@ const validatePayload = (payload, requiredFields = []) => {
 const DraftSaleDetailsService = require("../services/DraftSaleDetailsService")
 const DraftSaleDetailsRepository = require('../repository/DraftSaleDetailsRepository')
 
+const StcardService = require("../services/StcardService")
+const StcardRepository = require("../repository/StcardRepository")
+
 const getData = async ({ payload, repository, db }) => {
   try {
     const results = await repository.getData({ payload, db })
@@ -101,7 +104,9 @@ const saveData = async ({ payload, repository, db }) => {
     const mappingPayload = {
       ...payload,
       id: generateUUID(),
-      document_date: getMoment().format('YYYY-MM-DD HH:mm:ss'),
+      document_date: payload.create_date
+        ? getMoment(payload.create_date).format('YYYY-MM-DD HH:mm:ss')
+        : getMoment().format('YYYY-MM-DD HH:mm:ss'),
       post_status: 'N',
       update_date: getMoment().format('YYYY-MM-DD HH:mm:ss')
     }
@@ -143,6 +148,9 @@ const updateData = async ({ payload, repository, db }) => {
       total_item: totalItem,
       emp_code_update: empCode,
       discount_amount: discount ?? 0,
+      document_date: payload.createDate
+        ? getMoment(payload.createDate).format('YYYY-MM-DD HH:mm:ss')
+        : getMoment().format('YYYY-MM-DD HH:mm:ss'),
       update_date: getMoment().format('YYYY-MM-DD HH:mm:ss')
     }
     const results = await repository.updateData({ payload: mappingPayload, db })
@@ -182,7 +190,29 @@ const updateData = async ({ payload, repository, db }) => {
 const deleteData = async ({ payload, repository, db }) => {
   try {
     validatePayload(payload)
-    
+
+    const { id } = payload
+    const existing = await repository.getDataById({ payload: { id }, db })
+    if (!existing || existing.length === 0) {
+      throw new Error('ไม่พบรายการที่ต้องการลบ')
+    }
+
+    const { billno, branch_code, post_status } = existing[0]
+
+    if (post_status === 'Y') {
+      await StcardService.deleteByBillNo({
+        payload: { S_No: billno, S_Bran: branch_code },
+        repository: StcardRepository,
+        db
+      })
+    }
+
+    await DraftSaleDetailsService.deleteDataByBillNo({
+      payload: { billno },
+      repository: DraftSaleDetailsRepository,
+      db
+    })
+
     const results = await repository.deleteData({ payload, db })
     return results
   } catch (error) {

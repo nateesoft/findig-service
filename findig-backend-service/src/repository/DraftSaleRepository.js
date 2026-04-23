@@ -137,12 +137,12 @@ const updateData = async ({ payload, db }) => {
       throw new Error('POS database connection not available')
     }
 
-    const { id, branch_code, post_status, emp_code_update, update_date, total_item, discount_amount } = payload
+    const { id, branch_code, post_status, emp_code_update, update_date, document_date, total_item, discount_amount } = payload
     const sql = `UPDATE draft_sale
-                SET branch_code=?, post_status=?, emp_code_update=?, update_date=?, total_item=?, discount_amount=?
+                SET branch_code=?, post_status=?, emp_code_update=?, update_date=?, document_date=?, total_item=?, discount_amount=?
                 WHERE id=?`
     const results = await db.pos.query(sql,
-      [branch_code, post_status, emp_code_update, update_date, total_item, discount_amount ?? 0, id])
+      [branch_code, post_status, emp_code_update, update_date, document_date, total_item, discount_amount ?? 0, id])
     return results
   } catch (error) {
     throw new Error(`Database query failed: ${error.message}`)

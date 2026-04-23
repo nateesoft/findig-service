@@ -6,7 +6,7 @@ import {
 
 import { getThemeClasses } from '../../utils/themes';
 import { AppContext } from '../../contexts';
-import { createDraftSaleInfo, loadDraftSaleById, loadDraftSaleInfo, processStockFromSale, searchData, updateDraftSaleInfo } from '../../api/saleApi';
+import { createDraftSaleInfo, deleteDraftSaleInfo, loadDraftSaleById, loadDraftSaleInfo, processStockFromSale, searchData, updateDraftSaleInfo } from '../../api/saleApi';
 import { loadAllProduct } from '../../api/productApi';
 import POSTModal from './POSTModal';
 import ReviewModal from './ReviewModal';
@@ -63,7 +63,7 @@ const Sales = () => {
     branchCode: '',
     billNo: '',
     empCode: userInfo.UserName,
-    createDate: new Date().toISOString().split('T')[0],
+    createDate: new Date().toLocaleDateString('en-CA'),
     branchCode: branchCode
   });
 
@@ -235,7 +235,7 @@ const Sales = () => {
       branchCode: branchCode,
       billNo: '',
       empCode: userInfo.UserName,
-      createDate: new Date().toISOString().split('T')[0],
+      createDate: new Date().toLocaleDateString('en-CA'),
     });
     setCurrentItem({
       barcode: '',
@@ -386,7 +386,9 @@ const Sales = () => {
           ...data,
           emp_code_update: userInfo.UserName,
           branchCode: branchCode,
-          createDate: data.createDate || new Date().toISOString().split('T')[0]
+          createDate: data.documentDate
+            ? new Date(data.documentDate).toLocaleDateString('en-CA')
+            : new Date().toLocaleDateString('en-CA')
         });
         
         setSaleItems(data.items || []);
@@ -420,6 +422,46 @@ const Sales = () => {
       });
     }
   };
+
+  const handleDeleteSale = (id) => {
+    setActiveModal({
+      type: 'warning',
+      title: 'ยืนยันการลบข้อมูล',
+      message: 'คุณต้องการลบรายการขายนี้หรือไม่? การดำเนินการนี้ไม่สามารถยกเลิกได้',
+      showCancel: true,
+      confirmText: 'ลบข้อมูล',
+      cancelText: 'ยกเลิก',
+      actions: [
+        {
+          label: 'ยกเลิก',
+          onClick: () => setActiveModal(null)
+        }
+      ],
+      onConfirm: async () => {
+        setActiveModal(null)
+        try {
+          const { data, error } = await deleteDraftSaleInfo({ id })
+          if (data) {
+            initLoadData()
+          } else {
+            setActiveModal({
+              type: 'error',
+              title: 'ไม่สามารถลบข้อมูลได้',
+              message: error || 'กรุณาลองใหม่อีกครั้ง',
+              actions: [{ label: 'ตกลง', onClick: () => setActiveModal(null) }]
+            })
+          }
+        } catch (error) {
+          setActiveModal({
+            type: 'error',
+            title: 'ไม่สามารถลบข้อมูลได้',
+            message: error.message || 'กรุณาลองใหม่อีกครั้ง',
+            actions: [{ label: 'ตกลง', onClick: () => setActiveModal(null) }]
+          })
+        }
+      }
+    })
+  }
 
   const handleNewSaleSubmit = async () => {
     if (!saleHeader.billNo) {
@@ -457,6 +499,7 @@ const Sales = () => {
           branchCode: saleHeader.branchCode,
           billNo: saleHeader.billNo,
           empCode: saleHeader.empCode,
+          createDate: saleHeader.createDate,
           totalItem: totalQty,
           discount,
           saleItems
@@ -756,6 +799,7 @@ const Sales = () => {
         filteredSales={filteredSales}
         handleReviewSale={handleReviewSale}
         handleEditSale={handleEditSale}
+        handleDeleteSale={handleDeleteSale}
         searchCriteria={searchCriteria}
         resetSearch={resetSearch}
         isLoading={isLoading}
@@ -825,7 +869,11 @@ const Sales = () => {
           cancelText={activeModal.cancelText}
           showCancel={activeModal.showCancel}
           onConfirm={() => {
-            setActiveModal(null)
+            if (activeModal?.onConfirm) {
+              activeModal.onConfirm()
+            } else {
+              setActiveModal(null)
+            }
           }}
         />
       )}

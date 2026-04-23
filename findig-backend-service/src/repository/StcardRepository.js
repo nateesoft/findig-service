@@ -153,6 +153,20 @@ const updateStcard = async ({ payload, db }) => {
   }
 }
 
+const deleteByBillNo = async ({ payload, db }) => {
+  try {
+    if (!db.pos) {
+      throw new Error('Database connection not available');
+    }
+    const { S_No, S_Bran } = payload
+    const sql = `DELETE FROM stcard WHERE S_No=? AND S_Bran=?`
+    const results = await db.pos.query(sql, [S_No, S_Bran])
+    return results
+  } catch (error) {
+    throw new Error(`Database query failed: ${error.message}`);
+  }
+}
+
 module.exports = {
   getData,
   getAllData,
@@ -160,5 +174,6 @@ module.exports = {
   updateStcard,
   findByBillNoPCode,
   getDataByBillNoPCode,
-  searchData
+  searchData,
+  deleteByBillNo
 }

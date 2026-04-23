@@ -236,11 +236,22 @@ const processStockTranfer = async ({ payload, repository, db, stockTranType }) =
   }
 }
 
+const deleteByBillNo = async ({ payload, repository, db }) => {
+  try {
+    validatePayload(payload, ['S_No', 'S_Bran'])
+    const results = await repository.deleteByBillNo({ payload, db })
+    return results
+  } catch (error) {
+    throw new Error(`Service error in deleteByBillNo: ${error.message}`)
+  }
+}
+
 module.exports = {
   getSTCard,
   getAllSTCard,
   processStock,
   searchStCardData,
   getReportStcard,
-  processStockTranfer
+  processStockTranfer,
+  deleteByBillNo
 }
