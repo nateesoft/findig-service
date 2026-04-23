@@ -145,7 +145,8 @@ const processStock = async ({ payload, repository, db }) => {
         S_EntryTime: getMoment().format('HH:mm:ss'),
         S_Link: "",
         Source_Data: "WEB",
-        Data_Sync: "N"
+        Data_Sync: "N",
+        Discount: item.discount_amount ?? 0
       }
 
       if (existing) {

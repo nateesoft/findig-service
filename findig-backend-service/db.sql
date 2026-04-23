@@ -19,8 +19,14 @@ CREATE TABLE `stcard` (
   `S_Link` varchar(80) default NULL,
   `S_Bran` varchar(20) default NULL,
   `Data_Sync` varchar(1) default 'N',
-  `Source_Data` varchar(30) default 'POS'
+  `Source_Data` varchar(30) default 'POS',
+  `NetTotal` decimal(10,2) default 0.00,
+  `Discount` decimal(10,2) default 0.00
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- Migration: run on existing databases
+-- ALTER TABLE `stcard` ADD COLUMN `NetTotal` decimal(10,2) default 0.00;
+-- ALTER TABLE `stcard` ADD COLUMN `Discount` decimal(10,2) default 0.00;
 
 -- MyRetail652findigColo.stkfile definition
 

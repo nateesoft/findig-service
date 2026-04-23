@@ -391,7 +391,13 @@ const Sales = () => {
             : new Date().toLocaleDateString('en-CA')
         });
         
-        setSaleItems(data.items || []);
+        setSaleItems(
+          (data.items || []).map(item => ({
+            ...item,
+            discount: item.discountAmount ?? 0
+          }))
+        );
+        setDiscount(data.discountAmount ?? 0);
         setCurrentSaleData(data);
         setModalMode('edit');
         setShowSaleModal(true);
