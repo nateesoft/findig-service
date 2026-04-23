@@ -1,6 +1,7 @@
-import { 
-  Eye, 
+import {
+  Eye,
   Edit,
+  Trash2,
   FileText,
   ChevronLeft,
   ChevronRight,
@@ -22,6 +23,7 @@ const DataTable = ({
     filteredSales,
     handleReviewSale,
     handleEditSale,
+    handleDeleteSale,
     searchCriteria,
     resetSearch,
     isLoading
@@ -532,7 +534,7 @@ const DataTable = ({
                       >
                         <Eye className="w-4 h-4" />
                       </button>
-                      {draft_sale.post_status !== "Y" && 
+                      {draft_sale.post_status !== "Y" && (
                         <button
                           onClick={() => handleEditSale(draft_sale.id)}
                           className={`p-2 rounded-lg ${getThemeClasses(
@@ -549,7 +551,14 @@ const DataTable = ({
                         >
                           <Edit className="w-4 h-4" />
                         </button>
-                      }
+                      )}
+                      <button
+                        onClick={() => handleDeleteSale(draft_sale.id)}
+                        className={`p-2 rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900 ${getThemeClasses("transition", currentTheme)}`}
+                        title="ลบ"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
                   </td>
                 </tr>

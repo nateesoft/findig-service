@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sed -n '106,114p' /Users/nateelive/Documents/Projects/GithubProject/findig-service/findig-backend-service/src/services/DraftSaleDetailsService.js)",
+      "Bash(sed -n '115,123p' /Users/nateelive/Documents/Projects/GithubProject/findig-service/findig-backend-service/src/repository/DraftSaleDetailsRepository.js)",
+      "Bash(grep -A 40 \"CREATE TABLE \\\\`stcard\\\\`\" /Users/nateelive/Documents/Projects/GithubProject/findig-service/findig-backend-service/db.sql)",
+      "Bash(grep -A 40 \"CREATE TABLE \\\\`stkfile\\\\`\" /Users/nateelive/Documents/Projects/GithubProject/findig-service/findig-backend-service/db.sql)"
+    ]
+  }
+}

@@ -19,8 +19,14 @@ CREATE TABLE `stcard` (
   `S_Link` varchar(80) default NULL,
   `S_Bran` varchar(20) default NULL,
   `Data_Sync` varchar(1) default 'N',
-  `Source_Data` varchar(30) default 'POS'
+  `Source_Data` varchar(30) default 'POS',
+  `NetTotal` decimal(10,2) default 0.00,
+  `Discount` decimal(10,2) default 0.00
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- Migration: run on existing databases
+-- ALTER TABLE `stcard` ADD COLUMN `NetTotal` decimal(10,2) default 0.00;
+-- ALTER TABLE `stcard` ADD COLUMN `Discount` decimal(10,2) default 0.00;
 
 -- MyRetail652findigColo.stkfile definition
 
@@ -533,6 +539,7 @@ CREATE TABLE `draft_sale` (
   `emp_code` varchar(100) NOT NULL,
   `update_date` datetime default NULL,
   `total_item` int(11) NOT NULL,
+  `discount_amount` decimal(10,2) default 0.00,
   `emp_code_update` varchar(100) NOT NULL,
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
@@ -547,6 +554,7 @@ CREATE TABLE `draft_sale_details` (
   `product_name` varchar(250) default NULL,
   `stock_code` varchar(10) NOT NULL,
   `qty` int(11) NOT NULL,
+  `discount_amount` decimal(10,2) default 0.00,
   `update_date` datetime default NULL,
   `emp_code` varchar(100) NOT NULL,
   `emp_code_update` varchar(100) NOT NULL,

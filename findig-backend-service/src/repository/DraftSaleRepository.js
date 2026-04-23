@@ -117,14 +117,14 @@ const saveData = async ({ payload, db }) => {
       throw new Error('POS database connection not available')
     }
 
-    const { id, billno, document_date, branch_code, post_status, 
-      emp_code, update_date, total_item, emp_code_update } = payload
+    const { id, billno, document_date, branch_code, post_status,
+      emp_code, update_date, total_item, discount_amount, emp_code_update } = payload
     const sql = `INSERT INTO draft_sale
-                (id, billno, document_date, branch_code, post_status, 
-                emp_code, update_date, total_item, emp_code_update)
-                VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)`
-    const results = await db.pos.query(sql, 
-      [id, billno, document_date, branch_code, post_status, emp_code, update_date, total_item, emp_code_update])
+                (id, billno, document_date, branch_code, post_status,
+                emp_code, update_date, total_item, discount_amount, emp_code_update)
+                VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    const results = await db.pos.query(sql,
+      [id, billno, document_date, branch_code, post_status, emp_code, update_date, total_item, discount_amount ?? 0, emp_code_update])
     return results
   } catch (error) {
     throw new Error(`Database query failed: ${error.message}`)
@@ -137,12 +137,12 @@ const updateData = async ({ payload, db }) => {
       throw new Error('POS database connection not available')
     }
 
-    const { id, branch_code, post_status, emp_code_update, update_date, total_item } = payload
+    const { id, branch_code, post_status, emp_code_update, update_date, document_date, total_item, discount_amount } = payload
     const sql = `UPDATE draft_sale
-                SET branch_code=?, post_status=?, emp_code_update=?, update_date=?, total_item=?
+                SET branch_code=?, post_status=?, emp_code_update=?, update_date=?, document_date=?, total_item=?, discount_amount=?
                 WHERE id=?`
-    const results = await db.pos.query(sql, 
-      [branch_code, post_status, emp_code_update, update_date, total_item, id])
+    const results = await db.pos.query(sql,
+      [branch_code, post_status, emp_code_update, update_date, document_date, total_item, discount_amount ?? 0, id])
     return results
   } catch (error) {
     throw new Error(`Database query failed: ${error.message}`)

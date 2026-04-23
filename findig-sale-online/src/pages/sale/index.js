@@ -6,7 +6,7 @@ import {
 
 import { getThemeClasses } from '../../utils/themes';
 import { AppContext } from '../../contexts';
-import { createDraftSaleInfo, loadDraftSaleById, loadDraftSaleInfo, processStockFromSale, searchData, updateDraftSaleInfo } from '../../api/saleApi';
+import { createDraftSaleInfo, deleteDraftSaleInfo, loadDraftSaleById, loadDraftSaleInfo, processStockFromSale, searchData, updateDraftSaleInfo } from '../../api/saleApi';
 import { loadAllProduct } from '../../api/productApi';
 import POSTModal from './POSTModal';
 import ReviewModal from './ReviewModal';
@@ -63,7 +63,7 @@ const Sales = () => {
     branchCode: '',
     billNo: '',
     empCode: userInfo.UserName,
-    createDate: new Date().toISOString().split('T')[0],
+    createDate: new Date().toLocaleDateString('en-CA'),
     branchCode: branchCode
   });
 
@@ -72,11 +72,13 @@ const Sales = () => {
     productName: '',
     stock: '',
     qty: 0,
+    price: 0,
     canStock: null,
     canSet: null
   });
 
   const [saleItems, setSaleItems] = useState([]);
+  const [discount, setDiscount] = useState(0);
 
   // Debounced search with API call
   const performSearch = async (searchTerm) => {
@@ -178,6 +180,7 @@ const Sales = () => {
       productName: product.PDesc,
       stock: currentItem.stock || '',
       qty: currentItem.qty || 0,
+      price: product.PPrice11 || 0,
       canStock: product.PStock,
       canSet: product.PSet
     });
@@ -201,6 +204,7 @@ const Sales = () => {
       productName: '', // Clear product name when barcode changes
       stock: '',       // Clear stock as well
       qty: 0,
+      price: 0,
       canStock: null,
       canSet: null
     });
@@ -231,17 +235,19 @@ const Sales = () => {
       branchCode: branchCode,
       billNo: '',
       empCode: userInfo.UserName,
-      createDate: new Date().toISOString().split('T')[0],
+      createDate: new Date().toLocaleDateString('en-CA'),
     });
     setCurrentItem({
       barcode: '',
       productName: '',
       stock: '',
       qty: 0,
+      price: 0,
       canStock: null,
       canSet: null
     });
     setSaleItems([]);
+    setDiscount(0);
     setCurrentSaleData(null);
     setProductSearchTerm('');
   };
@@ -252,6 +258,7 @@ const Sales = () => {
       productName: '',
       stock: '',
       qty: 0,
+      price: 0,
       canStock: null,
       canSet: null
     });
@@ -312,6 +319,28 @@ const Sales = () => {
     }
   };
 
+  const calculateDiscount = () => {
+    const discountAmount = parseFloat(discount) || 0;
+    if (discountAmount <= 0 || saleItems.length === 0) return;
+
+    const totalPrice = saleItems.reduce((sum, item) => sum + (item.price || 0), 0);
+    if (totalPrice === 0) return;
+
+    let remaining = parseFloat(discountAmount.toFixed(2));
+    const updatedItems = saleItems.map((item, index) => {
+      let itemDiscount;
+      if (index === saleItems.length - 1) {
+        itemDiscount = parseFloat(remaining.toFixed(2));
+      } else {
+        itemDiscount = parseFloat(((item.price || 0) / totalPrice * discountAmount).toFixed(2));
+        remaining = parseFloat((remaining - itemDiscount).toFixed(2));
+      }
+      return { ...item, discount: itemDiscount };
+    });
+
+    setSaleItems(updatedItems);
+  };
+
   const handleReviewSale = async (id) => {
     try {
       const { data, error } = await loadDraftSaleById({ id });
@@ -357,10 +386,18 @@ const Sales = () => {
           ...data,
           emp_code_update: userInfo.UserName,
           branchCode: branchCode,
-          createDate: data.createDate || new Date().toISOString().split('T')[0]
+          createDate: data.documentDate
+            ? new Date(data.documentDate).toLocaleDateString('en-CA')
+            : new Date().toLocaleDateString('en-CA')
         });
         
-        setSaleItems(data.items || []);
+        setSaleItems(
+          (data.items || []).map(item => ({
+            ...item,
+            discount: item.discountAmount ?? 0
+          }))
+        );
+        setDiscount(data.discountAmount ?? 0);
         setCurrentSaleData(data);
         setModalMode('edit');
         setShowSaleModal(true);
@@ -392,6 +429,46 @@ const Sales = () => {
     }
   };
 
+  const handleDeleteSale = (id) => {
+    setActiveModal({
+      type: 'warning',
+      title: 'ยืนยันการลบข้อมูล',
+      message: 'คุณต้องการลบรายการขายนี้หรือไม่? การดำเนินการนี้ไม่สามารถยกเลิกได้',
+      showCancel: true,
+      confirmText: 'ลบข้อมูล',
+      cancelText: 'ยกเลิก',
+      actions: [
+        {
+          label: 'ยกเลิก',
+          onClick: () => setActiveModal(null)
+        }
+      ],
+      onConfirm: async () => {
+        setActiveModal(null)
+        try {
+          const { data, error } = await deleteDraftSaleInfo({ id })
+          if (data) {
+            initLoadData()
+          } else {
+            setActiveModal({
+              type: 'error',
+              title: 'ไม่สามารถลบข้อมูลได้',
+              message: error || 'กรุณาลองใหม่อีกครั้ง',
+              actions: [{ label: 'ตกลง', onClick: () => setActiveModal(null) }]
+            })
+          }
+        } catch (error) {
+          setActiveModal({
+            type: 'error',
+            title: 'ไม่สามารถลบข้อมูลได้',
+            message: error.message || 'กรุณาลองใหม่อีกครั้ง',
+            actions: [{ label: 'ตกลง', onClick: () => setActiveModal(null) }]
+          })
+        }
+      }
+    })
+  }
+
   const handleNewSaleSubmit = async () => {
     if (!saleHeader.billNo) {
       return;
@@ -420,14 +497,17 @@ const Sales = () => {
         result = await updateDraftSaleInfo({
           ...saleHeader,
           totalItem: totalQty,
+          discount,
           saleItems
         });
       } else {
         result = await createDraftSaleInfo({
-          branchCode: saleHeader.branchCode, 
-          billNo: saleHeader.billNo, 
-          empCode: saleHeader.empCode, 
+          branchCode: saleHeader.branchCode,
+          billNo: saleHeader.billNo,
+          empCode: saleHeader.empCode,
+          createDate: saleHeader.createDate,
           totalItem: totalQty,
+          discount,
           saleItems
         });
       }
@@ -725,6 +805,7 @@ const Sales = () => {
         filteredSales={filteredSales}
         handleReviewSale={handleReviewSale}
         handleEditSale={handleEditSale}
+        handleDeleteSale={handleDeleteSale}
         searchCriteria={searchCriteria}
         resetSearch={resetSearch}
         isLoading={isLoading}
@@ -777,6 +858,9 @@ const Sales = () => {
           setShowSaleModal={setShowSaleModal}
           resetNewSaleForm={resetNewSaleForm}
           handleNewSaleSubmit={handleNewSaleSubmit}
+          discount={discount}
+          setDiscount={setDiscount}
+          calculateDiscount={calculateDiscount}
         />
       )}
 
@@ -791,7 +875,11 @@ const Sales = () => {
           cancelText={activeModal.cancelText}
           showCancel={activeModal.showCancel}
           onConfirm={() => {
-            setActiveModal(null)
+            if (activeModal?.onConfirm) {
+              activeModal.onConfirm()
+            } else {
+              setActiveModal(null)
+            }
           }}
         />
       )}

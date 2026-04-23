@@ -145,7 +145,8 @@ const processStock = async ({ payload, repository, db }) => {
         S_EntryTime: getMoment().format('HH:mm:ss'),
         S_Link: "",
         Source_Data: "WEB",
-        Data_Sync: "N"
+        Data_Sync: "N",
+        Discount: item.discount_amount ?? 0
       }
 
       if (existing) {
@@ -236,11 +237,22 @@ const processStockTranfer = async ({ payload, repository, db, stockTranType }) =
   }
 }
 
+const deleteByBillNo = async ({ payload, repository, db }) => {
+  try {
+    validatePayload(payload, ['S_No', 'S_Bran'])
+    const results = await repository.deleteByBillNo({ payload, db })
+    return results
+  } catch (error) {
+    throw new Error(`Service error in deleteByBillNo: ${error.message}`)
+  }
+}
+
 module.exports = {
   getSTCard,
   getAllSTCard,
   processStock,
   searchStCardData,
   getReportStcard,
-  processStockTranfer
+  processStockTranfer,
+  deleteByBillNo
 }

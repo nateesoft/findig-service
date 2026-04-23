@@ -51,14 +51,16 @@ const getDataById = async (req, res, next) => {
 
 const saveData = async (req, res, next) => {
   try {
-    const { branchCode, billNo, empCode, totalItem, saleItems } = req.body
+    const { branchCode, billNo, empCode, createDate, totalItem, saleItems, discount } = req.body
     const dataInfo = await DraftSaleService.saveData({
       payload: {
         billno: billNo,
         branch_code: branchCode,
         emp_code: empCode,
         emp_code_update: empCode,
+        create_date: createDate,
         total_item: totalItem,
+        discount_amount: discount ?? 0,
         sale_items: saleItems
       },
       repository: DraftSaleRepository,
