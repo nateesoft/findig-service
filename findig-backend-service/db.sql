@@ -533,6 +533,7 @@ CREATE TABLE `draft_sale` (
   `emp_code` varchar(100) NOT NULL,
   `update_date` datetime default NULL,
   `total_item` int(11) NOT NULL,
+  `discount_amount` decimal(10,2) default 0.00,
   `emp_code_update` varchar(100) NOT NULL,
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
@@ -547,6 +548,7 @@ CREATE TABLE `draft_sale_details` (
   `product_name` varchar(250) default NULL,
   `stock_code` varchar(10) NOT NULL,
   `qty` int(11) NOT NULL,
+  `discount_amount` decimal(10,2) default 0.00,
   `update_date` datetime default NULL,
   `emp_code` varchar(100) NOT NULL,
   `emp_code_update` varchar(100) NOT NULL,

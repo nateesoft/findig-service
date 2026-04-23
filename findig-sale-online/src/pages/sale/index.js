@@ -449,14 +449,16 @@ const Sales = () => {
         result = await updateDraftSaleInfo({
           ...saleHeader,
           totalItem: totalQty,
+          discount,
           saleItems
         });
       } else {
         result = await createDraftSaleInfo({
-          branchCode: saleHeader.branchCode, 
-          billNo: saleHeader.billNo, 
-          empCode: saleHeader.empCode, 
+          branchCode: saleHeader.branchCode,
+          billNo: saleHeader.billNo,
+          empCode: saleHeader.empCode,
           totalItem: totalQty,
+          discount,
           saleItems
         });
       }
