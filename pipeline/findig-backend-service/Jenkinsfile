@@ -1,0 +1,117 @@
+// ============================================================
+// Jenkinsfile — findig-backend-service
+//
+// Prerequisites (ตั้งค่าใน Jenkins ก่อน):
+//   Credentials:
+//     - ID: findig-backend-env-prod   (Secret File)  → ไฟล์ .env.prod
+//     - ID: deploy-server-ssh         (SSH Username with Private Key)
+//
+//   Plugins:
+//     - SSH Agent Plugin
+//     - Credentials Binding Plugin
+// ============================================================
+
+pipeline {
+    agent any
+
+    environment {
+        APP_NAME    = 'findig-backend-service'
+        // ---------- ปรับค่าให้ตรงกับ server จริง ----------
+        DEPLOY_HOST = '192.168.1.100'
+        DEPLOY_USER = 'ubuntu'
+        DEPLOY_DIR  = '/opt/apps/findig-backend-service'
+        // ---------------------------------------------------
+        SSH_CRED_ID = 'deploy-server-ssh'
+        ENV_CRED_ID = 'findig-backend-env-prod'
+    }
+
+    options {
+        timestamps()
+        disableConcurrentBuilds()
+    }
+
+    stages {
+        // ----------------------------------------------------------
+        stage('Checkout') {
+        // ----------------------------------------------------------
+            steps {
+                checkout scm
+            }
+        }
+
+        // ----------------------------------------------------------
+        stage('Load Env') {
+        // ----------------------------------------------------------
+        // ดึง .env.prod จาก Jenkins Credentials (Secret File)
+        // ไฟล์นี้จะถูกลบออกจาก workspace หลัง pipeline จบ
+            steps {
+                withCredentials([file(credentialsId: ENV_CRED_ID, variable: 'ENV_PROD_FILE')]) {
+                    sh 'cp "$ENV_PROD_FILE" findig-backend-service/.env.prod'
+                }
+            }
+        }
+
+        // ----------------------------------------------------------
+        stage('Deploy') {
+        // ----------------------------------------------------------
+            steps {
+                sshagent(credentials: [SSH_CRED_ID]) {
+                    // 1. สร้าง deploy directory บน server (ถ้ายังไม่มี)
+                    sh "ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} 'mkdir -p ${DEPLOY_DIR}/logs'"
+
+                    // 2. Sync source code ไปที่ server
+                    //    ยกเว้น node_modules, .env*, logs เพื่อไม่ทับของเดิม
+                    sh """
+                        rsync -avz --delete \
+                            --exclude='node_modules' \
+                            --exclude='.env*' \
+                            --exclude='logs' \
+                            --exclude='.DS_Store' \
+                            -e 'ssh -o StrictHostKeyChecking=no' \
+                            findig-backend-service/ \
+                            ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_DIR}/
+                    """
+
+                    // 3. Copy .env.prod ไปที่ server
+                    sh "scp -o StrictHostKeyChecking=no findig-backend-service/.env.prod ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_DIR}/.env.prod"
+
+                    // 4. Install dependencies และ restart PM2 บน server
+                    sh """
+                        ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} '
+                            set -e
+                            cd ${DEPLOY_DIR}
+
+                            echo "[INFO] Installing production dependencies..."
+                            npm ci --omit=dev
+
+                            echo "[INFO] Reloading PM2..."
+                            if pm2 list | grep -q "${APP_NAME}"; then
+                                pm2 reload ${APP_NAME} --update-env
+                            else
+                                pm2 start bin/www \
+                                    --name ${APP_NAME} \
+                                    --node-args="--env-file=.env.prod" \
+                                    --log logs/app.log \
+                                    --error logs/error.log
+                            fi
+                            pm2 save
+                        '
+                    """
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "[SUCCESS] ${APP_NAME} deployed successfully — build #${BUILD_NUMBER}"
+        }
+        failure {
+            echo "[FAILED] ${APP_NAME} deployment failed — build #${BUILD_NUMBER}"
+        }
+        cleanup {
+            // ลบ .env.prod ออกจาก workspace เสมอ ไม่ให้ค้างใน agent
+            sh 'rm -f findig-backend-service/.env.prod || true'
+        }
+    }
+}

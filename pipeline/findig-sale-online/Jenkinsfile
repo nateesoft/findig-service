@@ -1,0 +1,157 @@
+// ============================================================
+// Jenkinsfile — findig-sale-online
+//
+// โครงสร้าง:
+//   findig-sale-online/         ← React frontend (build บน Jenkins)
+//   findig-sale-online/server/  ← Express proxy server (deploy ไป production)
+//     server.js                 ← serve build/ + proxy ไป backend
+//     build/                    ← React build output (copy มาจาก Jenkins)
+//
+// Prerequisites (ตั้งค่าใน Jenkins ก่อน):
+//   Credentials:
+//     - ID: findig-sale-online-env-prod     (Secret File)
+//         ตัวอย่างเนื้อหา .env.prod:
+//           REACT_APP_API_USER=admin
+//           REACT_APP_API_KEY=supersecret
+//           REACT_APP_SERVICE_HOST=http://YOUR_SERVER_IP:9090/api
+//           WEB_PORT=3000
+//           SERVICE_HOST=http://127.0.0.1:9090
+//
+//     - ID: deploy-server-ssh   (SSH Username with Private Key)
+//
+//   Plugins:
+//     - SSH Agent Plugin
+//     - Credentials Binding Plugin
+//     - NodeJS Plugin (แนะนำให้ configure Node version ใน Global Tool Config)
+// ============================================================
+
+pipeline {
+    agent any
+
+    environment {
+        APP_NAME    = 'findig-sale-online'
+        // ---------- ปรับค่าให้ตรงกับ server จริง ----------
+        DEPLOY_HOST = '192.168.1.100'
+        DEPLOY_USER = 'ubuntu'
+        DEPLOY_DIR  = '/opt/apps/findig-sale-online'
+        // ---------------------------------------------------
+        SSH_CRED_ID = 'deploy-server-ssh'
+        ENV_CRED_ID = 'findig-sale-online-env-prod'
+    }
+
+    options {
+        timestamps()
+        disableConcurrentBuilds()
+    }
+
+    stages {
+        // ----------------------------------------------------------
+        stage('Checkout') {
+        // ----------------------------------------------------------
+            steps {
+                checkout scm
+            }
+        }
+
+        // ----------------------------------------------------------
+        stage('Load Env') {
+        // ----------------------------------------------------------
+        // ดึง .env.prod มาใช้สำหรับ React build (REACT_APP_*)
+        // และ server runtime (WEB_PORT, SERVICE_HOST) ในไฟล์เดียวกัน
+            steps {
+                withCredentials([file(credentialsId: ENV_CRED_ID, variable: 'ENV_PROD_FILE')]) {
+                    sh 'cp "$ENV_PROD_FILE" findig-sale-online/.env.prod'
+                    // React (react-scripts build) จะอ่านจาก .env.production
+                    // หรือ .env เมื่อ NODE_ENV=production
+                    sh 'cp "$ENV_PROD_FILE" findig-sale-online/.env.production'
+                    // เก็บไว้สำหรับ copy ไปให้ server ด้วย
+                    sh 'cp "$ENV_PROD_FILE" findig-sale-online/server/.env.prod'
+                }
+            }
+        }
+
+        // ----------------------------------------------------------
+        stage('Install & Build React') {
+        // ----------------------------------------------------------
+        // Build บน Jenkins agent — ไม่ต้อง install dev deps บน production
+            steps {
+                dir('findig-sale-online') {
+                    sh 'npm ci'
+                    sh 'npm run build'
+                }
+            }
+        }
+
+        // ----------------------------------------------------------
+        stage('Deploy') {
+        // ----------------------------------------------------------
+            steps {
+                sshagent(credentials: [SSH_CRED_ID]) {
+                    // 1. สร้าง directory structure บน server
+                    sh "ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} 'mkdir -p ${DEPLOY_DIR}/server/build'"
+
+                    // 2. Sync React build output → server/build/ บน production
+                    sh """
+                        rsync -avz --delete \
+                            -e 'ssh -o StrictHostKeyChecking=no' \
+                            findig-sale-online/build/ \
+                            ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_DIR}/server/build/
+                    """
+
+                    // 3. Sync Express server source files
+                    sh """
+                        rsync -avz --delete \
+                            --exclude='node_modules' \
+                            --exclude='.env*' \
+                            --exclude='build' \
+                            --exclude='.DS_Store' \
+                            -e 'ssh -o StrictHostKeyChecking=no' \
+                            findig-sale-online/server/ \
+                            ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_DIR}/server/
+                    """
+
+                    // 4. Copy .env.prod เป็น .env สำหรับ server runtime
+                    //    server.js ใช้ require("dotenv").config() → อ่าน .env
+                    sh "scp -o StrictHostKeyChecking=no findig-sale-online/server/.env.prod ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_DIR}/server/.env"
+
+                    // 5. Install server dependencies และ restart PM2
+                    sh """
+                        ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} '
+                            set -e
+                            cd ${DEPLOY_DIR}/server
+
+                            echo "[INFO] Installing server dependencies..."
+                            npm ci --omit=dev
+
+                            echo "[INFO] Reloading PM2..."
+                            if pm2 list | grep -q "${APP_NAME}"; then
+                                pm2 reload ${APP_NAME} --update-env
+                            else
+                                pm2 start server.js \
+                                    --name ${APP_NAME}
+                            fi
+                            pm2 save
+                        '
+                    """
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "[SUCCESS] ${APP_NAME} deployed successfully — build #${BUILD_NUMBER}"
+        }
+        failure {
+            echo "[FAILED] ${APP_NAME} deployment failed — build #${BUILD_NUMBER}"
+        }
+        cleanup {
+            // ลบ .env files ออกจาก workspace เสมอ
+            sh '''
+                rm -f findig-sale-online/.env.prod || true
+                rm -f findig-sale-online/.env.production || true
+                rm -f findig-sale-online/server/.env.prod || true
+            '''
+        }
+    }
+}
