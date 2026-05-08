@@ -1,5 +1,5 @@
-import { 
-  Plus, 
+import {
+  Plus,
   Edit,
   X,
   Calendar,
@@ -8,6 +8,23 @@ import {
   Search} from 'lucide-react';
 
 import { useRef } from 'react';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+
+function parseYMD(str) {
+  if (!str) return null;
+  const parts = str.split("-");
+  if (parts.length === 3) return new Date(parts[0], parts[1] - 1, parts[2]);
+  return null;
+}
+
+function formatYMD(date) {
+  if (!date) return "";
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
 
 const CreateEditModal = ({
     getThemeClasses,
@@ -205,16 +222,18 @@ const CreateEditModal = ({
                   <Calendar className="w-4 h-4 inline mr-2" />
                   วันที่
                 </label>
-                <input
-                  type="date"
-                  value={saleHeader.createDate}
-                  onChange={(e) =>
-                    setSaleHeader({ ...saleHeader, createDate: e.target.value })
+                <DatePicker
+                  selected={parseYMD(saleHeader.createDate)}
+                  onChange={(date) =>
+                    setSaleHeader({ ...saleHeader, createDate: formatYMD(date) })
                   }
+                  dateFormat="dd/MM/yyyy"
                   className={`w-full px-3 py-2 border rounded-lg ${getThemeClasses(
                     "input",
                     currentTheme
                   )}`}
+                  wrapperClassName="w-full"
+                  autoComplete="off"
                 />
               </div>
               <div>
