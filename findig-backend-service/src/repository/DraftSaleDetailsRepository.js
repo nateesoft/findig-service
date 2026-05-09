@@ -48,14 +48,14 @@ const saveData = async ({ payload, db }) => {
       throw new Error('POS database connection not available')
     }
 
-    const { id, billno, create_date, barcode, product_name, stock_code, qty, discount_amount,
+    const { id, billno, create_date, barcode, product_name, stock_code, qty, price, discount_amount,
           update_date, emp_code, emp_code_update, can_stock, can_set } = payload
     const sql = `INSERT INTO draft_sale_details
-              (id, billno, create_date, barcode, product_name, stock_code, qty, discount_amount, update_date,
+              (id, billno, create_date, barcode, product_name, stock_code, qty, price, discount_amount, update_date,
               emp_code, emp_code_update, can_stock, can_set)
-              VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
+              VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
     const results = await db.pos.query(sql,
-      [id, billno, create_date, barcode, product_name, stock_code, qty, discount_amount ?? 0,
+      [id, billno, create_date, barcode, product_name, stock_code, qty, price ?? 0, discount_amount ?? 0,
         update_date, emp_code, emp_code_update, can_stock, can_set])
     return results
   } catch (error) {
@@ -69,13 +69,13 @@ const updateData = async ({ payload, db }) => {
       throw new Error('POS database connection not available')
     }
 
-    const { id, stock_code, qty, discount_amount, update_date, emp_code_update, can_stock, can_set } = payload
+    const { id, stock_code, qty, price, discount_amount, update_date, emp_code_update, can_stock, can_set } = payload
     const sql = `UPDATE draft_sale_details
-                SET stock_code=?, qty=?, discount_amount=?, update_date=?, emp_code_update=?,
+                SET stock_code=?, qty=?, price=?, discount_amount=?, update_date=?, emp_code_update=?,
                 can_stock=?, can_set=?
                 WHERE id=?`
     const results = await db.pos.query(sql,
-      [stock_code, qty, discount_amount ?? 0, update_date, emp_code_update, can_stock, can_set, id])
+      [stock_code, qty, price ?? 0, discount_amount ?? 0, update_date, emp_code_update, can_stock, can_set, id])
     return results
   } catch (error) {
     throw new Error(`Database query failed: ${error.message}`)

@@ -346,7 +346,13 @@ const Sales = () => {
       const { data, error } = await loadDraftSaleById({ id });
       
       if (data) {
-        setCurrentSaleData(data);
+        setCurrentSaleData({
+          ...data,
+          items: (data.items || []).map(item => ({
+            ...item,
+            discount: item.discountAmount ?? item.discount ?? 0
+          }))
+        });
         setModalMode('review');
         setShowReviewModal(true);
       } else {
@@ -394,10 +400,11 @@ const Sales = () => {
         setSaleItems(
           (data.items || []).map(item => ({
             ...item,
-            discount: item.discountAmount ?? 0
+            price: parseFloat(item.price) || 0,
+            discount: parseFloat(item.discountAmount ?? item.discount ?? 0) || 0
           }))
         );
-        setDiscount(data.discountAmount ?? 0);
+        setDiscount(parseFloat(data.discountAmount) || 0);
         setCurrentSaleData(data);
         setModalMode('edit');
         setShowSaleModal(true);

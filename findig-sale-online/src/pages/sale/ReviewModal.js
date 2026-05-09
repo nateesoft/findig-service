@@ -104,6 +104,14 @@ const ReviewModal = ({
                           <th className={`px-4 py-2 text-right text-xs font-medium ${getThemeClasses('textMuted', currentTheme)} uppercase tracking-wider`}>
                             จำนวน
                           </th>
+                          <th className={`px-4 py-2 text-right text-xs font-medium ${getThemeClasses('textMuted', currentTheme)} uppercase tracking-wider`}>
+                            ราคา
+                          </th>
+                          {currentSaleData.items.some(item => item.discount > 0) && (
+                            <th className={`px-4 py-2 text-right text-xs font-medium ${getThemeClasses('textMuted', currentTheme)} uppercase tracking-wider`}>
+                              ส่วนลด
+                            </th>
+                          )}
                         </tr>
                       </thead>
                       <tbody className={`${getThemeClasses('cardBg', currentTheme)} divide-y ${getThemeClasses('tableBorder', currentTheme)}`}>
@@ -121,6 +129,14 @@ const ReviewModal = ({
                             <td className={`px-4 py-3 text-right text-sm ${getThemeClasses('textSecondary', currentTheme)}`}>
                               {item.qty}
                             </td>
+                            <td className={`px-4 py-3 text-right text-sm ${getThemeClasses('textSecondary', currentTheme)}`}>
+                              {item.price ? item.price.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'}
+                            </td>
+                            {currentSaleData.items.some(i => i.discount > 0) && (
+                              <td className={`px-4 py-3 text-right text-sm text-red-500`}>
+                                {item.discount ? item.discount.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'}
+                              </td>
+                            )}
                           </tr>
                         ))}
                       </tbody>
@@ -135,16 +151,32 @@ const ReviewModal = ({
                 {/* สรุปรายการ */}
                 {currentSaleData.items && currentSaleData.items.length > 0 && (
                   <div className={`mt-4 p-3 rounded-lg ${currentTheme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'} border-t ${getThemeClasses('cardBorder', currentTheme)}`}>
-                    <div className="flex justify-between items-center">
-                      <span className={`text-sm font-medium ${getThemeClasses('textSecondary', currentTheme)}`}>
-                        สรุปรายการ
-                      </span>
-                      <div className="text-right">
-                        <div className={`text-lg font-bold ${getThemeClasses('textPrimary', currentTheme)}`}>
-                          รวม {currentSaleData.items.reduce((sum, item) => sum + (item.qty || 0), 0)} ชิ้น
+                    <div className="flex justify-end items-start">
+                      <div className="text-right space-y-1">
+                        <div className={`text-sm ${getThemeClasses('textSecondary', currentTheme)}`}>
+                          {currentSaleData.items.length} รายการ / รวม {currentSaleData.items.reduce((sum, item) => sum + (item.qty || 0), 0)} ชิ้น
                         </div>
                         <div className={`text-sm ${getThemeClasses('textSecondary', currentTheme)}`}>
-                          {currentSaleData.items.length} รายการ
+                          รวมราคา{' '}
+                          <span className={`font-medium ${getThemeClasses('textPrimary', currentTheme)}`}>
+                            {currentSaleData.items.reduce((sum, item) => sum + (item.price || 0), 0).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </span>{' '}บาท
+                        </div>
+                        {currentSaleData.items.some(item => item.discount > 0) && (
+                          <div className="text-sm text-red-500">
+                            ส่วนลด{' '}
+                            <span className="font-medium">
+                              -{currentSaleData.items.reduce((sum, item) => sum + (item.discount || 0), 0).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </span>{' '}บาท
+                          </div>
+                        )}
+                        <div className={`text-lg font-bold ${getThemeClasses('textPrimary', currentTheme)}`}>
+                          ยอดสุทธิ{' '}
+                          {(
+                            currentSaleData.items.reduce((sum, item) => sum + (item.price || 0), 0) -
+                            currentSaleData.items.reduce((sum, item) => sum + (item.discount || 0), 0)
+                          ).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}{' '}
+                          บาท
                         </div>
                       </div>
                     </div>
