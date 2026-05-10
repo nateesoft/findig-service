@@ -2,11 +2,11 @@ require('dotenv').config();
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
 module.exports = function (app) {
-    const serviceHost = process.env.REACT_APP_SERVICE_HOST
+    const backendHost = process.env.BACKEND_HOST || 'http://127.0.0.1:9090';
     app.use(
-        '/api',
+        '/api/findig-backend-service',
         createProxyMiddleware({
-            target: `${serviceHost}`,
+            target: backendHost,
             changeOrigin: true,
         })
     );
