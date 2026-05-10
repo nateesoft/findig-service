@@ -9,7 +9,8 @@ module.exports = {
         WEB_USER_AUTH: "admin",
         WEB_USER_PASS: "supersecret",
         API_SECRET_PASS: "XkhZG4fW2t2W",
-        dbConfig: "PRODUCTION"
+        dbConfig: "PRODUCTION",
+        MYSQLDUMP_PATH: "D:\\MySQL5\\bin"
       }
     }
   ]

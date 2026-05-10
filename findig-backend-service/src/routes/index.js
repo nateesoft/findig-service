@@ -22,6 +22,7 @@ const StockOutController = require('../controllers/StockOutController')
 const StockOutDetailsController = require('../controllers/StockOutDetailsController')
 
 const ReportController = require('../controllers/ReportController')
+const BackupController = require('../controllers/BackupController')
 
 router.get('/api/branch', BranchController.getBranchData);
 router.get('/api/branch/list', BranchController.findAllBranch);
@@ -94,6 +95,10 @@ router.get('/api/stock-out-details/:id', StockOutDetailsController.getDataById)
 router.post('/api/stock-out-details', StockOutDetailsController.saveData)
 router.put('/api/stock-out-details/:id', StockOutDetailsController.updateData)
 router.delete('/api/stock-out-details/:id', StockOutDetailsController.deleteData)
+
+// backup routes
+router.post('/api/backup/pos', BackupController.createBackup)
+router.get('/api/backup/list', BackupController.listBackups)
 
 router.post('/api/product', ProductController.getProductData);
 router.get('/api/groupfile/list', GroupfileController.getAllGroupfile);

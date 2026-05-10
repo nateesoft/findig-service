@@ -1,5 +1,5 @@
 // ============================================================
-// Jenkinsfile — findig-backend-service
+// Jenkinsfile — findig-backend-service (Windows Server)
 //
 // Prerequisites (ตั้งค่าใน Jenkins ก่อน):
 //   Credentials:
@@ -9,17 +9,30 @@
 //   Plugins:
 //     - SSH Agent Plugin
 //     - Credentials Binding Plugin
+//
+//   Jenkins Agent (Windows):
+//     - Windows Server 2019 Build 17063+ หรือ Windows 10 1803+
+//       (มี tar.exe built-in — ถ้าเก่ากว่าให้ติดตั้ง Git for Windows)
+//     - OpenSSH Client (Settings → Apps → Optional Features → OpenSSH Client)
+//     - Node.js + npm
+//
+//   Windows Deploy Server:
+//     - OpenSSH Server (Settings → Apps → Optional Features → OpenSSH Server)
+//     - PowerShell 5.1+ หรือ PowerShell Core 7+
+//     - Node.js + npm + PM2 (npm install -g pm2)
+//     - ตั้ง PowerShell ExecutionPolicy:
+//       Set-ExecutionPolicy RemoteSigned -Scope LocalMachine
 // ============================================================
 
 pipeline {
-    agent any
+    agent { label 'windows' }  // ปรับเป็น label ของ Windows Jenkins agent จริง
 
     environment {
         APP_NAME    = 'findig-backend-service'
         // ---------- ปรับค่าให้ตรงกับ server จริง ----------
         DEPLOY_HOST = '192.168.1.100'
-        DEPLOY_USER = 'ubuntu'
-        DEPLOY_DIR  = '/opt/apps/findig-backend-service'
+        DEPLOY_USER = 'Administrator'               // Windows Server user
+        DEPLOY_DIR  = 'C:/apps/findig-backend-service'  // forward slash ใช้ได้ทั้ง SCP และ PowerShell
         // ---------------------------------------------------
         SSH_CRED_ID = 'deploy-server-ssh'
         ENV_CRED_ID = 'findig-backend-env-prod'
@@ -43,60 +56,97 @@ pipeline {
         stage('Load Env') {
         // ----------------------------------------------------------
         // ดึง .env.prod จาก Jenkins Credentials (Secret File)
-        // ไฟล์นี้จะถูกลบออกจาก workspace หลัง pipeline จบ
+        // ไฟล์นี้จะถูกลบออกจาก workspace ใน cleanup เสมอ
             steps {
                 withCredentials([file(credentialsId: ENV_CRED_ID, variable: 'ENV_PROD_FILE')]) {
-                    sh 'cp "$ENV_PROD_FILE" findig-backend-service/.env.prod'
+                    powershell 'Copy-Item "$env:ENV_PROD_FILE" -Destination "findig-backend-service\\.env.prod" -Force'
                 }
+            }
+        }
+
+        // ----------------------------------------------------------
+        stage('Package') {
+        // ----------------------------------------------------------
+        // Archive source code ยกเว้น node_modules, .env*, logs
+        // tar.exe built-in ใน Windows Server 2019 Build 17063+
+            steps {
+                powershell '''
+                    Remove-Item -Force deploy-backend.tar.gz -ErrorAction SilentlyContinue
+                    tar -czf deploy-backend.tar.gz `
+                        --exclude=findig-backend-service/node_modules `
+                        --exclude=findig-backend-service/.env.prod `
+                        --exclude=findig-backend-service/logs `
+                        --exclude=findig-backend-service/.DS_Store `
+                        findig-backend-service
+                '''
             }
         }
 
         // ----------------------------------------------------------
         stage('Deploy') {
         // ----------------------------------------------------------
+        // 1. เขียน PowerShell deploy script ลงไฟล์ชั่วคราว
+        // 2. โอน archive + env + script ไปยัง Windows Server ผ่าน SCP
+        // 3. รัน script บน server ผ่าน SSH
+        //
+        // ใช้ script file แทน inline command เพื่อหลีกเลี่ยงปัญหา quoting
+        // ใน nested SSH → PowerShell
             steps {
+                script {
+                    def deployDir = env.DEPLOY_DIR
+                    def appName   = env.APP_NAME
+
+                    writeFile file: 'deploy-backend-remote.ps1', text: """
+Set-StrictMode -Version Latest
+\$ErrorActionPreference = 'Stop'
+
+\$deployDir = '${deployDir}'
+\$appName   = '${appName}'
+
+Write-Host '[INFO] Creating deploy directories...'
+New-Item -ItemType Directory -Force -Path "\$deployDir/logs" | Out-Null
+
+Write-Host '[INFO] Extracting source archive...'
+tar -xzf 'C:/Windows/Temp/deploy-backend.tar.gz' -C \$deployDir --strip-components=1
+
+Set-Location \$deployDir
+
+Write-Host '[INFO] Installing production dependencies...'
+npm ci --omit=dev
+
+Write-Host '[INFO] Managing PM2 process...'
+try {
+    \$processes = pm2 jlist 2>\$null | ConvertFrom-Json -ErrorAction SilentlyContinue
+    \$isRunning = \$null -ne (\$processes | Where-Object { \$_.name -eq \$appName })
+} catch {
+    \$isRunning = \$false
+}
+
+if (\$isRunning) {
+    Write-Host '[INFO] Reloading existing PM2 process...'
+    pm2 reload \$appName --update-env
+} else {
+    Write-Host '[INFO] Starting new PM2 process via ecosystem.config.js...'
+    pm2 start ecosystem.config.js
+}
+pm2 save
+
+Write-Host '[INFO] Cleaning up temp files on server...'
+Remove-Item -Force 'C:/Windows/Temp/deploy-backend.tar.gz'      -ErrorAction SilentlyContinue
+Remove-Item -Force 'C:/Windows/Temp/deploy-backend-remote.ps1'  -ErrorAction SilentlyContinue
+
+Write-Host '[SUCCESS] Deployment completed.'
+"""
+                }
+
                 sshagent(credentials: [SSH_CRED_ID]) {
-                    // 1. สร้าง deploy directory บน server (ถ้ายังไม่มี)
-                    sh "ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} 'mkdir -p ${DEPLOY_DIR}/logs'"
+                    // โอนไฟล์ไปยัง Windows Server
+                    powershell "scp -o StrictHostKeyChecking=no deploy-backend.tar.gz         ${DEPLOY_USER}@${DEPLOY_HOST}:C:/Windows/Temp/deploy-backend.tar.gz"
+                    powershell "scp -o StrictHostKeyChecking=no findig-backend-service/.env.prod ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_DIR}/.env.prod"
+                    powershell "scp -o StrictHostKeyChecking=no deploy-backend-remote.ps1      ${DEPLOY_USER}@${DEPLOY_HOST}:C:/Windows/Temp/deploy-backend-remote.ps1"
 
-                    // 2. Sync source code ไปที่ server
-                    //    ยกเว้น node_modules, .env*, logs เพื่อไม่ทับของเดิม
-                    sh """
-                        rsync -avz --delete \
-                            --exclude='node_modules' \
-                            --exclude='.env*' \
-                            --exclude='logs' \
-                            --exclude='.DS_Store' \
-                            -e 'ssh -o StrictHostKeyChecking=no' \
-                            findig-backend-service/ \
-                            ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_DIR}/
-                    """
-
-                    // 3. Copy .env.prod ไปที่ server
-                    sh "scp -o StrictHostKeyChecking=no findig-backend-service/.env.prod ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_DIR}/.env.prod"
-
-                    // 4. Install dependencies และ restart PM2 บน server
-                    sh """
-                        ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} '
-                            set -e
-                            cd ${DEPLOY_DIR}
-
-                            echo "[INFO] Installing production dependencies..."
-                            npm ci --omit=dev
-
-                            echo "[INFO] Reloading PM2..."
-                            if pm2 list | grep -q "${APP_NAME}"; then
-                                pm2 reload ${APP_NAME} --update-env
-                            else
-                                pm2 start bin/www \
-                                    --name ${APP_NAME} \
-                                    --node-args="--env-file=.env.prod" \
-                                    --log logs/app.log \
-                                    --error logs/error.log
-                            fi
-                            pm2 save
-                        '
-                    """
+                    // รัน deploy script บน Windows Server
+                    powershell "ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} powershell -ExecutionPolicy Bypass -File C:/Windows/Temp/deploy-backend-remote.ps1"
                 }
             }
         }
@@ -110,8 +160,12 @@ pipeline {
             echo "[FAILED] ${APP_NAME} deployment failed — build #${BUILD_NUMBER}"
         }
         cleanup {
-            // ลบ .env.prod ออกจาก workspace เสมอ ไม่ให้ค้างใน agent
-            sh 'rm -f findig-backend-service/.env.prod || true'
+            // ลบไฟล์ชั่วคราวออกจาก workspace เสมอ ไม่ว่า pipeline จะสำเร็จหรือไม่
+            powershell '''
+                Remove-Item -Force "findig-backend-service\\.env.prod" -ErrorAction SilentlyContinue
+                Remove-Item -Force "deploy-backend.tar.gz"             -ErrorAction SilentlyContinue
+                Remove-Item -Force "deploy-backend-remote.ps1"         -ErrorAction SilentlyContinue
+            '''
         }
     }
 }
