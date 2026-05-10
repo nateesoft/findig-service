@@ -25,17 +25,17 @@ const processStockFromSale = async ({ payload, repository, db }) => {
   try {
     validatePayload(payload, ['id', 'billno'])
     
-    const { id, billno } = payload
+    const { id, billno, document_date } = payload
 
     const resultDetails = await DraftSaleDetailsService.getSaleDetailsByBillNo({
-      payload: { billno },
+      payload: { billno, document_date },
       repository: DraftSaleDetailsRepository,
       db
     })
 
     const mappingPayload = {
       ...payload,
-      S_Date: getMoment().format("YYYY-MM-DD HH:mm:ss")
+      S_Date: getMoment(document_date).format("YYYY-MM-DD")
     }
 
     const processStcard = await StcardService.processStock({

@@ -469,7 +469,7 @@ const DataTable = ({
                     )}`}
                   >
                     {moment(draft_sale.document_date).format(
-                      "DD/MM/YYYY HH:mm:ss"
+                      "DD/MM/YYYY"
                     )}
                   </td>
                   <td

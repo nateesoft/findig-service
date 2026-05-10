@@ -128,7 +128,7 @@ const processStock = async ({ payload, repository, db }) => {
 
       const stcard = {
         S_Bran: billInfo.branch_code,
-        S_Date: getMoment(item.create_date).format('YYYY-MM-DD HH:mm:ss'),
+        S_Date: billInfo.document_date ? getMoment(billInfo.document_date).format('YYYY-MM-DD') : getMoment().format('YYYY-MM-DD'),
         S_No: billInfo.billno,
         S_SubNo: "",
         S_Que: (index + 1),
