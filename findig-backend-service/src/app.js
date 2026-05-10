@@ -46,14 +46,14 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/api/version', (req, res) => {
+app.get('/api/findig-backend-service/version', (req, res) => {
   res.json({
     version: "0.0.0"
   })
 })
 
 // ใช้ middleware ก่อน protected routes
-app.use('/api', selectBranchDb);
+app.use('/api/findig-backend-service', selectBranchDb);
 app.use(allRouter);
 
 app.use(errorHandler)

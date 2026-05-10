@@ -8,7 +8,7 @@
           "serviceName": "getData",
           "repositoryName": "getData",
           "inputType": "body",
-          "path": "/api/user/login",
+          "path": "/api/findig-backend-service/user/login",
           "method": "post"
         },
         {
@@ -16,7 +16,7 @@
           "serviceName": "getDataById",
           "repositoryName": "getDataById",
           "inputType": "params",
-          "path": "/api/user/profile/:id",
+          "path": "/api/findig-backend-service/user/profile/:id",
           "method": "get"
         }
       ]

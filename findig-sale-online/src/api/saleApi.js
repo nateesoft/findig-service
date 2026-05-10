@@ -1,58 +1,31 @@
-import apiClient from "../httpRequest";
+import apiClient, { handleApiError } from "../httpRequest";
 
 export const loadDraftSaleInfo = async () => {
     const branchCode = localStorage.getItem('branchCode') || ''
     try {
-        const response = await apiClient.get(`/api/draftsale?branchCode=${branchCode}`)
+        const response = await apiClient.get(`/draftsale?branchCode=${branchCode}`)
         return { data: response.data, error: null }
     } catch (error) {
-        if (error.response) {
-            if (error.response.status === 504) {
-                return { data: null, error: error.response.statusText }
-            }
-            return { data: null, error: error.response.data.message };
-        } else if (error.request) {
-            return { data: null, error: "Network error. Please try again." };
-        } else {
-            return { data: null, error: error.message };
-        }
+        return handleApiError(error)
     }
 }
 
 export const searchData = async (payload) => {
     try {
-        const response = await apiClient.post(`/api/draftsale/search`, payload)
+        const response = await apiClient.post(`/draftsale/search`, payload)
         return { data: response.data, error: null }
     } catch (error) {
-        if (error.response) {
-            if (error.response.status === 504) {
-                return { data: null, error: error.response.statusText }
-            }
-            return { data: null, error: error.response.data.message };
-        } else if (error.request) {
-            return { data: null, error: "Network error. Please try again." };
-        } else {
-            return { data: null, error: error.message };
-        }
+        return handleApiError(error)
     }
 }
 
 export const loadDraftSaleDashboard = async () => {
     const branchCode = localStorage.getItem('branchCode') || ''
     try {
-        const response = await apiClient.get(`/api/draftsale/dashboard?branchCode=${branchCode}`)
+        const response = await apiClient.get(`/draftsale/dashboard?branchCode=${branchCode}`)
         return { data: response.data, error: null }
     } catch (error) {
-        if (error.response) {
-            if (error.response.status === 504) {
-                return { data: null, error: error.response.statusText }
-            }
-            return { data: null, error: error.response.data.message };
-        } else if (error.request) {
-            return { data: null, error: "Network error. Please try again." };
-        } else {
-            return { data: null, error: error.message };
-        }
+        return handleApiError(error)
     }
 }
 
@@ -60,109 +33,55 @@ export const loadDraftSaleById = async (payload) => {
     const branchCode = localStorage.getItem('branchCode') || ''
     try {
         const { id } = payload
-        const response = await apiClient.get(`/api/draftsale/${id}?branchCode=${branchCode}`)
+        const response = await apiClient.get(`/draftsale/${id}?branchCode=${branchCode}`)
         return { data: response.data, error: null }
     } catch (error) {
-        if (error.response) {
-            if (error.response.status === 504) {
-                return { data: null, error: error.response.statusText }
-            }
-            return { data: null, error: error.response.data.message };
-        } else if (error.request) {
-            return { data: null, error: "Network error. Please try again." };
-        } else {
-            return { data: null, error: error.message };
-        }
+        return handleApiError(error)
     }
 }
 
 export const createDraftSaleInfo = async (payload) => {
     try {
-        const response = await apiClient.post(`/api/draftsale`, {...payload})
+        const response = await apiClient.post(`/draftsale`, {...payload})
         return { data: response.data, error: null }
     } catch (error) {
-        if (error.response) {
-            if (error.response.status === 504) {
-                return { data: null, error: error.response.statusText }
-            }
-            return { data: null, error: error.response.data.message };
-        } else if (error.request) {
-            return { data: null, error: "Network error. Please try again." };
-        } else {
-            return { data: null, error: error.message };
-        }
+        return handleApiError(error)
     }
 }
 
 export const updateDraftSaleInfo = async (payload) => {
     try {
-        const response = await apiClient.put(`/api/draftsale/${payload.id}`, payload)
+        const response = await apiClient.put(`/draftsale/${payload.id}`, payload)
         return { data: response.data, error: null }
     } catch (error) {
-        if (error.response) {
-            if (error.response.status === 504) {
-                return { data: null, error: error.response.statusText }
-            }
-            return { data: null, error: error.response.data.message };
-        } else if (error.request) {
-            return { data: null, error: "Network error. Please try again." };
-        } else {
-            return { data: null, error: error.message };
-        }
+        return handleApiError(error)
     }
 }
 
 export const processStockFromSale = async (payload) => {
     try {
-        const response = await apiClient.post(`/api/draftsale/process-stock`, payload)
+        const response = await apiClient.post(`/draftsale/process-stock`, payload)
         return { data: response.data, error: null }
     } catch (error) {
-        if (error.response) {
-            if (error.response.status === 504) {
-                return { data: null, error: error.response.statusText }
-            }
-            return { data: null, error: error.response.data.message };
-        } else if (error.request) {
-            return { data: null, error: "Network error. Please try again." };
-        } else {
-            return { data: null, error: error.message };
-        }
+        return handleApiError(error)
     }
 }
 
 export const deleteDraftSaleInfo = async (payload) => {
     try {
         const { id } = payload
-        const response = await apiClient.delete(`/api/draftsale/${id}`)
+        const response = await apiClient.delete(`/draftsale/${id}`)
         return { data: response.data, error: null }
     } catch (error) {
-        if (error.response) {
-            if (error.response.status === 504) {
-                return { data: null, error: error.response.statusText }
-            }
-            return { data: null, error: error.response.data.message };
-        } else if (error.request) {
-            return { data: null, error: "Network error. Please try again." };
-        } else {
-            return { data: null, error: error.message };
-        }
+        return handleApiError(error)
     }
 }
 
 export const loadReportAllDraftSale = async () => {
     try {
-        const response = await apiClient.get(`/api/draftsale/all`)
+        const response = await apiClient.get(`/draftsale/all`)
         return { data: response.data, error: null }
     } catch (error) {
-        if (error.response) {
-            if (error.response.status === 504) {
-                return { data: null, error: error.response.statusText }
-            }
-            return { data: null, error: error.response.data.message };
-        } else if (error.request) {
-            return { data: null, error: "Network error. Please try again." };
-        } else {
-            return { data: null, error: error.message };
-        }
+        return handleApiError(error)
     }
 }
