@@ -210,22 +210,18 @@ const DataTable = ({
 
   // ฟังก์ชันสำหรับ export Excel
   const handleExportExcel = () => {
-    // สร้างข้อมูลสำหรับ Excel
     const data = [];
-    
-    // เพิ่ม header
+
+    // header row
     data.push([
       'เลขที่ใบเสร็จ', 'วันที่ออกใบเสร็จ', 'เวลา', 'จำนวนขาย', 'รหัสสินค้า', 'ชื่อสินค้า', 'หมวดสินค้า', 'สาขา', 'พนักงาน'
     ]);
-    
-    // เพิ่มข้อมูลแต่ละสาขา
+
+    // ข้อมูลแต่ละสาขา
     sortedGroups.forEach(group => {
-      // เพิ่มแถวหัวสาขา
       data.push([
         `สาขา: ${group.branch_code}`, `${group.totalBills} บิล`, `รวม ${group.totalItems} สินค้า`, '', '', '', '', '', ''
       ]);
-      
-      // เพิ่มข้อมูลรายการในสาขา
       group.items.forEach(item => {
         data.push([
           item.billno || '',
@@ -241,16 +237,65 @@ const DataTable = ({
       });
     });
 
+    // --- สรุปตามสาขา ---
+    data.push([]);
+    data.push(['สรุปตามสาขา', '', '', '', '', '', '', '', '']);
+    data.push(['สาขา', 'จำนวนรายการ', 'รวมส่วนลด', 'รวมสุทธิ', '', '', '', '', '']);
+
+    const branchSummary = {};
+    filteredSales.forEach(item => {
+      const branch = item.branch_code || 'ไม่ระบุ';
+      if (!branchSummary[branch]) {
+        branchSummary[branch] = { count: 0, totalDiscount: 0, totalNet: 0 };
+      }
+      branchSummary[branch].count += 1;
+      branchSummary[branch].totalDiscount += Number(item.discount_amount) || 0;
+      branchSummary[branch].totalNet += (Number(item.price) || 0) - (Number(item.discount_amount) || 0);
+    });
+
+    let grandCount = 0, grandDiscount = 0, grandNet = 0;
+    Object.entries(branchSummary)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .forEach(([branch, s]) => {
+        data.push([branch, s.count, s.totalDiscount.toFixed(2), s.totalNet.toFixed(2), '', '', '', '', '']);
+        grandCount += s.count;
+        grandDiscount += s.totalDiscount;
+        grandNet += s.totalNet;
+      });
+    data.push(['รวมทั้งหมด', grandCount, grandDiscount.toFixed(2), grandNet.toFixed(2), '', '', '', '', '']);
+
+    // --- สรุปตามกลุ่มสินค้า ---
+    data.push([]);
+    data.push(['สรุปตามกลุ่มสินค้า', '', '', '', '', '', '', '', '']);
+    data.push(['กลุ่มสินค้า', 'จำนวนรายการ', 'รวมส่วนลด', 'รวมสุทธิ', '', '', '', '', '']);
+
+    const groupSummary = {};
+    filteredSales.forEach(item => {
+      const pgroup = item.PGroup || 'ไม่ระบุ';
+      if (!groupSummary[pgroup]) {
+        groupSummary[pgroup] = { count: 0, totalDiscount: 0, totalNet: 0 };
+      }
+      groupSummary[pgroup].count += 1;
+      groupSummary[pgroup].totalDiscount += Number(item.discount_amount) || 0;
+      groupSummary[pgroup].totalNet += (Number(item.price) || 0) - (Number(item.discount_amount) || 0);
+    });
+
+    Object.entries(groupSummary)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .forEach(([pgroup, s]) => {
+        data.push([pgroup, s.count, s.totalDiscount.toFixed(2), s.totalNet.toFixed(2), '', '', '', '', '']);
+      });
+    data.push(['รวมทั้งหมด', grandCount, grandDiscount.toFixed(2), grandNet.toFixed(2), '', '', '', '', '']);
+
     // สร้าง workbook และ worksheet
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.aoa_to_sheet(data);
-    
-    // กำหนดความกว้างของคอลัมน์
+
     const colWidths = [
-      { wch: 15 }, // เลขที่ใบเสร็จ
-      { wch: 12 }, // วันที่ออกใบเสร็จ
-      { wch: 10 }, // เวลา
-      { wch: 10 }, // จำนวนขาย
+      { wch: 20 }, // เลขที่ใบเสร็จ / label
+      { wch: 14 }, // วันที่ออกใบเสร็จ / จำนวนรายการ
+      { wch: 14 }, // เวลา / รวมส่วนลด
+      { wch: 14 }, // จำนวนขาย / รวมสุทธิ
       { wch: 15 }, // รหัสสินค้า
       { wch: 30 }, // ชื่อสินค้า
       { wch: 15 }, // หมวดสินค้า
@@ -258,14 +303,10 @@ const DataTable = ({
       { wch: 10 }  // พนักงาน
     ];
     ws['!cols'] = colWidths;
-    
-    // เพิ่ม worksheet เข้า workbook
+
     XLSX.utils.book_append_sheet(wb, ws, 'รายงานการเปิดบิลด้วยมือ');
-    
-    // สร้างชื่อไฟล์
+
     const filename = `รายงานการเปิดบิลด้วยมือ แยกตามสาขา_${new Date().toISOString().split('T')[0]}.xlsx`;
-    
-    // ดาวน์โหลดไฟล์
     XLSX.writeFile(wb, filename);
   };
 

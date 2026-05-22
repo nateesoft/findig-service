@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import moment from 'moment';
 import React from 'react';
-import * as XLSX from 'xlsx';
+import * as XLSX from 'xlsx-js-style';
 
 function getCurrencyFormat(value) {
   return Number(value || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -291,32 +291,48 @@ const DataTable = ({
 
   // ฟังก์ชันสำหรับ export Excel
   const handleExportExcel = () => {
-    // สร้างข้อมูล Excel
     const worksheetData = [];
-    
-    // เพิ่ม headers
-    worksheetData.push([
-      'สาขา', 'กลุ่มสินค้า', 'วันที่', 'เลขที่บิล', 'ประเภท', 'รหัสสินค้า', 'ชื่อสินค้า', 'รับเข้า(In)', 'มูลค่า', 'จ่ายออก(Out)', 'มูลค่า', 'คลัง', 'ส่วนลด', 'สุทธิ', 'ยกเลิกบิล', 'เลขที่ใบเสร็จ'
-    ]);
+    // 'header' | 'branch' | 'group' | 'item' | 'group-summary' | 'branch-summary' | 'grand-total' | 'empty'
+    const rowTypes = [];
+    const COL_COUNT = 16;
+    const fmt = (v) => Number(v || 0).toFixed(2);
 
-    console.log('sortedGroups:', sortedGroups)
-    
-    // เพิ่มข้อมูล
+    const emptyRow = () => Array(COL_COUNT).fill('');
+    const summaryRow = (label, sIn, sInVal, sOut, sOutVal, sDiscount, sNet) => [
+      label, '', '', '', '', '', '',
+      sIn, fmt(sInVal), sOut, fmt(sOutVal), '',
+      fmt(sDiscount), fmt(sNet), '', ''
+    ];
+
+    worksheetData.push([
+      'สาขา', 'กลุ่มสินค้า', 'วันที่', 'เลขที่บิล', 'ประเภท', 'รหัสสินค้า', 'ชื่อสินค้า',
+      'รับเข้า(In)', 'มูลค่า', 'จ่ายออก(Out)', 'มูลค่า', 'คลัง', 'ส่วนลด', 'สุทธิ', 'ยกเลิกบิล', 'เลขที่ใบเสร็จ'
+    ]);
+    rowTypes.push('header');
+
+    let grandIn = 0, grandInVal = 0, grandOut = 0, grandOutVal = 0, grandDiscount = 0, grandNet = 0;
+
     sortedGroups.forEach(group => {
-      // แถวสรุปสาขา
       worksheetData.push([
-        `สาขา: ${group.branchCode}`, `${group.totalItems} รายการ`, `รวมรับเข้า ${group.totalQtyIn}`, `รวมจ่ายออก ${group.totalQtyOut}`, '', '', '', '', '', '', '', '', '', '', '', ''
+        `สาขา: ${group.branchCode}`, `${group.totalItems} รายการ`,
+        ...Array(COL_COUNT - 2).fill('')
       ]);
-      
-      // กลุ่มสินค้าแต่ละกลุ่ม
+      rowTypes.push('branch');
+
+      let branchIn = 0, branchInVal = 0, branchOut = 0, branchOutVal = 0, branchDiscount = 0, branchNet = 0;
+
       groupByProductGroup(group.items).forEach(productGroup => {
-        // แถวสรุปกลุ่มสินค้า
         worksheetData.push([
-          `  กลุ่ม: ${productGroup.groupName}`, `${productGroup.totalItems} รายการ`, `รวมรับเข้า ${productGroup.totalQtyIn}`, `รวมจ่ายออก ${productGroup.totalQtyOut}`, '', '', '', '', '', '', '', '', '', '', '', ''
+          `  กลุ่ม: ${productGroup.groupName}`, `${productGroup.totalItems} รายการ`,
+          ...Array(COL_COUNT - 2).fill('')
         ]);
-        
-        // รายการสินค้าในกลุ่ม
+        rowTypes.push('group');
+
+        let pgIn = 0, pgInVal = 0, pgOut = 0, pgOutVal = 0, pgDiscount = 0, pgNet = 0;
+
         productGroup.items.forEach(item => {
+          const inVal = Number(item.S_In > 0 ? item.UnitPrice : 0);
+          const outVal = Number(item.S_Out > 0 ? item.UnitPrice : 0);
           worksheetData.push([
             item.S_Bran || '',
             item.GroupName || '',
@@ -325,28 +341,81 @@ const DataTable = ({
             item.S_Rem || '',
             item.S_PCode || '',
             item.PDesc || '',
-            item.S_In || '',
-            Number(item.S_In>0 ? item.UnitPrice : 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-            item.S_Out || '',
-            Number(item.S_Out>0 ? item.UnitPrice : 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+            Number(item.S_In || 0),
+            inVal,
+            Number(item.S_Out || 0),
+            outVal,
             item.S_Stk || '',
-            Number(item.Discount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-            Number(item.NetTotal || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+            Number(item.Discount || 0),
+            Number(item.NetTotal || 0),
             item.Refund || '',
             item.RefNo || ''
           ]);
+          rowTypes.push('item');
+          pgIn += Number(item.S_In || 0);
+          pgInVal += inVal;
+          pgOut += Number(item.S_Out || 0);
+          pgOutVal += outVal;
+          pgDiscount += Number(item.Discount || 0);
+          pgNet += Number(item.NetTotal || 0);
         });
+
+        worksheetData.push(summaryRow(
+          `  รวมกลุ่ม: ${productGroup.groupName}`,
+          pgIn, pgInVal, pgOut, pgOutVal, pgDiscount, pgNet
+        ));
+        rowTypes.push('group-summary');
+
+        branchIn += pgIn; branchInVal += pgInVal;
+        branchOut += pgOut; branchOutVal += pgOutVal;
+        branchDiscount += pgDiscount; branchNet += pgNet;
       });
+
+      worksheetData.push(summaryRow(
+        `รวมสาขา: ${group.branchCode}`,
+        branchIn, branchInVal, branchOut, branchOutVal, branchDiscount, branchNet
+      ));
+      rowTypes.push('branch-summary');
+      worksheetData.push(emptyRow());
+      rowTypes.push('empty');
+
+      grandIn += branchIn; grandInVal += branchInVal;
+      grandOut += branchOut; grandOutVal += branchOutVal;
+      grandDiscount += branchDiscount; grandNet += branchNet;
     });
 
-    // สร้าง worksheet
+    worksheetData.push(summaryRow(
+      'รวมทั้งหมด',
+      grandIn, grandInVal, grandOut, grandOutVal, grandDiscount, grandNet
+    ));
+    rowTypes.push('grand-total');
+
     const ws = XLSX.utils.aoa_to_sheet(worksheetData);
-    
-    // สร้าง workbook
+
+    // apply background สี summary rows
+    const fillColor = {
+      'group-summary':  'EEEEEE',
+      'branch-summary': 'CCCCCC',
+      'grand-total':    '999999',
+    };
+    const boldTypes = new Set(['group-summary', 'branch-summary', 'grand-total']);
+
+    rowTypes.forEach((type, r) => {
+      const color = fillColor[type];
+      if (!color) return;
+      for (let c = 0; c < COL_COUNT; c++) {
+        const cellAddr = XLSX.utils.encode_cell({ r, c });
+        if (!ws[cellAddr]) ws[cellAddr] = { v: '', t: 's' };
+        ws[cellAddr].s = {
+          fill: { patternType: 'solid', fgColor: { rgb: color } },
+          font: boldTypes.has(type) ? { bold: true } : {},
+          alignment: { vertical: 'center' }
+        };
+      }
+    });
+
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'รายงานความเคลื่อนไหวสินค้า');
-    
-    // ดาวน์โหลดไฟล์
     XLSX.writeFile(wb, `รายงานความเคลื่อนไหวสินค้า_${new Date().toISOString().split('T')[0]}.xlsx`);
   };
 
