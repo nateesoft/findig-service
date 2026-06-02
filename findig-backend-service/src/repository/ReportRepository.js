@@ -90,10 +90,10 @@ const searchReportStcard = async ({ db, payload }) => {
     }
 
     const { GroupCode, S_PCode, S_Stk, S_Date_Start, S_Date_End, S_Rem, S_Bran_Start, S_Bran_End } = payload
-    let sql = `select p.PCode, p.PDesc, p.PGroup, g.GroupName, st.* 
-      from stcard st 
-      left join product p on st.S_PCode=p.PCode 
-      left join groupfile g on p.PGroup=g.GroupCode 
+    let sql = `select p.PCode, p.PDesc, p.PGroup, p.PPrice11, g.GroupName, st.*
+      from stcard st
+      left join product p on st.S_PCode=p.PCode
+      left join groupfile g on p.PGroup=g.GroupCode
       where 1=1 `
     const params = []
 

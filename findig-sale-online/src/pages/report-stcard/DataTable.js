@@ -57,12 +57,14 @@ const DataTable = ({
       }
       acc[branchCode].items.push(item);
       acc[branchCode].totalItems += 1;
-      acc[branchCode].totalQtyIn += Number(item.S_In || 0);
-      acc[branchCode].totalQtyInVal += Number(item.S_In > 0 ? item.S_InCost : 0);
-      acc[branchCode].totalQtyOut += Number(item.S_Out || 0);
-      acc[branchCode].totalQtyOutVal += Number(item.S_Out > 0 ? item.S_OutCost : 0);
-      acc[branchCode].totalDiscount += Number(item.Discount || 0);
-      acc[branchCode].totalNetTotal += Number(item.NetTotal || 0);
+      if (item.Refund !== 'V') {
+        acc[branchCode].totalQtyIn += Number(item.S_In || 0);
+        acc[branchCode].totalQtyInVal += Number(item.S_In > 0 ? item.S_InCost : 0);
+        acc[branchCode].totalQtyOut += Number(item.S_Out || 0);
+        acc[branchCode].totalQtyOutVal += Number(item.S_Out > 0 ? item.S_OutCost : 0);
+        acc[branchCode].totalDiscount += Number(item.Discount || 0);
+        acc[branchCode].totalNetTotal += Number(item.NetTotal || 0);
+      }
       return acc;
     }, {});
     
@@ -88,12 +90,14 @@ const DataTable = ({
       }
       acc[groupName].items.push(item);
       acc[groupName].totalItems += 1;
-      acc[groupName].totalQtyIn += Number(item.S_In || 0);
-      acc[groupName].totalQtyInVal += Number(item.S_In > 0 ? item.S_InCost : 0);
-      acc[groupName].totalQtyOut += Number(item.S_Out || 0);
-      acc[groupName].totalQtyOutVal += Number(item.S_Out > 0 ? item.S_OutCost : 0);
-      acc[groupName].totalDiscount += Number(item.Discount || 0);
-      acc[groupName].totalNetTotal += Number(item.NetTotal || 0);
+      if (item.Refund !== 'V') {
+        acc[groupName].totalQtyIn += Number(item.S_In || 0);
+        acc[groupName].totalQtyInVal += Number(item.S_In > 0 ? item.S_InCost : 0);
+        acc[groupName].totalQtyOut += Number(item.S_Out || 0);
+        acc[groupName].totalQtyOutVal += Number(item.S_Out > 0 ? item.S_OutCost : 0);
+        acc[groupName].totalDiscount += Number(item.Discount || 0);
+        acc[groupName].totalNetTotal += Number(item.NetTotal || 0);
+      }
       return acc;
     }, {});
 
@@ -139,12 +143,14 @@ const DataTable = ({
   // คำนวณ grand total จากข้อมูลทั้งหมด
   const grandTotals = filteredSales.reduce((acc, item) => {
     acc.totalItems += 1;
-    acc.totalQtyIn += Number(item.S_In || 0);
-    acc.totalQtyInVal += Number(item.S_In > 0 ? item.S_InCost : 0);
-    acc.totalQtyOut += Number(item.S_Out || 0);
-    acc.totalQtyOutVal += Number(item.S_Out > 0 ? item.S_OutCost : 0);
-    acc.totalDiscount += Number(item.Discount || 0);
-    acc.totalNetTotal += Number(item.NetTotal || 0);
+    if (item.Refund !== 'V') {
+      acc.totalQtyIn += Number(item.S_In || 0);
+      acc.totalQtyInVal += Number(item.S_In > 0 ? item.S_InCost : 0);
+      acc.totalQtyOut += Number(item.S_Out || 0);
+      acc.totalQtyOutVal += Number(item.S_Out > 0 ? item.S_OutCost : 0);
+      acc.totalDiscount += Number(item.Discount || 0);
+      acc.totalNetTotal += Number(item.NetTotal || 0);
+    }
     return acc;
   }, { totalItems: 0, totalQtyIn: 0, totalQtyInVal: 0, totalQtyOut: 0, totalQtyOutVal: 0, totalDiscount: 0, totalNetTotal: 0 });
   
@@ -225,14 +231,27 @@ const DataTable = ({
         let pgIn = 0, pgInVal = 0, pgOut = 0, pgOutVal = 0, pgDiscount = 0, pgNet = 0;
 
         const itemRows = productGroup.items.map(item => {
+          const vs = item.Refund === 'V' ? -1 : 1;
+          const sIn = Number(item.S_In || 0);
+          const sOut = Number(item.S_Out || 0);
           const inVal = Number(item.S_In > 0 ? item.S_InCost : 0);
           const outVal = Number(item.S_Out > 0 ? item.S_OutCost : 0);
-          pgIn += Number(item.S_In || 0);
-          pgInVal += inVal;
-          pgOut += Number(item.S_Out || 0);
-          pgOutVal += outVal;
-          pgDiscount += Number(item.Discount || 0);
-          pgNet += Number(item.NetTotal || 0);
+          const discount = Number(item.Discount || 0);
+          const netTotal = Number(item.NetTotal || 0);
+          const dispIn = sIn > 0 ? vs * sIn : sIn;
+          const dispInVal = inVal > 0 ? vs * inVal : inVal;
+          const dispOut = sOut > 0 ? vs * sOut : sOut;
+          const dispOutVal = outVal > 0 ? vs * outVal : outVal;
+          const dispDiscount = discount > 0 ? vs * discount : discount;
+          const dispNetTotal = netTotal > 0 ? vs * netTotal : netTotal;
+          if (item.Refund !== 'V') {
+            pgIn += sIn;
+            pgInVal += inVal;
+            pgOut += sOut;
+            pgOutVal += outVal;
+            pgDiscount += discount;
+            pgNet += netTotal;
+          }
           return `
             <tr>
               <td style="padding-left: 40px;">${item.S_Bran || ''}</td>
@@ -242,13 +261,14 @@ const DataTable = ({
               <td>${item.S_Rem || ''}</td>
               <td>${item.S_PCode || ''}</td>
               <td>${item.PDesc || ''}</td>
-              <td class="text-right">${item.S_In || ''}</td>
-              <td class="text-right">${fmt(inVal)}</td>
-              <td class="text-right">${item.S_Out || ''}</td>
-              <td class="text-right">${fmt(outVal)}</td>
+              <td class="text-right">${fmt(item.PPrice11)}</td>
+              <td class="text-right">${dispIn || ''}</td>
+              <td class="text-right">${fmt(dispInVal)}</td>
+              <td class="text-right">${dispOut || ''}</td>
+              <td class="text-right">${fmt(dispOutVal)}</td>
               <td class="text-center">${item.S_Stk || ''}</td>
-              <td class="text-right">${fmt(item.Discount)}</td>
-              <td class="text-right">${fmt(item.NetTotal)}</td>
+              <td class="text-right">${fmt(dispDiscount)}</td>
+              <td class="text-right">${fmt(dispNetTotal)}</td>
               <td class="text-center">${item.Refund || ''}</td>
               <td class="text-center">${item.RefNo || ''}</td>
             </tr>`;
@@ -261,11 +281,11 @@ const DataTable = ({
         return `
           <tr style="background-color: #f1f5f9; font-weight: bold;">
             <td colspan="2" style="padding-left: 20px;">กลุ่ม: ${productGroup.groupName} (${productGroup.totalItems} รายการ)</td>
-            <td colspan="14"></td>
+            <td colspan="15"></td>
           </tr>
           ${itemRows}
           <tr class="group-summary">
-            <td colspan="7" style="padding-left: 20px;">รวมกลุ่ม: ${productGroup.groupName}</td>
+            <td colspan="8" style="padding-left: 20px;">รวมกลุ่ม: ${productGroup.groupName}</td>
             <td class="text-right">${fmt(pgIn)}</td>
             <td class="text-right">${fmt(pgInVal)}</td>
             <td class="text-right">${fmt(pgOut)}</td>
@@ -283,11 +303,11 @@ const DataTable = ({
 
       return `
         <tr style="background-color: #f8fafc; font-weight: bold;">
-          <td colspan="16" style="padding: 12px;">สาขา: ${group.branchCode} (${group.totalItems} รายการ)</td>
+          <td colspan="17" style="padding: 12px;">สาขา: ${group.branchCode} (${group.totalItems} รายการ)</td>
         </tr>
         ${productGroupRows}
         <tr class="branch-summary">
-          <td colspan="7">รวมสาขา: ${group.branchCode}</td>
+          <td colspan="8">รวมสาขา: ${group.branchCode}</td>
           <td class="text-right">${fmt(branchIn)}</td>
           <td class="text-right">${fmt(branchInVal)}</td>
           <td class="text-right">${fmt(branchOut)}</td>
@@ -297,12 +317,12 @@ const DataTable = ({
           <td class="text-right">${fmt(branchNet)}</td>
           <td colspan="2"></td>
         </tr>
-        <tr><td colspan="16" style="border: none; padding: 4px;"></td></tr>`;
+        <tr><td colspan="17" style="border: none; padding: 4px;"></td></tr>`;
     }).join('');
 
     const grandTotalRow = `
       <tr class="grand-total">
-        <td colspan="7">รวมทั้งหมด</td>
+        <td colspan="8">รวมทั้งหมด</td>
         <td class="text-right">${fmt(grandIn)}</td>
         <td class="text-right">${fmt(grandInVal)}</td>
         <td class="text-right">${fmt(grandOut)}</td>
@@ -350,6 +370,7 @@ const DataTable = ({
               <th>ประเภท</th>
               <th>รหัสสินค้า</th>
               <th>ชื่อสินค้า</th>
+              <th class="text-right">ราคา</th>
               <th class="text-right">รับเข้า(In)</th>
               <th class="text-right">มูลค่ารับเข้า</th>
               <th class="text-right">จ่ายออก(Out)</th>
@@ -385,18 +406,18 @@ const DataTable = ({
     const worksheetData = [];
     // 'header' | 'branch' | 'group' | 'item' | 'group-summary' | 'branch-summary' | 'grand-total' | 'empty'
     const rowTypes = [];
-    const COL_COUNT = 16;
+    const COL_COUNT = 17;
     const fmt = (v) => Number(v || 0).toFixed(2);
 
     const emptyRow = () => Array(COL_COUNT).fill('');
     const summaryRow = (label, sIn, sInVal, sOut, sOutVal, sDiscount, sNet) => [
-      label, '', '', '', '', '', '',
+      label, '', '', '', '', '', '', '',
       sIn, fmt(sInVal), sOut, fmt(sOutVal), '',
       fmt(sDiscount), fmt(sNet), '', ''
     ];
 
     worksheetData.push([
-      'สาขา', 'กลุ่มสินค้า', 'วันที่', 'เลขที่บิล', 'ประเภท', 'รหัสสินค้า', 'ชื่อสินค้า',
+      'สาขา', 'กลุ่มสินค้า', 'วันที่', 'เลขที่บิล', 'ประเภท', 'รหัสสินค้า', 'ชื่อสินค้า', 'ราคา',
       'รับเข้า(In)', 'มูลค่ารับเข้า', 'จ่ายออก(Out)', 'มูลค่าจ่ายออก', 'คลัง', 'ส่วนลด', 'สุทธิ', 'ยกเลิกบิล', 'เลขที่ใบเสร็จ'
     ]);
     rowTypes.push('header');
@@ -422,8 +443,13 @@ const DataTable = ({
         let pgIn = 0, pgInVal = 0, pgOut = 0, pgOutVal = 0, pgDiscount = 0, pgNet = 0;
 
         productGroup.items.forEach(item => {
+          const vs = item.Refund === 'V' ? -1 : 1;
+          const sIn = Number(item.S_In || 0);
+          const sOut = Number(item.S_Out || 0);
           const inVal = Number(item.S_In > 0 ? item.S_InCost : 0);
           const outVal = Number(item.S_Out > 0 ? item.S_OutCost : 0);
+          const discount = Number(item.Discount || 0);
+          const netTotal = Number(item.NetTotal || 0);
           worksheetData.push([
             item.S_Bran || '',
             item.GroupName || '',
@@ -432,23 +458,26 @@ const DataTable = ({
             item.S_Rem || '',
             item.S_PCode || '',
             item.PDesc || '',
-            Number(item.S_In || 0),
-            inVal,
-            Number(item.S_Out || 0),
-            outVal,
+            Number(item.PPrice11 || 0),
+            sIn > 0 ? vs * sIn : sIn,
+            inVal > 0 ? vs * inVal : inVal,
+            sOut > 0 ? vs * sOut : sOut,
+            outVal > 0 ? vs * outVal : outVal,
             item.S_Stk || '',
-            Number(item.Discount || 0),
-            Number(item.NetTotal || 0),
+            discount > 0 ? vs * discount : discount,
+            netTotal > 0 ? vs * netTotal : netTotal,
             item.Refund || '',
             item.RefNo || ''
           ]);
           rowTypes.push('item');
-          pgIn += Number(item.S_In || 0);
-          pgInVal += inVal;
-          pgOut += Number(item.S_Out || 0);
-          pgOutVal += outVal;
-          pgDiscount += Number(item.Discount || 0);
-          pgNet += Number(item.NetTotal || 0);
+          if (item.Refund !== 'V') {
+            pgIn += sIn;
+            pgInVal += inVal;
+            pgOut += sOut;
+            pgOutVal += outVal;
+            pgDiscount += discount;
+            pgNet += netTotal;
+          }
         });
 
         worksheetData.push(summaryRow(
@@ -992,6 +1021,7 @@ const DataTable = ({
                                 <td className={`px-2 py-2 text-xs font-medium ${getThemeClasses("textMuted", currentTheme)} uppercase tracking-wider`} style={{whiteSpace: 'nowrap'}}>ประเภท</td>
                                 <td className={`px-2 py-2 text-xs font-medium ${getThemeClasses("textMuted", currentTheme)} uppercase tracking-wider`} style={{whiteSpace: 'nowrap'}}>รหัสสินค้า</td>
                                 <td className={`px-2 py-2 text-xs font-medium ${getThemeClasses("textMuted", currentTheme)} uppercase tracking-wider`} style={{whiteSpace: 'nowrap'}}>ชื่อสินค้า</td>
+                                <td className={`px-2 py-2 text-xs font-medium ${getThemeClasses("textMuted", currentTheme)} uppercase tracking-wider text-right`} style={{whiteSpace: 'nowrap'}}>ราคา</td>
                                 <td className={`px-2 py-2 text-xs font-medium ${getThemeClasses("textMuted", currentTheme)} uppercase tracking-wider text-right`} style={{whiteSpace: 'nowrap'}}>รับเข้า(In)</td>
                                 <td className={`px-2 py-2 text-xs font-medium ${getThemeClasses("textMuted", currentTheme)} uppercase tracking-wider text-right`} style={{whiteSpace: 'nowrap'}}>มูลค่ารับเข้า</td>
                                 <td className={`px-2 py-2 text-xs font-medium ${getThemeClasses("textMuted", currentTheme)} uppercase tracking-wider text-right`} style={{whiteSpace: 'nowrap'}}>จ่ายออก(Out)</td>
@@ -1007,26 +1037,40 @@ const DataTable = ({
                                 <tr
                                   key={`${item.S_No}-${index}`}
                                   className={`${getThemeClasses("tableRow", currentTheme)}`}
+                                  style={item.Refund === 'V' ? { backgroundColor: '#fee2e2' } : {}}
                                 >
                                   <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)} pl-16`}>{moment(item.S_Date).format("DD/MM/YYYY")}</td>
                                   <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)}`}>{item.S_No}</td>
                                   <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)}`}>{item.S_Rem}</td>
                                   <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)}`}>{item.S_PCode}</td>
                                   <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)} truncate`} title={item.PDesc}>{item.PDesc}</td>
-                                  <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)} text-right`}>{item.S_In}</td>
-                                  <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)} text-right`}>{Number(item.S_In>0 ? item.S_InCost : 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                                  <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)} text-right`}>{item.S_Out}</td>
-                                  <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)} text-right`}>{Number(item.S_Out>0 ? item.S_OutCost : 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                                  <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)}`}>{item.S_Stk}</td>
-                                  <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)} text-right`}>{Number(item.Discount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                                  <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)} text-right`}>{Number(item.NetTotal || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                                  <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)} text-right`}>{getCurrencyFormat(item.PPrice11)}</td>
+                                  {(() => {
+                                    const vs = item.Refund === 'V' ? -1 : 1;
+                                    const fmtNum = (v) => Number(v || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                    const sIn = Number(item.S_In || 0);
+                                    const sOut = Number(item.S_Out || 0);
+                                    const inCost = Number(item.S_In > 0 ? item.S_InCost : 0);
+                                    const outCost = Number(item.S_Out > 0 ? item.S_OutCost : 0);
+                                    const discount = Number(item.Discount || 0);
+                                    const netTotal = Number(item.NetTotal || 0);
+                                    return (<>
+                                      <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)} text-right`}>{sIn > 0 ? vs * sIn : sIn || ''}</td>
+                                      <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)} text-right`}>{fmtNum(inCost > 0 ? vs * inCost : inCost)}</td>
+                                      <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)} text-right`}>{sOut > 0 ? vs * sOut : sOut || ''}</td>
+                                      <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)} text-right`}>{fmtNum(outCost > 0 ? vs * outCost : outCost)}</td>
+                                      <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)}`}>{item.S_Stk}</td>
+                                      <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)} text-right`}>{fmtNum(discount > 0 ? vs * discount : discount)}</td>
+                                      <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)} text-right`}>{fmtNum(netTotal > 0 ? vs * netTotal : netTotal)}</td>
+                                    </>);
+                                  })()}
                                   <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)}`}>{item.Refund}</td>
                                   <td className={`px-2 py-2 text-sm ${getThemeClasses("textSecondary", currentTheme)}`}>{item.RefNo}</td>
                                 </tr>
                               ))}
                               {/* รวมกลุ่ม summary row */}
                               <tr className="text-sm font-semibold" style={{ backgroundColor: '#e5e7eb', color: '#111827' }}>
-                                <td className="px-2 py-2 pl-16" colSpan={5} style={{ whiteSpace: 'nowrap' }}>
+                                <td className="px-2 py-2 pl-16" colSpan={6} style={{ whiteSpace: 'nowrap' }}>
                                   รวมกลุ่ม: {productGroup.groupName} ({productGroup.totalItems} รายการ)
                                 </td>
                                 <td className="px-2 py-2 text-right" style={{ whiteSpace: 'nowrap' }}>{getCurrencyFormat(productGroup.totalQtyIn)}</td>

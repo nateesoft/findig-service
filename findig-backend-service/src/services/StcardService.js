@@ -137,7 +137,7 @@ const processStock = async ({ payload, repository, db }) => {
         S_In: 0,
         S_Out: item.qty,
         S_InCost: 0,
-        S_OutCost: 0,
+        S_OutCost: (item.price ?? 0) * (item.qty ?? 0) ?? 0,
         S_ACost: 0,
         S_Rem: "SAL",
         S_User: item.emp_code_update,
@@ -146,7 +146,8 @@ const processStock = async ({ payload, repository, db }) => {
         S_Link: "",
         Source_Data: "WEB",
         Data_Sync: "N",
-        Discount: item.discount_amount ?? 0
+        Discount: item.discount_amount ?? 0,
+        NetTotal: (item.price ?? 0) * (item.qty ?? 0) - (item.discount_amount ?? 0)
       }
 
       if (existing) {

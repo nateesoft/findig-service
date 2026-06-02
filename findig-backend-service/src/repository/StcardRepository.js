@@ -31,10 +31,10 @@ const searchData = async ({ payload, db }) => {
       throw new Error('Database connection not available');
     }
     const { S_No, S_Date_Start, S_Date_End, S_Bran, S_User, Data_Sync, S_Stk, S_PCode, GroupCode  } = payload
-    let sql = `select p.PCode, p.PDesc, p.PGroup, g.GroupName  , st.* 
-      from stcard st 
-      left join product p on st.S_PCode=p.PCode 
-      left join groupfile g on p.PGroup=g.GroupCode 
+    let sql = `select p.PCode, p.PDesc, p.PGroup, p.PPrice11, g.GroupName  , st.*
+      from stcard st
+      left join product p on st.S_PCode=p.PCode
+      left join groupfile g on p.PGroup=g.GroupCode
       where 1=1 `
     const params = []
     if (S_No) {
