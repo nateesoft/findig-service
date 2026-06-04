@@ -1,7 +1,8 @@
-import apiClient, { handleApiError } from "../httpRequest";
+import apiClient, { handleApiError } from "../httpRequest"
+import { getBranchFromToken } from "../utils/auth"
 
 export const loadStfileInfo = async (payload) => {
-    const branchCode = localStorage.getItem('branchCode') || ''
+    const branchCode = getBranchFromToken()
     try {
         const response = await apiClient.get(`/stkfile/${branchCode}`)
         return { data: response.data, error: null }
@@ -20,7 +21,7 @@ export const searchData = async (payload) => {
 }
 
 export const loadStfileViewDetail = async (payload) => {
-    const branchCode = localStorage.getItem('branchCode') || ''
+    const branchCode = getBranchFromToken()
     try {
         const { productCode } = payload
         const response = await apiClient.get(`/stkfile/${productCode}?branchCode=${branchCode}`)

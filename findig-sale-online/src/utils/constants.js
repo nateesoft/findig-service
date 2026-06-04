@@ -31,7 +31,7 @@ export const MENU_GROUPS = [
     items: [
       { id: 'stock-card', label: 'รายงานภาพรวมสินค้า', page: 'report-summary' },
       { id: 'stock-card', label: 'รายงานการเปิดบิลด้วยมือ', page: 'report-sales' },
-      { id: 'stock-card', label: 'รายงาน สต๊อกคงเหลือ', page: 'report-stkfile' },
+      { id: 'stock-card', label: 'รายงาน สินค้าคงเหลือ', page: 'report-stkfile' },
       { id: 'stock-card', label: 'รายงานความเคลื่อนไหวสินค้า', page: 'report-stcard' }
     ]
   },

@@ -172,7 +172,7 @@ const SaleTable = ({
       <!DOCTYPE html>
       <html>
       <head>
-        <title>รายงาน สต๊อกคงเหลือ</title>
+        <title>รายงาน สินค้าคงเหลือ</title>
         <meta charset="utf-8">
         <style>
           body { font-family: 'Sarabun', Arial, sans-serif; margin: 20px; }
@@ -190,7 +190,7 @@ const SaleTable = ({
       </head>
       <body>
         <div class="print-date">วันที่พิมพ์: ${new Date().toLocaleDateString('th-TH')}</div>
-        <h1>รายงาน สต๊อกคงเหลือ</h1>
+        <h1>รายงาน สินค้าคงเหลือ</h1>
         <table>
           <thead>
             <tr>
@@ -289,10 +289,10 @@ const SaleTable = ({
     
     // สร้าง workbook
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'รายงาน สต๊อกคงเหลือ');
+    XLSX.utils.book_append_sheet(wb, ws, 'รายงาน สินค้าคงเหลือ');
     
     // ดาวน์โหลดไฟล์
-    XLSX.writeFile(wb, `รายงาน สต๊อกคงเหลือ_${new Date().toISOString().split('T')[0]}.xlsx`);
+    XLSX.writeFile(wb, `รายงาน สินค้าคงเหลือ_${new Date().toISOString().split('T')[0]}.xlsx`);
   };
 
   // ฟังก์ชันสำหรับแสดงไอคอน sort
@@ -355,7 +355,7 @@ const SaleTable = ({
     return (
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <h1 className={`text-2xl font-bold ${getThemeClasses('textPrimary', currentTheme)}`}>รายงาน สต๊อกคงเหลือ</h1>
+          <h1 className={`text-2xl font-bold ${getThemeClasses('textPrimary', currentTheme)}`}>รายงาน สินค้าคงเหลือ</h1>
         </div>
         <div className="flex items-center justify-center py-20">
           <div className="flex flex-col items-center space-y-4">
@@ -392,7 +392,7 @@ const SaleTable = ({
                 currentTheme
               )}`}
             >
-              รายงาน สต๊อกคงเหลือ
+              รายงาน สินค้าคงเหลือ
             </h3>
             {sortedGroups.length > 0 && (
               <p className={`text-sm ${getThemeClasses("textMuted", currentTheme)} mt-2`}>

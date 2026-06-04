@@ -1,7 +1,8 @@
-import apiClient, { handleApiError } from "../httpRequest";
+import apiClient, { handleApiError } from "../httpRequest"
+import { getBranchFromToken } from "../utils/auth"
 
 export const loadSummaryReport = async (payload) => {
-    const branchCode = localStorage.getItem('branchCode') || ''
+    const branchCode = getBranchFromToken()
     try {
         const response = await apiClient.post(`/report/summary?branchCode=${branchCode}`, payload)
         return { data: response.data, error: null }
@@ -11,7 +12,7 @@ export const loadSummaryReport = async (payload) => {
 }
 
 export const loadSaleReport = async (payload) => {
-    const branchCode = localStorage.getItem('branchCode') || ''
+    const branchCode = getBranchFromToken()
     try {
         const response = await apiClient.post(`/report/sale?branchCode=${branchCode}`, payload)
         return { data: response.data, error: null }
@@ -21,7 +22,7 @@ export const loadSaleReport = async (payload) => {
 }
 
 export const loadStcardReport = async (payload) => {
-    const branchCode = localStorage.getItem('branchCode') || ''
+    const branchCode = getBranchFromToken()
     try {
         const response = await apiClient.post(`/report/stcard?branchCode=${branchCode}`, payload)
         return { data: response.data, error: null }
@@ -31,7 +32,7 @@ export const loadStcardReport = async (payload) => {
 }
 
 export const loadStkfileReport = async (payload) => {
-    const branchCode = localStorage.getItem('branchCode') || ''
+    const branchCode = getBranchFromToken()
     try {
         const response = await apiClient.post(`/report/stkfile?branchCode=${branchCode}`, payload)
         return { data: response.data, error: null }

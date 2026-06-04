@@ -80,12 +80,12 @@ const SessionWarningModal = ({
               <div className="flex items-center space-x-3">
                 <div className={`w-10 h-10 bg-${themes[currentTheme].accent} rounded-full flex items-center justify-center shadow-sm`}>
                   <span className="text-white text-sm font-medium">
-                    {user?.fullName?.charAt(0)}
+                    {(user?.fullName || user?.Name || user?.UserName)?.charAt(0)}
                   </span>
                 </div>
                 <div>
                   <p className={`text-sm font-medium ${getThemeClasses('textPrimary', currentTheme)}`}>
-                    {user?.fullName}
+                    {user?.fullName || user?.Name || user?.UserName}
                   </p>
                   <p className={`text-xs ${getThemeClasses('textMuted', currentTheme)} flex items-center space-x-1`}>
                     <span>🔒 เซสชันที่เริ่ม:</span>

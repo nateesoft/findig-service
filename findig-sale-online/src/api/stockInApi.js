@@ -1,7 +1,8 @@
-import apiClient, { handleApiError } from "../httpRequest";
+import apiClient, { handleApiError } from "../httpRequest"
+import { getBranchFromToken } from "../utils/auth"
 
 export const loadStockInInfo = async () => {
-    const branchCode = localStorage.getItem('branchCode') || ''
+    const branchCode = getBranchFromToken()
     try {
         const response = await apiClient.get(`/stock-in?branchCode=${branchCode}`)
         return { data: response.data, error: null }
@@ -20,7 +21,7 @@ export const searchData = async (payload) => {
 }
 
 export const loadStockInDashboard = async () => {
-    const branchCode = localStorage.getItem('branchCode') || ''
+    const branchCode = getBranchFromToken()
     try {
         const response = await apiClient.get(`/stock-in/dashboard?branchCode=${branchCode}`)
         return { data: response.data, error: null }
@@ -30,7 +31,7 @@ export const loadStockInDashboard = async () => {
 }
 
 export const loadStockInById = async (payload) => {
-    const branchCode = localStorage.getItem('branchCode') || ''
+    const branchCode = getBranchFromToken()
     try {
         const { id } = payload
         const response = await apiClient.get(`/stock-in/${id}?branchCode=${branchCode}`)

@@ -36,8 +36,6 @@ const LoginPage = ( { onLogin, setUser }) => {
       if (token) {
         setAuthCookie(token)
       }
-      localStorage.setItem('userInfo', JSON.stringify(userInfoWithoutToken))
-      localStorage.setItem('branchCode', loginData.branchCode)
 
       setAppData(prevData => ({
         ...prevData,
@@ -169,9 +167,10 @@ const LoginPage = ( { onLogin, setUser }) => {
           <div>
             <select
               value={loginData.branchCode}
-              onChange={(e) =>
+              onChange={(e) => {
+                localStorage.setItem('branchCode', e.target.value)
                 setLoginData({ ...loginData, branchCode: e.target.value })
-              }
+              }}
               className={`w-full px-4 py-3 border rounded-lg text-center text-sm ${getThemeClasses(
                 "input",
                 currentTheme

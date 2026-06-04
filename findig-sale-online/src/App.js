@@ -10,6 +10,7 @@ import {
 
 import { getThemeClasses } from "./utils/themes"
 import { SESSION_TIMEOUT, WARNING_TIME } from "./utils/constants"
+import { getUserFromToken, getBranchFromToken, clearAuthCookie } from "./utils/auth"
 
 import LoginPage from "./components/Auth/LoginPage"
 import Sidebar from "./components/Layout/Sidebar"
@@ -38,7 +39,6 @@ import SystemSettings from "./pages/SystemSettings"
 import BranchInfo from "./pages/BranchInfo"
 
 import { AppContext } from './contexts'
-import { clearAuthCookie } from './api/userLoginApi'
 
 const AppLayout = ({
   children,
@@ -128,82 +128,35 @@ const AppContent = () => {
   const [sessionCountdown, setSessionCountdown] = useState(60)
   const [lastActivity, setLastActivity] = useState(Date.now())
 
-  // เพิ่ม useEffect สำหรับ initialize user จาก localStorage และ context
+  // initialize user จาก JWT cookie
   useEffect(() => {
-    let userFound = false;
-
     const isValidUser = (u) => u && (u.username || u.UserName || u.id)
-    const getUserKey = (u) => u?.username || u?.UserName || u?.id
 
-    // ตรวจสอบ userInfo จาก context ก่อน
-    if (userInfo && userInfo !== 'null' && userInfo !== 'undefined') {
-      if (typeof userInfo === 'string') {
-        try {
-          const parsedUserInfo = JSON.parse(userInfo)
-          if (isValidUser(parsedUserInfo)) {
-            setUser(parsedUserInfo)
-            userFound = true;
-          }
-        } catch (error) {
-          console.error('Error parsing userInfo from context:', error)
-        }
-      } else if (isValidUser(userInfo)) {
-        setUser(userInfo)
-        userFound = true;
-      }
+    // ตรวจสอบ userInfo จาก context ก่อน (set โดย initContext หรือ login)
+    if (userInfo && isValidUser(userInfo)) {
+      setUser(userInfo)
+      setIsInitialized(true)
+      return
     }
 
-    // ถ้าไม่มีใน context ให้ตรวจสอบ localStorage
-    if (!userFound) {
-      const storedUserInfo = localStorage.getItem('userInfo')
-
-      if (storedUserInfo && storedUserInfo !== 'null' && storedUserInfo !== 'undefined') {
-        try {
-          const parsedUserInfo = JSON.parse(storedUserInfo)
-          if (isValidUser(parsedUserInfo)) {
-            setUser(parsedUserInfo)
-            // อัพเดท context ด้วย
-            setAppData(prevData => ({
-              ...prevData,
-              userInfo: parsedUserInfo
-            }))
-            userFound = true;
-          }
-        } catch (error) {
-          console.error('Error parsing userInfo from localStorage:', error)
-          localStorage.removeItem('userInfo') // ลบข้อมูลที่เสียหาย
-        }
-      }
+    // fallback: อ่านจาก JWT cookie โดยตรง
+    const tokenUser = getUserFromToken()
+    if (tokenUser && isValidUser(tokenUser)) {
+      setUser(tokenUser)
+      setAppData(prevData => ({
+        ...prevData,
+        userInfo: tokenUser,
+        branchCode: tokenUser.branchCode || prevData.branchCode
+      }))
     }
 
-    // set initialized เมื่อเสร็จแล้ว (ไม่ว่าจะมี user หรือไม่)
     setIsInitialized(true)
   }, [setAppData, userInfo])
 
-  // ทำให้ user state sync กับ userInfo จาก context (เมื่อ context เปลี่ยน)
+  // sync user state เมื่อ userInfo ใน context เป็น null (logout)
   useEffect(() => {
-    const isValidUser = (u) => u && (u.username || u.UserName || u.id)
-    const getUserKey = (u) => u?.username || u?.UserName || u?.id
-
-    // ถ้า context มี userInfo และ local user state ยังไม่มี หรือไม่ตรงกัน
-    if (userInfo && userInfo !== 'null' && userInfo !== 'undefined') {
-      if (typeof userInfo === 'string') {
-        try {
-          const parsedUserInfo = JSON.parse(userInfo)
-          if (isValidUser(parsedUserInfo) && (!user || getUserKey(user) !== getUserKey(parsedUserInfo))) {
-            setUser(parsedUserInfo)
-          }
-        } catch (error) {
-          console.error('Error parsing userInfo:', error)
-        }
-      } else if (isValidUser(userInfo) && (!user || getUserKey(user) !== getUserKey(userInfo))) {
-        setUser(userInfo)
-      }
-    } else if (!userInfo || userInfo === 'null') {
-      // ถ้า context ไม่มี userInfo แต่ local state มี ให้เคลียร์ local state
-      if (user) {
-        setUser(null)
-      }
+    if (!userInfo && user) {
+      setUser(null)
     }
   }, [userInfo, user])
 
@@ -254,7 +207,6 @@ const AppContent = () => {
         ...prevData,
         userInfo: null
       }))
-      localStorage.setItem('userInfo', null)
       clearAuthCookie()
       setUser(null);
       navigate("/login")
@@ -319,7 +271,6 @@ const AppContent = () => {
       userInfo: null
     }))
 
-    localStorage.setItem('userInfo', null)
     clearAuthCookie()
 
     setUser(null);
@@ -719,22 +670,9 @@ const AppContent = () => {
   )
 }
 
-const getInitialUserInfo = () => {
-  const stored = localStorage.getItem("userInfo")
-  if (!stored || stored === 'null' || stored === 'undefined') {
-    return null
-  }
-  try {
-    return JSON.parse(stored)
-  } catch (error) {
-    console.error('Error parsing userInfo from localStorage:', error)
-    return null
-  }
-}
-
 const initContext = {
-  branchCode: localStorage.getItem('branchCode') || '',
-  userInfo: getInitialUserInfo(),
+  branchCode: getBranchFromToken() || localStorage.getItem('branchCode') || '',
+  userInfo: getUserFromToken(),
   currentTheme: localStorage.getItem("currentTheme") || "sunset"
 }
 

@@ -101,15 +101,15 @@ const Sidebar = ({
           <div className="flex items-center">
             <div className={`w-8 h-8 bg-${themes[currentTheme].accent} rounded-full flex items-center justify-center`}>
               <span className="text-white text-sm font-medium">
-                {user?.fullName?.charAt(0)}
+                {(user?.fullName || user?.Name || user?.UserName)?.charAt(0)}
               </span>
             </div>
             <div className="ml-3">
               <p className={`text-sm font-medium ${getThemeClasses('textPrimary', currentTheme)}`}>
-                {user?.fullName}
+                {user?.fullName || user?.Name || user?.UserName}
               </p>
               <p className={`text-xs ${getThemeClasses('textMuted', currentTheme)}`}>
-                {user?.role}
+                {user?.role || user?.UserGroup}
               </p>
             </div>
           </div>
