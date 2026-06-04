@@ -175,7 +175,7 @@ const Sales = () => {
         />
       )}
 
-      {/* กราฟแท่งคงเหลือสินค้าตามสาขา (Top 3 รายการ) */}
+      {/* กราฟแท่งคงเหลือสินค้าตามสาขา (Top 10 รายการ) */}
       <InventoryChart 
         filteredSales={filteredSales} 
         getThemeClasses={getThemeClasses} 

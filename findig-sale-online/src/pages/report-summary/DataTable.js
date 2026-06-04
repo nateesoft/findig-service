@@ -38,8 +38,13 @@ const DataTable = ({
 
   // จัดเรียงข้อมูล
   const sortedSales = [...filteredSales].sort((a, b) => {
-    if (!sortField) return 0;
-    
+    if (!sortField) {
+      // default: เรียงตาม Branch asc แล้ว BQty24 desc (เหมือนกราฟ)
+      const branchCmp = (a.Branch || '').localeCompare(b.Branch || '');
+      if (branchCmp !== 0) return branchCmp;
+      return Number(b.BQty24) - Number(a.BQty24);
+    }
+
     let aValue = a[sortField];
     let bValue = b[sortField];
   
