@@ -14,7 +14,7 @@ const validateLogin = async (req, res, next) => {
     })
     if(result) {
       const token = jwt.sign(
-        { username, branchCode: branchCode || '' },
+        { ...result, branchCode: branchCode || '', fullName: result.Name || result.UserName || username, role: result.UserGroup || 'user' },
         JWT_SECRET,
         { expiresIn: '40m' }
       )
