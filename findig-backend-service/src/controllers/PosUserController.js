@@ -1,8 +1,11 @@
+const jwt = require('jsonwebtoken')
 const PosUserService = require('../services/PosUserService')
 const PosUserRepository = require("../repository/PosUserRepository")
 
+const JWT_SECRET = process.env.JWT_SECRET || 'findig-jwt-secret-key'
+
 const validateLogin = async (req, res, next) => {
-  const { username, password } = req.body
+  const { username, password, branchCode } = req.body
   try {
     const result = await PosUserService.checkLogin({
       payload: { username, password },
@@ -10,7 +13,12 @@ const validateLogin = async (req, res, next) => {
       db: req.db
     })
     if(result) {
-      res.json(result);
+      const token = jwt.sign(
+        { username, branchCode: branchCode || '' },
+        JWT_SECRET,
+        { expiresIn: '40m' }
+      )
+      res.json({ ...result, token });
     } else {
       res.status(401).json({ error: 'Invalid username or password' }); // Return 401 Unauthorized if login fails
     }
