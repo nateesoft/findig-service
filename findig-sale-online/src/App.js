@@ -4,7 +4,8 @@ import {
   Routes,
   Route,
   Navigate,
-  useNavigate
+  useNavigate,
+  useLocation
 } from "react-router-dom"
 
 import { getThemeClasses } from "./utils/themes"
@@ -37,6 +38,7 @@ import SystemSettings from "./pages/SystemSettings"
 import BranchInfo from "./pages/BranchInfo"
 
 import { AppContext } from './contexts'
+import { clearAuthCookie } from './api/userLoginApi'
 
 const AppLayout = ({
   children,
@@ -81,6 +83,26 @@ const AppLayout = ({
   )
 }
 
+const LoginRoute = ({ user, currentTheme, setUser, navigate }) => {
+  const location = useLocation()
+  if (user) {
+    const params = new URLSearchParams(location.search)
+    const redirect = params.get('redirect')
+    return <Navigate to={redirect || '/dashboard'} replace />
+  }
+  return (
+    <LoginPage
+      currentTheme={currentTheme}
+      setUser={setUser}
+      onLogin={() => {
+        const params = new URLSearchParams(location.search)
+        const redirect = params.get('redirect')
+        navigate(redirect || '/dashboard')
+      }}
+    />
+  )
+}
+
 const AppContent = () => {
   const { appData, setAppData } = useContext(AppContext)
   const { userInfo, currentTheme } = appData
@@ -109,20 +131,23 @@ const AppContent = () => {
   // เพิ่ม useEffect สำหรับ initialize user จาก localStorage และ context
   useEffect(() => {
     let userFound = false;
-    
+
+    const isValidUser = (u) => u && (u.username || u.UserName || u.id)
+    const getUserKey = (u) => u?.username || u?.UserName || u?.id
+
     // ตรวจสอบ userInfo จาก context ก่อน
     if (userInfo && userInfo !== 'null' && userInfo !== 'undefined') {
       if (typeof userInfo === 'string') {
         try {
           const parsedUserInfo = JSON.parse(userInfo)
-          if (parsedUserInfo && parsedUserInfo.id) {
+          if (isValidUser(parsedUserInfo)) {
             setUser(parsedUserInfo)
             userFound = true;
           }
         } catch (error) {
           console.error('Error parsing userInfo from context:', error)
         }
-      } else if (userInfo && userInfo.id) {
+      } else if (isValidUser(userInfo)) {
         setUser(userInfo)
         userFound = true;
       }
@@ -131,11 +156,11 @@ const AppContent = () => {
     // ถ้าไม่มีใน context ให้ตรวจสอบ localStorage
     if (!userFound) {
       const storedUserInfo = localStorage.getItem('userInfo')
-      
+
       if (storedUserInfo && storedUserInfo !== 'null' && storedUserInfo !== 'undefined') {
         try {
           const parsedUserInfo = JSON.parse(storedUserInfo)
-          if (parsedUserInfo && parsedUserInfo.id) {
+          if (isValidUser(parsedUserInfo)) {
             setUser(parsedUserInfo)
             // อัพเดท context ด้วย
             setAppData(prevData => ({
@@ -150,25 +175,28 @@ const AppContent = () => {
         }
       }
     }
-    
+
     // set initialized เมื่อเสร็จแล้ว (ไม่ว่าจะมี user หรือไม่)
     setIsInitialized(true)
   }, [setAppData, userInfo])
 
   // ทำให้ user state sync กับ userInfo จาก context (เมื่อ context เปลี่ยน)
   useEffect(() => {
+    const isValidUser = (u) => u && (u.username || u.UserName || u.id)
+    const getUserKey = (u) => u?.username || u?.UserName || u?.id
+
     // ถ้า context มี userInfo และ local user state ยังไม่มี หรือไม่ตรงกัน
     if (userInfo && userInfo !== 'null' && userInfo !== 'undefined') {
       if (typeof userInfo === 'string') {
         try {
           const parsedUserInfo = JSON.parse(userInfo)
-          if (parsedUserInfo && parsedUserInfo.id && (!user || user.id !== parsedUserInfo.id)) {
+          if (isValidUser(parsedUserInfo) && (!user || getUserKey(user) !== getUserKey(parsedUserInfo))) {
             setUser(parsedUserInfo)
           }
         } catch (error) {
           console.error('Error parsing userInfo:', error)
         }
-      } else if (userInfo && userInfo.id && (!user || user.id !== userInfo.id)) {
+      } else if (isValidUser(userInfo) && (!user || getUserKey(user) !== getUserKey(userInfo))) {
         setUser(userInfo)
       }
     } else if (!userInfo || userInfo === 'null') {
@@ -227,6 +255,7 @@ const AppContent = () => {
         userInfo: null
       }))
       localStorage.setItem('userInfo', null)
+      clearAuthCookie()
       setUser(null);
       navigate("/login")
       setShowSessionWarning(false)
@@ -291,6 +320,7 @@ const AppContent = () => {
     }))
 
     localStorage.setItem('userInfo', null)
+    clearAuthCookie()
 
     setUser(null);
     navigate('/login');
@@ -317,14 +347,7 @@ const AppContent = () => {
         <Route
           path="/login"
           element={
-            user ? (
-              <Navigate to="/dashboard" replace />
-            ) : (
-              <LoginPage 
-                currentTheme={currentTheme}
-                setUser={setUser} 
-                onLogin={() => navigate("/dashboard")} />
-            )
+            <LoginRoute user={user} currentTheme={currentTheme} setUser={setUser} navigate={navigate} />
           }
         />
 

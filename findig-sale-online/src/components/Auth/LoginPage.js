@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { ShoppingCart } from 'lucide-react';
 
-import { validateLogin } from "../../api/userLoginApi"
+import { validateLogin, setAuthCookie } from "../../api/userLoginApi"
 import { themes, getThemeClasses } from '../../utils/themes';
 import { AppContext } from '../../contexts';
 import { Modal } from '../Modals';
@@ -27,25 +27,25 @@ const LoginPage = ( { onLogin, setUser }) => {
 
     const { data: userInfo, error } = await validateLogin({
       username: loginData.username,
-      password: loginData.password
+      password: loginData.password,
+      branchCode: loginData.branchCode
     })
 
     if(userInfo) {
-      localStorage.setItem('userInfo', JSON.stringify(userInfo))
+      const { token, ...userInfoWithoutToken } = userInfo
+      if (token) {
+        setAuthCookie(token)
+      }
+      localStorage.setItem('userInfo', JSON.stringify(userInfoWithoutToken))
       localStorage.setItem('branchCode', loginData.branchCode)
 
       setAppData(prevData => ({
         ...prevData,
-        userInfo: userInfo,
+        userInfo: userInfoWithoutToken,
         branchCode: loginData.branchCode
       }))
 
-      setUser({
-        id: 1,
-        username: loginData.username,
-        fullName: 'Admin',
-        role: 'admin'
-      })
+      setUser(userInfoWithoutToken)
 
       onLogin()
     } else {

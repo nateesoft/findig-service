@@ -1,7 +1,8 @@
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 
 const ProtectedRoute = ({ children, user, isInitialized }) => {
-  // แสดง loading จนกว่า app จะ initialize เสร็จ
+  const location = useLocation();
+
   if (!isInitialized) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -13,11 +14,10 @@ const ProtectedRoute = ({ children, user, isInitialized }) => {
     );
   }
 
-  // หลังจาก initialize แล้ว ถ้าไม่มี user ให้ redirect ไป login
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to={`/login?redirect=${encodeURIComponent(location.pathname)}`} replace />;
   }
-  
+
   return children;
 };
 
