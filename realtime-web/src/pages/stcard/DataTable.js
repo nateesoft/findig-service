@@ -56,12 +56,6 @@ const DataTable = ({
       bValue = Number(bValue);
     }
     
-    // จัดการกับข้อมูลข้อความ
-    if (typeof aValue === 'string') {
-      aValue = aValue;
-      bValue = bValue;
-    }
-    
     if (aValue < bValue) {
       return sortDirection === 'asc' ? -1 : 1;
     }

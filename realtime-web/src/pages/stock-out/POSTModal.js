@@ -1,9 +1,8 @@
-import { 
+import {
   X,
   Calendar,
   Upload,
   CheckCircle,
-  AlertTriangle,
   Clock} from 'lucide-react';
 import moment from 'moment';
 

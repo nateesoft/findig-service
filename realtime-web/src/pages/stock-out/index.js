@@ -52,7 +52,7 @@ const Sales = () => {
   const [showAutocomplete, setShowAutocomplete] = useState(false);
   const [selectedProductIndex, setSelectedProductIndex] = useState(-1);
 
-  const [isSearching, setIsSearching] = useState(false);
+  const [, setIsSearching] = useState(false);
   
   const barcodeInputRef = useRef(null);
   const autocompleteRef = useRef(null);
@@ -169,6 +169,8 @@ const Sales = () => {
       case 'Escape':
         setShowAutocomplete(false);
         setSelectedProductIndex(-1);
+        break;
+      default:
         break;
     }
   };
@@ -651,6 +653,7 @@ const Sales = () => {
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showSaleModal, showReviewModal, showPostModal, currentItem]);
 
   useEffect(()=> {

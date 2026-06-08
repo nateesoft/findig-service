@@ -38,7 +38,7 @@ const CreateEditModal = ({
     setActiveModal
 }) => {
 
-  const [branchCode, setBranchCode] = useState('');
+  const [branchCode] = useState('');
 
   // Refs for form navigation
   const billNoInputRef = useRef(null);

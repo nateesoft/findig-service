@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { LogOut, X } from 'lucide-react';
 
 import { getThemeClasses, themes } from '../../utils/themes';

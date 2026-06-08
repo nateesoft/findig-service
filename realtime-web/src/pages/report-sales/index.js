@@ -32,12 +32,12 @@ const Sales = () => {
     branch_code_End: branchCode || ''
   });
 
-  const [productSearchTerm, setProductSearchTerm] = useState('');
-  const [filteredProducts, setFilteredProducts] = useState([]);
-  const [showAutocomplete, setShowAutocomplete] = useState(false);
-  const [selectedProductIndex, setSelectedProductIndex] = useState(-1);
+  const [productSearchTerm] = useState('');
+  const [, setFilteredProducts] = useState([]);
+  const [, setShowAutocomplete] = useState(false);
+  const [, setSelectedProductIndex] = useState(-1);
 
-  const [productList, setProductList] = useState([])
+  const [productList] = useState([])
   
   const autocompleteRef = useRef(null);
  
@@ -61,6 +61,7 @@ const Sales = () => {
       setShowAutocomplete(false);
       setSelectedProductIndex(-1);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productSearchTerm]);
 
   useEffect(() => {

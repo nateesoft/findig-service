@@ -87,6 +87,7 @@ const LoginPage = ( { onLogin, setUser }) => {
     }
     
     initLoad()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const loginThemeClasses = currentTheme === 'sunset' ? 'bg-gradient-to-br from-orange-100 via-pink-100 to-red-100' :

@@ -10,7 +10,7 @@ import DataTable from './DataTable';
 const UserGroups = ({ currentTheme }) => {
   const [activeModal, setActiveModal] = useState(null);
 
-  const [currentPage, setCurrentPage] = useState(1)
+  const [currentPage] = useState(1)
   const [itemsPerPage] = useState(10)
   const [showSearchForm, setShowSearchForm] = useState(true);
   const [isLoading, setIsLoading] = useState(false);

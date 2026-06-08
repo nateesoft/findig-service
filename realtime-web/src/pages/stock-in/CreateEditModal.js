@@ -7,7 +7,7 @@ import {
   Trash2,
   Search} from 'lucide-react';
 
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 
 const CreateEditModal = ({
     getThemeClasses,
@@ -37,8 +37,6 @@ const CreateEditModal = ({
     branchFile,
     setActiveModal
 }) => {
-
-  const [branchCode, setBranchCode] = useState('');
 
   // Refs for form navigation
   const billNoInputRef = useRef(null);

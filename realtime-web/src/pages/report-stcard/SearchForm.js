@@ -1,4 +1,4 @@
-import { Calendar, FileText, Search, RefreshCw, X } from "lucide-react"
+import { Calendar, Search, RefreshCw, X } from "lucide-react"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 import Select from "react-select"

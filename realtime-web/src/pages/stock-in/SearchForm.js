@@ -2,7 +2,6 @@ import {
   Calendar,
   FileText,
   Search,
-  Filter,
   RefreshCw
 } from "lucide-react"
 

@@ -258,6 +258,7 @@ const AppContent = () => {
         document.removeEventListener(type, throttledHandleActivity)
       })
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, showLogoutConfirm, showSessionWarning, navigate]);
 
   const extendSession = () => {
