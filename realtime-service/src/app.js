@@ -46,7 +46,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-const apiPrefix = `/api/${process.env.APP_PREFIX || 'findig-backend-service'}`;
+const apiPrefix = `/api/${process.env.APP_PREFIX || 'realtime-service'}`;
 
 app.get(`${apiPrefix}/version`, (req, res) => {
   res.json({

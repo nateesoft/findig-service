@@ -1,86 +1,19 @@
+const dbConn = {
+  host:     process.env.DB_HOST,
+  user:     process.env.DB_USER,
+  password: process.env.DB_PASS,
+  port:     process.env.DB_PORT || '3306',
+};
+
 module.exports = [
   {
-    code: 'PRODUCTION',
-    name: 'Stock Realtime 909',
-    driver: 'mysql',
+    code:   process.env.dbConfig || 'PRODUCTION',
+    name:   process.env.DB_APP_NAME || 'Stock Realtime',
+    driver: process.env.DB_DRIVER  || 'mysql',
     databases: {
-      pos: {
-        host: '183.88.210.11',
-        user: 'root',
-        password: 'P@ssword!#',
-        database: 'MyRetail652findigColo',
-        port: '3326'
-      },
-      crm: {
-        host: '183.88.210.11',
-        user: 'root',
-        password: 'P@ssword!#',
-        database: 'MyCrmBranch',
-        port: '3326'
-      },
-      bor: {
-        host: '183.88.210.11',
-        user: 'root',
-        password: 'P@ssword!#',
-        database: 'MyBorLocal',
-        port: '3326'
-      }
-    }
-  },
-  {
-    code: 'TEST',
-    name: 'Stock Realtime 909',
-    driver: 'mysql',
-    databases: {
-      pos: {
-        host: '183.88.210.11',
-        user: 'root',
-        password: 'P@ssword!#',
-        database: 'MyRetail652findigColoTest',
-        port: '3326'
-      },
-      crm: {
-        host: '183.88.210.11',
-        user: 'root',
-        password: 'P@ssword!#',
-        database: 'MyCrmBranch',
-        port: '3326'
-      },
-      bor: {
-        host: '183.88.210.11',
-        user: 'root',
-        password: 'P@ssword!#',
-        database: 'MyBorLocal',
-        port: '3326'
-      }
-    }
-  },
-  {
-    code: 'DEVELOPMENT',
-    name: 'TEST Stock Realtime',
-    driver: 'mysql2',
-    databases: {
-      pos: {
-        host: 'localhost',
-        user: 'root',
-        password: 'nathee2024',
-        database: 'MyRetail652findigColo',
-        port: '3306'
-      },
-      crm: {
-        host: 'localhost',
-        user: 'root',
-        password: 'nathee2024',
-        database: 'mycrmbranch',
-        port: '3306'
-      },
-      bor: {
-        host: 'localhost',
-        user: 'root',
-        password: 'nathee2024',
-        database: 'MyBorLocal',
-        port: '3306'
-      }
+      pos: { ...dbConn, database: process.env.DB_POS_NAME },
+      crm: { ...dbConn, database: process.env.DB_CRM_NAME },
+      bor: { ...dbConn, database: process.env.DB_BOR_NAME },
     }
   }
 ];
