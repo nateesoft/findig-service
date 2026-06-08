@@ -24,9 +24,9 @@ if %errorlevel% equ 0 (
     echo Service started successfully!
     echo ===============================================
     echo.
-    echo To view logs: pm2 logs findig-sale-online
-    echo To stop service: pm2 stop findig-sale-online
-    echo To restart service: pm2 restart findig-sale-online
+    echo To view logs: pm2 logs realtime-web
+    echo To stop service: pm2 stop realtime-web
+    echo To restart service: pm2 restart realtime-web
     echo To view status: pm2 status
     echo.
 ) else (

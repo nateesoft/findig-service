@@ -1,10 +1,12 @@
 module.exports = {
   apps: [
     {
-      name: "findig-sale-online",
+      name: "realtime-web",
       script: "server.js",
       env: {
-        PORT: 3333,
+        PORT: 3008,
+        APP_PREFIX: "realtime-web",
+        BACKEND_PREFIX: "findig-backend-service",
         BACKEND_HOST: "http://127.0.0.1:9090"
       }
     }

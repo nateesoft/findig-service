@@ -37,9 +37,9 @@ try {
         Write-Host "===============================================" -ForegroundColor Green
         Write-Host
         Write-Host "Useful PM2 commands:" -ForegroundColor Cyan
-        Write-Host "  View logs:       pm2 logs findig-sale-online" -ForegroundColor White
-        Write-Host "  Stop service:    pm2 stop findig-sale-online" -ForegroundColor White
-        Write-Host "  Restart service: pm2 restart findig-sale-online" -ForegroundColor White
+        Write-Host "  View logs:       pm2 logs realtime-web" -ForegroundColor White
+        Write-Host "  Stop service:    pm2 stop realtime-web" -ForegroundColor White
+        Write-Host "  Restart service: pm2 restart realtime-web" -ForegroundColor White
         Write-Host "  View status:     pm2 status" -ForegroundColor White
         Write-Host "  Save PM2 list:   pm2 save" -ForegroundColor White
         Write-Host "  Startup script:  pm2 startup" -ForegroundColor White

@@ -5,7 +5,7 @@ const { createProxyMiddleware } = require("http-proxy-middleware");
 const path = require('path');
 const app = express();
 
-const BASENAME = "/findig-sale-online";
+const BASENAME = "/realtime-web";
 const WEB_FOLDER = "build"
 
 app.use(BASENAME, express.static(path.join(__dirname, WEB_FOLDER)));

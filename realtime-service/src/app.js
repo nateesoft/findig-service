@@ -46,15 +46,17 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/api/findig-backend-service/version', (req, res) => {
+const apiPrefix = `/api/${process.env.APP_PREFIX || 'findig-backend-service'}`;
+
+app.get(`${apiPrefix}/version`, (req, res) => {
   res.json({
     version: "0.0.0"
   })
 })
 
 // ใช้ middleware ก่อน protected routes
-app.use('/api/findig-backend-service', selectBranchDb);
-app.use(allRouter);
+app.use(apiPrefix, selectBranchDb);
+app.use(apiPrefix, allRouter);
 
 app.use(errorHandler)
 

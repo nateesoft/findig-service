@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: "findig-sale-online",
+      name: "realtime-web",
       script: "server.js",
       env: {
         WEB_PORT: 3000,

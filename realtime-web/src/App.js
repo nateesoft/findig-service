@@ -680,7 +680,7 @@ const App = () => {
   const [appData, setAppData] = useState(initContext)
 
   return (
-    <Router basename="findig-sale-online">
+    <Router basename="realtime-web">
       <AppContext.Provider value={{ appData, setAppData}}>
         <AppContent />
       </AppContext.Provider>
