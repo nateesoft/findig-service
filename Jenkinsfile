@@ -1,6 +1,14 @@
 pipeline {
     agent any
 
+    parameters {
+        string(name: 'DB_HOST',     defaultValue: '183.88.210.11', description: 'Database host')
+        string(name: 'DB_USER',     defaultValue: 'root', description: 'Database user')
+        string(name: 'DB_POS_NAME', defaultValue: 'MyRetail652findigColo', description: 'POS database name')
+        string(name: 'DB_CRM_NAME', defaultValue: 'MyCrmBranch', description: 'CRM database name')
+        string(name: 'DB_BOR_NAME', defaultValue: 'MyBorLocal', description: 'BOR database name')
+    }
+
     environment {
         DEPLOY_DIR = 'C:\\apps\\findig-service'
         PM2_HOME   = 'C:\\ProgramData\\pm2'
@@ -21,14 +29,14 @@ pipeline {
         // ---- Database config — ใช้ Jenkins credentials แทน plaintext ถ้าเป็นไปได้ ----
         // credentials('id') → สร้าง secret text ใน Jenkins แล้วใส่ ID ที่นี่
         DB_CONFIG   = 'PRODUCTION'
-        DB_HOST     = credentials('DB_HOST')
+        DB_HOST     = "${params.DB_HOST}"
         DB_PORT     = '3326'
-        DB_USER     = credentials('DB_USER')
+        DB_USER     = "${params.DB_USER}"
         DB_PASS     = credentials('DB_PASS')
         DB_DRIVER   = 'mysql'
-        DB_POS_NAME = credentials('DB_POS_NAME')
-        DB_CRM_NAME = credentials('DB_CRM_NAME')
-        DB_BOR_NAME = credentials('DB_BOR_NAME')
+        DB_POS_NAME = "${params.DB_POS_NAME}"
+        DB_CRM_NAME = "${params.DB_CRM_NAME}"
+        DB_BOR_NAME = "${params.DB_BOR_NAME}"
         // ----------------------------------------------------------------
     }
 
