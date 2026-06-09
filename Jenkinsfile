@@ -138,7 +138,7 @@ module.exports = {
                 bat "copy /Y realtime-service\\package-lock.json %DEPLOY_DIR%\\%BACKEND_APP_NAME%\\package-lock.json"
                 bat "copy /Y ecosystem-backend.config.js %DEPLOY_DIR%\\%BACKEND_APP_NAME%\\ecosystem.config.js"
 
-                bat "cd %DEPLOY_DIR%\\%BACKEND_APP_NAME% && npm ci --omit=dev"
+                bat "cd /D %DEPLOY_DIR%\\%BACKEND_APP_NAME% && npm ci --omit=dev"
             }
         }
 
@@ -153,14 +153,14 @@ module.exports = {
                 bat "copy /Y realtime-web\\package-lock.json %DEPLOY_DIR%\\%FRONTEND_APP_NAME%\\package-lock.json"
                 bat "copy /Y ecosystem-frontend.config.js %DEPLOY_DIR%\\%FRONTEND_APP_NAME%\\ecosystem.config.js"
 
-                bat "cd %DEPLOY_DIR%\\%FRONTEND_APP_NAME% && npm ci --omit=dev"
+                bat "cd /D %DEPLOY_DIR%\\%FRONTEND_APP_NAME% && npm ci --omit=dev"
             }
         }
 
         stage('Start PM2') {
             steps {
-                bat "cd %DEPLOY_DIR%\\%BACKEND_APP_NAME% && pm2 start ecosystem.config.js"
-                bat "cd %DEPLOY_DIR%\\%FRONTEND_APP_NAME% && pm2 start ecosystem.config.js"
+                bat "cd /D %DEPLOY_DIR%\\%BACKEND_APP_NAME% && pm2 start ecosystem.config.js"
+                bat "cd /D %DEPLOY_DIR%\\%FRONTEND_APP_NAME% && pm2 start ecosystem.config.js"
                 bat 'pm2 save'
             }
         }
