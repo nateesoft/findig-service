@@ -26,6 +26,7 @@ pipeline {
         // URL prefix ที่ใช้ serve แต่ละ service  (http://host/<prefix>/...)
         BACKEND_PREFIX    = 'realtime-service'
         FRONTEND_PREFIX   = "${params.FRONTEND_PREFIX}"
+        REACT_APP_BASENAME = "/${params.FRONTEND_PREFIX}"
 
         BACKEND_HOST      = 'http://127.0.0.1:9090'
 

@@ -681,7 +681,7 @@ const App = () => {
   const [appData, setAppData] = useState(initContext)
 
   return (
-    <Router basename="realtime-web">
+    <Router basename={process.env.REACT_APP_BASENAME || '/realtime-web'}>
       <AppContext.Provider value={{ appData, setAppData}}>
         <AppContent />
       </AppContext.Provider>
