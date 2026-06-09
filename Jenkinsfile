@@ -2,27 +2,30 @@ pipeline {
     agent any
 
     parameters {
-        string(name: 'DB_HOST',     defaultValue: '183.88.210.11', description: 'Database host')
-        string(name: 'DB_USER',     defaultValue: 'root', description: 'Database user')
-        string(name: 'DB_POS_NAME', defaultValue: 'MyRetail652findigColo', description: 'POS database name')
-        string(name: 'DB_CRM_NAME', defaultValue: 'MyCrmBranch', description: 'CRM database name')
-        string(name: 'DB_BOR_NAME', defaultValue: 'MyBorLocal', description: 'BOR database name')
+        string(name: 'DB_HOST',           defaultValue: '183.88.210.11',        description: 'Database host')
+        string(name: 'DB_USER',           defaultValue: 'root',                 description: 'Database user')
+        string(name: 'DB_POS_NAME',       defaultValue: 'MyRetail652findigColo', description: 'POS database name')
+        string(name: 'DB_CRM_NAME',       defaultValue: 'MyCrmBranch',          description: 'CRM database name')
+        string(name: 'DB_BOR_NAME',       defaultValue: 'MyBorLocal',           description: 'BOR database name')
+        string(name: 'FRONTEND_APP_NAME', defaultValue: 'realtime-web',         description: 'PM2 app name for frontend')
+        string(name: 'FRONTEND_PORT',     defaultValue: '3008',                 description: 'Port for frontend server')
+        string(name: 'FRONTEND_PREFIX',   defaultValue: 'realtime-web',         description: 'URL prefix for frontend service')
     }
 
     environment {
-        DEPLOY_DIR = 'C:\\apps\\findig-service'
+        DEPLOY_DIR = 'D:\\apps\\findig-service'
         PM2_HOME   = 'C:\\ProgramData\\pm2'
 
         // ---- App config (เปลี่ยน prefix / port ได้จากที่นี่ที่เดียว) ----
         BACKEND_APP_NAME  = 'realtime-service'
-        FRONTEND_APP_NAME = 'realtime-web'
+        FRONTEND_APP_NAME = "${params.FRONTEND_APP_NAME}"
 
         BACKEND_PORT      = '9090'
-        FRONTEND_PORT     = '3008'
+        FRONTEND_PORT     = "${params.FRONTEND_PORT}"
 
         // URL prefix ที่ใช้ serve แต่ละ service  (http://host/<prefix>/...)
         BACKEND_PREFIX    = 'realtime-service'
-        FRONTEND_PREFIX   = 'realtime-web'
+        FRONTEND_PREFIX   = "${params.FRONTEND_PREFIX}"
 
         BACKEND_HOST      = 'http://127.0.0.1:9090'
 
