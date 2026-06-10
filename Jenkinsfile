@@ -7,6 +7,11 @@ pipeline {
             choices: ['ALL', 'SERVICE_ONLY', 'WEB_ONLY'],
             description: 'เลือก service ที่ต้องการ deploy'
         )
+        string(
+            name: 'DEPLOY_PATH',
+            defaultValue: 'D:\\ICS-Projects\\apps\\findig-service',
+            description: 'Deploy path บน Windows server'
+        )
 
         // ─── realtime-service ────────────────────────────────────────────────
         separator(name: 'SERVICE_SECTION', sectionHeader: 'realtime-service Config')
@@ -69,14 +74,46 @@ pipeline {
             }
         }
 
+        stage('Sync: realtime-service') {
+            when {
+                expression { params.DEPLOY_TARGET in ['ALL', 'SERVICE_ONLY'] }
+            }
+            steps {
+                script {
+                    def src = "${env.WORKSPACE}\\${SERVICE_DIR}"
+                    def dst = "${params.DEPLOY_PATH}\\${SERVICE_DIR}"
+                    bat """
+                        if not exist "${dst}" mkdir "${dst}"
+                        robocopy "${src}" "${dst}" /MIR /XD node_modules .git /XF .env* /NFL /NDL /NJH /NJS
+                        if %errorlevel% leq 7 exit /b 0
+                    """
+                }
+            }
+        }
+
+        stage('Install Prod Deps: realtime-service') {
+            when {
+                expression { params.DEPLOY_TARGET in ['ALL', 'SERVICE_ONLY'] }
+            }
+            steps {
+                script {
+                    def dst = "${params.DEPLOY_PATH}\\${SERVICE_DIR}"
+                    bat """
+                        cd /d "${dst}"
+                        npm ci --omit=dev
+                    """
+                }
+            }
+        }
+
         stage('Config: realtime-service') {
             when {
                 expression { params.DEPLOY_TARGET in ['ALL', 'SERVICE_ONLY'] }
             }
             steps {
-                dir(SERVICE_DIR) {
-                    script {
-                        def cfg = """\
+                script {
+                    def dst = "${params.DEPLOY_PATH}\\${SERVICE_DIR}"
+                    def cfg = """\
 module.exports = {
   apps: [
     {
@@ -105,9 +142,8 @@ module.exports = {
   ]
 }
 """
-                        writeFile file: 'ecosystem.config.js', text: cfg
-                        echo 'ecosystem.config.js (realtime-service) updated'
-                    }
+                    writeFile file: "${dst}\\ecosystem.config.js", text: cfg
+                    echo "ecosystem.config.js written to ${dst}"
                 }
             }
         }
@@ -117,8 +153,10 @@ module.exports = {
                 expression { params.DEPLOY_TARGET in ['ALL', 'SERVICE_ONLY'] }
             }
             steps {
-                dir(SERVICE_DIR) {
-                    bat '''
+                script {
+                    def dst = "${params.DEPLOY_PATH}\\${SERVICE_DIR}"
+                    bat """
+                        cd /d "${dst}"
                         pm2 describe realtime-service >nul 2>&1
                         if %errorlevel% equ 0 (
                             pm2 reload ecosystem.config.js --only realtime-service
@@ -126,7 +164,7 @@ module.exports = {
                             pm2 start ecosystem.config.js --only realtime-service
                         )
                         pm2 save
-                    '''
+                    """
                 }
             }
         }
@@ -156,14 +194,56 @@ module.exports = {
             }
         }
 
+        stage('Sync: realtime-web') {
+            when {
+                expression { params.DEPLOY_TARGET in ['ALL', 'WEB_ONLY'] }
+            }
+            steps {
+                script {
+                    def src = "${env.WORKSPACE}\\${WEB_DIR}"
+                    def dst = "${params.DEPLOY_PATH}\\${WEB_DIR}"
+                    bat """
+                        if not exist "${dst}" mkdir "${dst}"
+
+                        rem --- sync React build output ---
+                        robocopy "${src}\\build" "${dst}\\build" /MIR /NFL /NDL /NJH /NJS
+                        if %errorlevel% leq 7 (set ERR=0) else (exit /b %errorlevel%)
+
+                        rem --- sync server files ---
+                        robocopy "${src}\\server" "${dst}\\server" /MIR /NFL /NDL /NJH /NJS
+                        if %errorlevel% leq 7 (set ERR=0) else (exit /b %errorlevel%)
+
+                        rem --- sync root files (server.js, package*.json) ---
+                        robocopy "${src}" "${dst}" server.js package.json package-lock.json /NFL /NDL /NJH /NJS
+                        if %errorlevel% leq 7 exit /b 0
+                    """
+                }
+            }
+        }
+
+        stage('Install Prod Deps: realtime-web') {
+            when {
+                expression { params.DEPLOY_TARGET in ['ALL', 'WEB_ONLY'] }
+            }
+            steps {
+                script {
+                    def dst = "${params.DEPLOY_PATH}\\${WEB_DIR}"
+                    bat """
+                        cd /d "${dst}"
+                        npm ci --omit=dev
+                    """
+                }
+            }
+        }
+
         stage('Config: realtime-web') {
             when {
                 expression { params.DEPLOY_TARGET in ['ALL', 'WEB_ONLY'] }
             }
             steps {
-                dir(WEB_DIR) {
-                    script {
-                        def cfg = """\
+                script {
+                    def dst = "${params.DEPLOY_PATH}\\${WEB_DIR}"
+                    def cfg = """\
 module.exports = {
   apps: [
     {
@@ -180,9 +260,8 @@ module.exports = {
   ]
 }
 """
-                        writeFile file: 'ecosystem.config.js', text: cfg
-                        echo 'ecosystem.config.js (realtime-web) updated'
-                    }
+                    writeFile file: "${dst}\\ecosystem.config.js", text: cfg
+                    echo "ecosystem.config.js written to ${dst}"
                 }
             }
         }
@@ -192,8 +271,10 @@ module.exports = {
                 expression { params.DEPLOY_TARGET in ['ALL', 'WEB_ONLY'] }
             }
             steps {
-                dir(WEB_DIR) {
-                    bat '''
+                script {
+                    def dst = "${params.DEPLOY_PATH}\\${WEB_DIR}"
+                    bat """
+                        cd /d "${dst}"
                         pm2 describe realtime-web >nul 2>&1
                         if %errorlevel% equ 0 (
                             pm2 reload ecosystem.config.js --only realtime-web
@@ -201,7 +282,7 @@ module.exports = {
                             pm2 start ecosystem.config.js --only realtime-web
                         )
                         pm2 save
-                    '''
+                    """
                 }
             }
         }
