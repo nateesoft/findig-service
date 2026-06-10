@@ -7,6 +7,7 @@ pipeline {
         string(name: 'DB_POS_NAME',       defaultValue: 'MyRetail652findigColo', description: 'POS database name')
         string(name: 'DB_CRM_NAME',       defaultValue: 'MyCrmBranch',          description: 'CRM database name')
         string(name: 'DB_BOR_NAME',       defaultValue: 'MyBorLocal',           description: 'BOR database name')
+        string(name: 'FRONTEND_SRC_DIR',  defaultValue: 'realtime-web',         description: 'Source folder name in repo')
         string(name: 'FRONTEND_APP_NAME', defaultValue: 'realtime-web',         description: 'PM2 app name for frontend')
         string(name: 'FRONTEND_PORT',     defaultValue: '3008',                 description: 'Port for frontend server')
         string(name: 'FRONTEND_PREFIX',   defaultValue: 'realtime-web',         description: 'URL prefix for frontend service')
@@ -18,6 +19,7 @@ pipeline {
 
         // ---- App config (เปลี่ยน prefix / port ได้จากที่นี่ที่เดียว) ----
         BACKEND_APP_NAME  = 'realtime-service'
+        FRONTEND_SRC_DIR  = "${params.FRONTEND_SRC_DIR}"
         FRONTEND_APP_NAME = "${params.FRONTEND_APP_NAME}"
 
         BACKEND_PORT      = '9090'
@@ -63,7 +65,7 @@ pipeline {
 
         stage('Build Frontend') {
             steps {
-                dir("${env.FRONTEND_APP_NAME}") {
+                dir("${env.FRONTEND_SRC_DIR}") {
                     bat 'npm ci'
                     bat 'npm run build:windows'
                 }
@@ -148,11 +150,11 @@ module.exports = {
             steps {
                 bat "if not exist %DEPLOY_DIR%\\%FRONTEND_APP_NAME% mkdir %DEPLOY_DIR%\\%FRONTEND_APP_NAME%"
 
-                bat "robocopy %FRONTEND_APP_NAME%\\build %DEPLOY_DIR%\\%FRONTEND_APP_NAME%\\build /E /PURGE & if %ERRORLEVEL% LEQ 7 exit 0"
+                bat "robocopy %FRONTEND_SRC_DIR%\\build %DEPLOY_DIR%\\%FRONTEND_APP_NAME%\\build /E /PURGE & if %ERRORLEVEL% LEQ 7 exit 0"
 
-                bat "copy /Y %FRONTEND_APP_NAME%\\server.js %DEPLOY_DIR%\\%FRONTEND_APP_NAME%\\server.js"
-                bat "copy /Y %FRONTEND_APP_NAME%\\package.json %DEPLOY_DIR%\\%FRONTEND_APP_NAME%\\package.json"
-                bat "copy /Y %FRONTEND_APP_NAME%\\package-lock.json %DEPLOY_DIR%\\%FRONTEND_APP_NAME%\\package-lock.json"
+                bat "copy /Y %FRONTEND_SRC_DIR%\\server.js %DEPLOY_DIR%\\%FRONTEND_APP_NAME%\\server.js"
+                bat "copy /Y %FRONTEND_SRC_DIR%\\package.json %DEPLOY_DIR%\\%FRONTEND_APP_NAME%\\package.json"
+                bat "copy /Y %FRONTEND_SRC_DIR%\\package-lock.json %DEPLOY_DIR%\\%FRONTEND_APP_NAME%\\package-lock.json"
                 bat "copy /Y ecosystem-frontend.config.js %DEPLOY_DIR%\\%FRONTEND_APP_NAME%\\ecosystem.config.js"
 
                 bat "cd /D %DEPLOY_DIR%\\%FRONTEND_APP_NAME% && npm ci --omit=dev"
