@@ -7,9 +7,7 @@ pipeline {
         string(name: 'DB_POS_NAME',       defaultValue: 'MyRetail652findigColo', description: 'POS database name')
         string(name: 'DB_CRM_NAME',       defaultValue: 'MyCrmBranch',          description: 'CRM database name')
         string(name: 'DB_BOR_NAME',       defaultValue: 'MyBorLocal',           description: 'BOR database name')
-        string(name: 'FRONTEND_APP_NAME', defaultValue: 'realtime-web',         description: 'PM2 app name for frontend')
         string(name: 'FRONTEND_PORT',     defaultValue: '3008',                 description: 'Port for frontend server')
-        string(name: 'FRONTEND_PREFIX',   defaultValue: 'realtime-web',         description: 'URL prefix for frontend service')
     }
 
     environment {
@@ -18,17 +16,17 @@ pipeline {
 
         // ---- App config (เปลี่ยน prefix / port ได้จากที่นี่ที่เดียว) ----
         BACKEND_APP_NAME  = 'realtime-service'
+        FRONTEND_APP_NAME = 'realtime-web'
         FRONTEND_SRC_DIR  = 'realtime-web'
-        FRONTEND_APP_NAME = "${params.FRONTEND_APP_NAME}"
 
         BACKEND_PORT      = '9090'
         FRONTEND_PORT     = "${params.FRONTEND_PORT}"
 
         // URL prefix ที่ใช้ serve แต่ละ service  (http://host/<prefix>/...)
-        BACKEND_PREFIX    = 'realtime-service'
-        FRONTEND_PREFIX   = "${params.FRONTEND_PREFIX}"
-        REACT_APP_BASENAME = "/${params.FRONTEND_PREFIX}"
-        PUBLIC_URL         = "/${params.FRONTEND_PREFIX}"
+        BACKEND_PREFIX     = 'realtime-service'
+        FRONTEND_PREFIX    = 'realtime-web'
+        REACT_APP_BASENAME = '/realtime-web'
+        PUBLIC_URL         = '/realtime-web'
 
         BACKEND_HOST      = 'http://127.0.0.1:9090'
 
