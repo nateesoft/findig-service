@@ -7,7 +7,6 @@ pipeline {
         string(name: 'DB_POS_NAME',       defaultValue: 'MyRetail652findigColo', description: 'POS database name')
         string(name: 'DB_CRM_NAME',       defaultValue: 'MyCrmBranch',          description: 'CRM database name')
         string(name: 'DB_BOR_NAME',       defaultValue: 'MyBorLocal',           description: 'BOR database name')
-        string(name: 'FRONTEND_SRC_DIR',  defaultValue: 'realtime-web',         description: 'Source folder name in repo')
         string(name: 'FRONTEND_APP_NAME', defaultValue: 'realtime-web',         description: 'PM2 app name for frontend')
         string(name: 'FRONTEND_PORT',     defaultValue: '3008',                 description: 'Port for frontend server')
         string(name: 'FRONTEND_PREFIX',   defaultValue: 'realtime-web',         description: 'URL prefix for frontend service')
@@ -19,7 +18,7 @@ pipeline {
 
         // ---- App config (เปลี่ยน prefix / port ได้จากที่นี่ที่เดียว) ----
         BACKEND_APP_NAME  = 'realtime-service'
-        FRONTEND_SRC_DIR  = "${params.FRONTEND_SRC_DIR}"
+        FRONTEND_SRC_DIR  = 'realtime-web'
         FRONTEND_APP_NAME = "${params.FRONTEND_APP_NAME}"
 
         BACKEND_PORT      = '9090'
