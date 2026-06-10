@@ -27,6 +27,7 @@ pipeline {
         BACKEND_PREFIX    = 'realtime-service'
         FRONTEND_PREFIX   = "${params.FRONTEND_PREFIX}"
         REACT_APP_BASENAME = "/${params.FRONTEND_PREFIX}"
+        PUBLIC_URL         = "/${params.FRONTEND_PREFIX}"
 
         BACKEND_HOST      = 'http://127.0.0.1:9090'
 
@@ -62,7 +63,7 @@ pipeline {
 
         stage('Build Frontend') {
             steps {
-                dir('realtime-web') {
+                dir("${env.FRONTEND_APP_NAME}") {
                     bat 'npm ci'
                     bat 'npm run build:windows'
                 }
@@ -147,11 +148,11 @@ module.exports = {
             steps {
                 bat "if not exist %DEPLOY_DIR%\\%FRONTEND_APP_NAME% mkdir %DEPLOY_DIR%\\%FRONTEND_APP_NAME%"
 
-                bat "robocopy realtime-web\\build %DEPLOY_DIR%\\%FRONTEND_APP_NAME%\\build /E /PURGE & if %ERRORLEVEL% LEQ 7 exit 0"
+                bat "robocopy %FRONTEND_APP_NAME%\\build %DEPLOY_DIR%\\%FRONTEND_APP_NAME%\\build /E /PURGE & if %ERRORLEVEL% LEQ 7 exit 0"
 
-                bat "copy /Y realtime-web\\server.js %DEPLOY_DIR%\\%FRONTEND_APP_NAME%\\server.js"
-                bat "copy /Y realtime-web\\package.json %DEPLOY_DIR%\\%FRONTEND_APP_NAME%\\package.json"
-                bat "copy /Y realtime-web\\package-lock.json %DEPLOY_DIR%\\%FRONTEND_APP_NAME%\\package-lock.json"
+                bat "copy /Y %FRONTEND_APP_NAME%\\server.js %DEPLOY_DIR%\\%FRONTEND_APP_NAME%\\server.js"
+                bat "copy /Y %FRONTEND_APP_NAME%\\package.json %DEPLOY_DIR%\\%FRONTEND_APP_NAME%\\package.json"
+                bat "copy /Y %FRONTEND_APP_NAME%\\package-lock.json %DEPLOY_DIR%\\%FRONTEND_APP_NAME%\\package-lock.json"
                 bat "copy /Y ecosystem-frontend.config.js %DEPLOY_DIR%\\%FRONTEND_APP_NAME%\\ecosystem.config.js"
 
                 bat "cd /D %DEPLOY_DIR%\\%FRONTEND_APP_NAME% && npm ci --omit=dev"
