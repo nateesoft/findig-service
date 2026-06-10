@@ -19,6 +19,6 @@ pm2 status
 
 echo.
 echo Findig Backend Service started successfully!
-echo To view logs: pm2 logs findig-backend-service
-echo To stop service: pm2 stop findig-backend-service
+echo To view logs: pm2 logs realtime-service
+echo To stop service: pm2 stop realtime-service
 pause

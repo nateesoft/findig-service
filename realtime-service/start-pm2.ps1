@@ -22,8 +22,8 @@ try {
     
     Write-Host ""
     Write-Host "Findig Backend Service started successfully!" -ForegroundColor Green
-    Write-Host "To view logs: pm2 logs findig-backend-service" -ForegroundColor White
-    Write-Host "To stop service: pm2 stop findig-backend-service" -ForegroundColor White
+    Write-Host "To view logs: pm2 logs realtime-service" -ForegroundColor White
+    Write-Host "To stop service: pm2 stop realtime-service" -ForegroundColor White
     
 } catch {
     Write-Host "Error starting PM2: $($_.Exception.Message)" -ForegroundColor Red
