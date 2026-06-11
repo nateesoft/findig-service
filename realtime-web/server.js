@@ -10,11 +10,12 @@ const BACKEND_HOST = process.env.BACKEND_HOST || 'http://127.0.0.1:9090';
 const BACKEND_PREFIX = process.env.BACKEND_PREFIX || 'realtime-service';
 
 // Proxy API requests to backend before serving static files
+// Use pathFilter (not app.use path) to avoid Express stripping the prefix
 app.use(
-    `/api/${BACKEND_PREFIX}`,
     createProxyMiddleware({
         target: BACKEND_HOST,
         changeOrigin: true,
+        pathFilter: `/api/${BACKEND_PREFIX}`,
     })
 );
 

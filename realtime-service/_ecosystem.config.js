@@ -15,11 +15,11 @@ module.exports = {
         DB_PORT: "3306",
         DB_USER: "",
         DB_PASS: "",
-        DB_DRIVER: "mysql",
+        DB_DRIVER: "mysql2",
         DB_APP_NAME: "Stock Realtime",
-        DB_POS_NAME: "",
-        DB_CRM_NAME: "",
-        DB_BOR_NAME: "",
+        DB_POS_NAME: "MyRetail652findigColo",
+        DB_CRM_NAME: "MyCrmBranch",
+        DB_BOR_NAME: "MyBorLocal",
         MYSQLDUMP_PATH: ""
       }
     }
