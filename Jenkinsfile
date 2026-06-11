@@ -16,27 +16,12 @@ pipeline {
         // ─── realtime-service ────────────────────────────────────────────────
         separator(name: 'SERVICE_SECTION', sectionHeader: 'realtime-service Config')
 
-        string(name: 'SERVICE_PORT',      defaultValue: '9090',              description: 'Backend port')
-        string(name: 'APP_PREFIX',        defaultValue: 'realtime-service',  description: 'App prefix')
-        string(name: 'DB_APP_NAME',       defaultValue: 'Stock Realtime',    description: 'Application display name')
-        string(name: 'DB_HOST',           defaultValue: '183.88.210.11',                  description: 'Database host')
-        string(name: 'DB_PORT',           defaultValue: '3326',              description: 'Database port')
-        string(name: 'DB_USER',           defaultValue: 'root',              description: 'Database user')
-        password(name: 'DB_PASS',         defaultValue: '',                  description: 'Database password')
         string(name: 'DB_POS_NAME',       defaultValue: 'MyRetail652findigColo',                  description: 'POS database name')
-        string(name: 'DB_CRM_NAME',       defaultValue: 'MyCrmBranch',                  description: 'CRM database name')
-        string(name: 'DB_BOR_NAME',       defaultValue: 'MyBorLocal',                  description: 'BOR database name')
-        string(name: 'MYSQLDUMP_PATH',    defaultValue: 'D:\\MySQL5\\bin',   description: 'Path to mysqldump binary')
-        string(name: 'WEB_USER_AUTH',     defaultValue: 'admin',             description: 'Web UI username')
-        password(name: 'WEB_USER_PASS',   defaultValue: 'supersecret',                  description: 'Web UI password')
-        password(name: 'API_SECRET_PASS', defaultValue: 'XkhZG4fW2t2W',                  description: 'API secret key')
 
         // ─── realtime-web ─────────────────────────────────────────────────────
         separator(name: 'WEB_SECTION', sectionHeader: 'realtime-web Config')
 
         string(name: 'WEB_PORT',          defaultValue: '3008',                    description: 'Frontend port')
-        string(name: 'BACKEND_HOST',      defaultValue: 'http://127.0.0.1:9090',  description: 'Backend URL สำหรับ proxy')
-        string(name: 'BACKEND_PREFIX',    defaultValue: 'realtime-service',        description: 'Backend prefix')
     }
 
     environment {
@@ -67,7 +52,8 @@ pipeline {
                 expression { params.DEPLOY_TARGET in ['ALL', 'SERVICE_ONLY'] }
             }
             steps {
-                dir(SERVICE_DIR) {
+                dir("${SERVICE_DIR}") {
+                    // validate package-lock.json integrity only (node_modules excluded from sync)
                     bat 'npm ci --omit=dev'
                 }
             }
@@ -119,23 +105,23 @@ module.exports = {
       name: 'realtime-service',
       script: 'bin/www',
       env: {
-        PORT: ${params.SERVICE_PORT},
+        PORT: 9090,
         NODE_ENV: 'production',
-        APP_PREFIX: '${params.APP_PREFIX}',
+        APP_PREFIX: 'realtime-service',
         dbConfig: 'PRODUCTION',
-        WEB_USER_AUTH: '${params.WEB_USER_AUTH}',
-        WEB_USER_PASS: '${params.WEB_USER_PASS}',
-        API_SECRET_PASS: '${params.API_SECRET_PASS}',
-        DB_HOST: '${params.DB_HOST}',
-        DB_PORT: '${params.DB_PORT}',
-        DB_USER: '${params.DB_USER}',
-        DB_PASS: '${params.DB_PASS}',
+        WEB_USER_AUTH: 'admin',
+        WEB_USER_PASS: 'supersecret',
+        API_SECRET_PASS: 'XkhZG4fW2t2W',
+        DB_HOST: '183.88.210.11',
+        DB_PORT: '3326',
+        DB_USER: 'root',
+        DB_PASS: 'P@ssword!#',
         DB_DRIVER: 'mysql',
-        DB_APP_NAME: '${params.DB_APP_NAME}',
+        DB_APP_NAME: 'Stock Realtime',
         DB_POS_NAME: '${params.DB_POS_NAME}',
-        DB_CRM_NAME: '${params.DB_CRM_NAME}',
-        DB_BOR_NAME: '${params.DB_BOR_NAME}',
-        MYSQLDUMP_PATH: '${params.MYSQLDUMP_PATH.replace('\\', '\\\\')}',
+        DB_CRM_NAME: 'MyCrmBranch',
+        DB_BOR_NAME: 'MyBorLocal',
+        MYSQLDUMP_PATH: 'D:\\MySQL5\\bin',
       }
     }
   ]
@@ -171,7 +157,7 @@ module.exports = {
                 expression { params.DEPLOY_TARGET in ['ALL', 'WEB_ONLY'] }
             }
             steps {
-                dir(WEB_DIR) {
+                dir("${WEB_DIR}") {
                     bat 'npm ci'
                 }
             }
@@ -182,7 +168,7 @@ module.exports = {
                 expression { params.DEPLOY_TARGET in ['ALL', 'WEB_ONLY'] }
             }
             steps {
-                dir(WEB_DIR) {
+                dir("${WEB_DIR}") {
                     bat 'npm run build'
                 }
             }
@@ -201,10 +187,6 @@ module.exports = {
 
                         rem --- sync React build output ---
                         robocopy "${src}\\build" "${dst}\\build" /MIR /NFL /NDL /NJH /NJS
-                        if %errorlevel% leq 7 (set ERR=0) else (exit /b %errorlevel%)
-
-                        rem --- sync server files ---
-                        robocopy "${src}\\server" "${dst}\\server" /MIR /NFL /NDL /NJH /NJS
                         if %errorlevel% leq 7 (set ERR=0) else (exit /b %errorlevel%)
 
                         rem --- sync root files (server.js, package*.json) ---
@@ -247,8 +229,8 @@ module.exports = {
         PORT: ${params.WEB_PORT},
         NODE_ENV: 'production',
         APP_PREFIX: 'realtime-web',
-        BACKEND_PREFIX: '${params.BACKEND_PREFIX}',
-        BACKEND_HOST: '${params.BACKEND_HOST}',
+        BACKEND_PREFIX: 'realtime-service',
+        BACKEND_HOST: 'http://127.0.0.1:9090',
       }
     }
   ]

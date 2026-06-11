@@ -34,7 +34,7 @@ app.use((req, res, next) => {
 
 // Fallback for SPA: ส่ง index.html กลับในทุกเส้นทางที่ไม่พบไฟล์
 app.get(`${BASENAME}/*`, (req, res) => {
-  res.sendFile(express.static(path.join(__dirname, 'index.html')));
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
 // Start server
