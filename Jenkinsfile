@@ -127,23 +127,9 @@ pipeline {
         stage('Restart Services') {
             steps {
                 // pm2 restart ถ้ามีอยู่แล้ว ไม่งั้น pm2 start จาก ecosystem.config.js
-                bat """
-                    pm2 describe %BACKEND_PM2_NAME% >nul 2>&1
-                    if %ERRORLEVEL% equ 0 (
-                        pm2 restart %BACKEND_PM2_NAME%
-                    ) else (
-                        pm2 start "%BACKEND_DIR%\\ecosystem.config.js"
-                    )
-                """
-                bat """
-                    pm2 describe %FRONTEND_PM2_NAME% >nul 2>&1
-                    if %ERRORLEVEL% equ 0 (
-                        pm2 restart %FRONTEND_PM2_NAME%
-                    ) else (
-                        pm2 start "%FRONTEND_DIR%\\ecosystem.config.js"
-                    )
-                """
-
+                // ใช้ || แทน if %ERRORLEVEL% เพราะ reliable กว่าใน Windows batch
+                bat "pm2 restart %BACKEND_PM2_NAME% || pm2 start \"%BACKEND_DIR%\\ecosystem.config.js\""
+                bat "pm2 restart %FRONTEND_PM2_NAME% || pm2 start \"%FRONTEND_DIR%\\ecosystem.config.js\""
                 bat 'pm2 save'
                 bat 'pm2 list'
             }
@@ -152,10 +138,9 @@ pipeline {
         // ──────────────────────────────────────────────────────
         stage('Health Check') {
             steps {
-                // รอให้ service start แล้วตรวจสอบ
                 bat 'ping -n 6 127.0.0.1 >nul'
-                bat 'curl -sf http://127.0.0.1:9090/api/realtime-service/version || echo "Backend health check failed"'
-                bat 'curl -sf http://127.0.0.1:3008/realtime-web || echo "Frontend health check failed"'
+                bat 'curl -sf http://127.0.0.1:9090/api/realtime-service/version && echo Backend OK || echo Backend health check failed'
+                bat 'curl -sf http://127.0.0.1:3008/realtime-web && echo Frontend OK || echo Frontend health check failed'
             }
         }
     }
