@@ -138,9 +138,19 @@ pipeline {
         // ──────────────────────────────────────────────────────
         stage('Health Check') {
             steps {
-                bat 'ping -n 6 127.0.0.1 >nul'
-                bat 'curl -sf http://127.0.0.1:9090/api/realtime-service/version && echo Backend OK || echo Backend health check failed'
-                bat 'curl -sf http://127.0.0.1:3008/realtime-web && echo Frontend OK || echo Frontend health check failed'
+                script {
+                    def bEco = env.BACKEND_DIR.replace('\\', '/') + '/ecosystem.config.js'
+                    def fEco = env.FRONTEND_DIR.replace('\\', '/') + '/ecosystem.config.js'
+
+                    def backendPort   = bat(script: "@node -e \"var c=require('${bEco}').apps[0]; process.stdout.write(String(c.env.PORT))\"", returnStdout: true).trim()
+                    def backendPrefix = bat(script: "@node -e \"var c=require('${bEco}').apps[0]; process.stdout.write(c.env.APP_PREFIX)\"", returnStdout: true).trim()
+                    def frontendPort  = bat(script: "@node -e \"var c=require('${fEco}').apps[0]; process.stdout.write(String(c.env.PORT))\"", returnStdout: true).trim()
+                    def frontendName  = bat(script: "@node -e \"var c=require('${fEco}').apps[0]; process.stdout.write(c.name)\"", returnStdout: true).trim()
+
+                    bat 'ping -n 6 127.0.0.1 >nul'
+                    bat "curl -sf http://127.0.0.1:${backendPort}/api/${backendPrefix}/version && echo Backend OK || echo Backend health check failed"
+                    bat "curl -sf http://127.0.0.1:${frontendPort}/${frontendName} && echo Frontend OK || echo Frontend health check failed"
+                }
             }
         }
     }
