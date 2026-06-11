@@ -27,4 +27,3 @@ yarn-error.log*
 /server/build
 
 ecosystem.config.js
-_ecosystem.config.js
