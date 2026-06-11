@@ -30,3 +30,5 @@ Archive.zip
 
 # database backups
 /backups
+
+ecosystem.config.js
