@@ -126,10 +126,10 @@ pipeline {
         // ──────────────────────────────────────────────────────
         stage('Restart Services') {
             steps {
-                // pm2 restart ถ้ามีอยู่แล้ว ไม่งั้น pm2 start จาก ecosystem.config.js
-                // ใช้ || แทน if %ERRORLEVEL% เพราะ reliable กว่าใน Windows batch
-                bat "pm2 restart %BACKEND_PM2_NAME% || pm2 start \"%BACKEND_DIR%\\ecosystem.config.js\""
-                bat "pm2 restart %FRONTEND_PM2_NAME% || pm2 start \"%FRONTEND_DIR%\\ecosystem.config.js\""
+                // cd /d ก่อนเสมอ เพื่อให้ PM2 resolve script path (./bin/www, server.js)
+                // จาก deploy dir ไม่ใช่จาก Jenkins workspace
+                bat "cd /d \"%BACKEND_DIR%\" && (pm2 restart %BACKEND_PM2_NAME% || pm2 start ecosystem.config.js)"
+                bat "cd /d \"%FRONTEND_DIR%\" && (pm2 restart %FRONTEND_PM2_NAME% || pm2 start ecosystem.config.js)"
                 bat 'pm2 save'
                 bat 'pm2 list'
             }
