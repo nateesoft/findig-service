@@ -156,12 +156,7 @@ module.exports = {
                     def dst = "${params.DEPLOY_PATH}\\${SERVICE_DIR}"
                     bat """
                         cd /d "${dst}"
-                        pm2 describe realtime-service >nul 2>&1
-                        if %errorlevel% equ 0 (
-                            pm2 reload ecosystem.config.js --update-env --only realtime-service
-                        ) else (
-                            pm2 start ecosystem.config.js --only realtime-service
-                        )
+                        pm2 startOrRestart ecosystem.config.js --update-env --only realtime-service
                         pm2 save
                     """
                 }
@@ -274,12 +269,7 @@ module.exports = {
                     def dst = "${params.DEPLOY_PATH}\\${WEB_DIR}"
                     bat """
                         cd /d "${dst}"
-                        pm2 describe realtime-web >nul 2>&1
-                        if %errorlevel% equ 0 (
-                            pm2 restart ecosystem.config.js --update-env --only realtime-web
-                        ) else (
-                            pm2 start ecosystem.config.js --only realtime-web
-                        )
+                        pm2 startOrRestart ecosystem.config.js --update-env --only realtime-web
                         pm2 save
                     """
                 }
