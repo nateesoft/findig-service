@@ -54,13 +54,16 @@ pipeline {
         stage('Build Frontend') {
             steps {
                 dir('realtime-web') {
-                    withCredentials([
-                        string(credentialsId: 'react-app-api-key', variable: 'API_KEY')
-                    ]) {
+                    script {
+                        def ecoPath = env.FRONTEND_DIR.replace('\\', '/') + '/ecosystem.config.js'
+                        def apiKey = bat(
+                            script: "@node -e \"process.stdout.write(require('${ecoPath}').apps[0].env.REACT_APP_API_KEY)\"",
+                            returnStdout: true
+                        ).trim()
                         bat """
                             set REACT_APP_SERVICE_HOST=/api/realtime-service
                             set REACT_APP_API_USER=admin
-                            set REACT_APP_API_KEY=%API_KEY%
+                            set REACT_APP_API_KEY=${apiKey}
                             npm run build
                         """
                     }
