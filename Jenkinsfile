@@ -23,27 +23,15 @@ pipeline {
         // ──────────────────────────────────────────────────────
         stage('Checkout') {
             steps {
-                checkout scm
                 bat 'git log -1 --oneline'
             }
         }
 
         // ──────────────────────────────────────────────────────
         stage('Install Dependencies') {
-            parallel {
-                stage('Backend: npm ci') {
-                    steps {
-                        dir('realtime-service') {
-                            bat 'npm ci'
-                        }
-                    }
-                }
-                stage('Frontend: npm ci') {
-                    steps {
-                        dir('realtime-web') {
-                            bat 'npm ci'
-                        }
-                    }
+            steps {
+                dir('realtime-web') {
+                    bat 'npm ci'
                 }
             }
         }
@@ -92,7 +80,7 @@ pipeline {
                         """
 
                         // ติดตั้ง production deps ที่ deploy dir
-                        dir("%BACKEND_DIR%") {
+                        dir(env.BACKEND_DIR) {
                             bat 'npm ci --omit=dev'
                         }
                     }
@@ -127,7 +115,7 @@ pipeline {
                         """
 
                         // ติดตั้ง production deps ที่ deploy dir
-                        dir("%FRONTEND_DIR%") {
+                        dir(env.FRONTEND_DIR) {
                             bat 'npm ci --omit=dev'
                         }
                     }
