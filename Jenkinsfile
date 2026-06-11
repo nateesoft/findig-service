@@ -184,8 +184,8 @@ pipeline {
             bat 'pm2 list'
         }
         always {
-            // ล้าง workspace เพื่อประหยัด disk (optional)
-            // cleanWs()
+            echo 'Pipeline finished'
+            // cleanWs()  // ล้าง workspace เพื่อประหยัด disk (optional)
         }
     }
 }
