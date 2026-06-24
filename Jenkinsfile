@@ -10,7 +10,7 @@ pipeline {
         FRONTEND_DIR      = 'D:\\ICS-Projects\\apps\\findig-service\\realtime-web'
         BACKEND_PM2_NAME  = 'realtime-service'
         FRONTEND_PM2_NAME = 'realtime-web'
-        PM2_HOME          = 'C:\\ProgramData\\pm2'
+        PM2_HOME          = 'C:\\Users\\Administrator\\.pm2'
 
         // ป้องกัน Puppeteer โหลด Chromium ระหว่าง npm ci (เร็วกว่า)
         PUPPETEER_SKIP_DOWNLOAD = 'true'
