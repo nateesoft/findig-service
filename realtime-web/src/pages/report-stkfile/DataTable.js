@@ -82,6 +82,32 @@ const SaleTable = ({
     return Object.values(grouped).sort((a, b) => a.groupName.localeCompare(b.groupName));
   };
 
+  // สรุปยอดคงเหลือรวมทุกสาขา แยกตามรหัสสินค้า และรวมตามรหัสหลัก (ตัดส่วนหลัง "-" ตัวสุดท้าย เช่น TC170-01 -> TC170, TC-170-01 -> TC-170)
+  const summarizeByProductCode = (items) => {
+    const round = (n) => Math.round(n * 1000) / 1000;
+    const byBase = {};
+    items.forEach(item => {
+      const code = item.BPCode || '';
+      const dashIndex = code.lastIndexOf('-');
+      const baseCode = dashIndex > 0 ? code.slice(0, dashIndex) : code;
+      if (!byBase[baseCode]) {
+        byBase[baseCode] = { baseCode, total: 0, codes: {} };
+      }
+      const qty = Number(item.BalanceQty || 0);
+      byBase[baseCode].total += qty;
+      byBase[baseCode].codes[code] = (byBase[baseCode].codes[code] || 0) + qty;
+    });
+    return Object.values(byBase)
+      .sort((a, b) => a.baseCode.localeCompare(b.baseCode))
+      .map(base => ({
+        baseCode: base.baseCode,
+        total: round(base.total),
+        codes: Object.entries(base.codes)
+          .sort(([a], [b]) => a.localeCompare(b))
+          .map(([code, qty]) => ({ code, qty: round(qty) }))
+      }));
+  };
+
   // ฟังก์ชันสำหรับ toggle การแสดงรายละเอียดของสาขา
   const toggleBranchExpansion = (branchCode) => {
     const newExpanded = new Set(expandedBranches);
@@ -189,6 +215,13 @@ const SaleTable = ({
           th { background-color: #f5f5f5; font-weight: bold; }
           .text-center { text-align: center; }
           .print-date { text-align: right; margin-bottom: 10px; font-size: 12px; }
+          .summary-title { margin-top: 30px; margin-bottom: 8px; font-size: 14px; font-weight: bold; }
+          .summary-table { width: auto; min-width: 50%; }
+          .summary-table td { border: none; padding: 2px 16px 2px 0; }
+          .summary-total td { font-weight: bold; border-top: 1px solid #999; padding-bottom: 10px; }
+          .text-right { text-align: right; }
+          /* ระยะขอบกระดาษตอนพิมพ์ */
+          @page { margin: 15mm 12mm; }
           @media print {
             body { margin: 0; }
             .no-print { display: none; }
@@ -250,6 +283,25 @@ const SaleTable = ({
         <div style="margin-top: 20px; text-align: center; font-size: 12px;">
           จำนวนสาขาทั้งหมด: ${sortedGroups.length} สาขา, จำนวนรายการทั้งหมด: ${filteredSales.length} รายการ
         </div>
+        <div class="summary-title">รวมทุกสาขาแยกตามรหัสสินค้า</div>
+        <table class="summary-table">
+          <tbody>
+            ${summarizeByProductCode(filteredSales).map(base => `
+              ${base.codes.map((c, i) => `
+                <tr>
+                  <td>${i === 0 ? 'รวม' : ''}</td>
+                  <td>${c.code}</td>
+                  <td class="text-right">${c.qty.toLocaleString()}</td>
+                </tr>
+              `).join('')}
+              <tr class="summary-total">
+                <td>รวมทั้งหมด</td>
+                <td>${base.baseCode}</td>
+                <td class="text-right">${base.total.toLocaleString()}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
       </body>
       </html>
     `;
@@ -304,6 +356,20 @@ const SaleTable = ({
           ]);
         });
       });
+    });
+
+    // สรุปรวมทุกสาขาแยกตามรหัสสินค้า
+    worksheetData.push([]);
+    worksheetData.push([
+      `จำนวนสาขาทั้งหมด: ${sortedGroups.length} สาขา, จำนวนรายการทั้งหมด: ${filteredSales.length} รายการ`
+    ]);
+    worksheetData.push([]);
+    worksheetData.push(['รวมทุกสาขาแยกตามรหัสสินค้า']);
+    summarizeByProductCode(filteredSales).forEach(base => {
+      base.codes.forEach((c, i) => {
+        worksheetData.push([i === 0 ? 'รวม' : '', c.code, c.qty]);
+      });
+      worksheetData.push(['รวมทั้งหมด', base.baseCode, base.total]);
     });
 
     // สร้าง worksheet
