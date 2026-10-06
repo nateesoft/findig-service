@@ -137,22 +137,64 @@ const getReportStkfile = async ({ db, payload }) => {
       throw new Error('POS database connection not available')
     }
 
-    const { Branch_Start, Branch_End, GroupCode_Start, GroupCode_End, BPCode, BStk } = payload
-    let sql = `select p.PCode, p.PDesc, p.PGroup, g.GroupName, st.* 
-      from stkfile st 
-      left join product p on st.BPCode = p.PCode 
-      left join groupfile g on p.PGroup = g.GroupCode 
-      where 1=1 `
+    const { Branch_Start, Branch_End, GroupCode_Start, GroupCode_End, BPCode, BStk, Date_Start, Date_End } = payload
+
+    // ช่วงแบบเลือกได้ทีละฝั่ง: เลือกแค่เริ่มต้น -> >=, แค่สิ้นสุด -> <=
+    const rangeFilter = (column, start, end) => {
+      if (start && end) return { sql: `and ${column} between ? and ? `, params: [start, end] }
+      if (start) return { sql: `and ${column} >= ? `, params: [start] }
+      if (end) return { sql: `and ${column} <= ? `, params: [end] }
+      return { sql: '', params: [] }
+    }
+
     const params = []
-    
-    if (Branch_Start && Branch_End) {
-      sql += `and st.Branch between ? and ? `
-      params.push(Branch_Start, Branch_End)
+    let sql
+    if (Date_End) {
+      // ยอด ณ วันที่ Date_End = ยอดปัจจุบัน (BQty24) - ความเคลื่อนไหวใน stcard หลัง Date_End
+      // รับ/จ่าย = ความเคลื่อนไหวในช่วง Date_Start..Date_End, ยกมา = คงเหลือ - รับ + จ่าย
+      const mvBranch = rangeFilter('S_Bran', Branch_Start, Branch_End)
+      let mvSql = `select S_Bran, S_Stk, S_PCode,
+          sum(case when S_Date > ? then S_In - S_Out else 0 end) as AfterEndQty,
+          sum(case when S_Date <= ? then S_In else 0 end) as InQty,
+          sum(case when S_Date <= ? then S_Out else 0 end) as OutQty
+        from stcard where 1=1 `
+      params.push(Date_End, Date_End, Date_End)
+      if (Date_Start) {
+        mvSql += `and S_Date >= ? `
+        params.push(Date_Start)
+      }
+      mvSql += mvBranch.sql
+      params.push(...mvBranch.params)
+      if (BStk) {
+        mvSql += `and S_Stk = ? `
+        params.push(BStk)
+      }
+      mvSql += `group by S_Bran, S_Stk, S_PCode`
+
+      sql = `select p.PCode, p.PDesc, p.PGroup, g.GroupName, st.*,
+          round(st.BQty24 - ifnull(mv.AfterEndQty, 0), 3) as BalanceQty,
+          round(ifnull(mv.InQty, 0), 3) as InQty,
+          round(ifnull(mv.OutQty, 0), 3) as OutQty,
+          round(st.BQty24 - ifnull(mv.AfterEndQty, 0) - ifnull(mv.InQty, 0) + ifnull(mv.OutQty, 0), 3) as OpeningQty
+        from stkfile st
+        left join product p on st.BPCode = p.PCode
+        left join groupfile g on p.PGroup = g.GroupCode
+        left join (${mvSql}) mv on mv.S_Bran = st.Branch and mv.S_Stk = st.BStk and mv.S_PCode = st.BPCode
+        where 1=1 `
+    } else {
+      sql = `select p.PCode, p.PDesc, p.PGroup, g.GroupName, st.*, st.BQty24 as BalanceQty
+        from stkfile st
+        left join product p on st.BPCode = p.PCode
+        left join groupfile g on p.PGroup = g.GroupCode
+        where 1=1 `
     }
-    if (GroupCode_Start && GroupCode_End) {
-      sql += `and g.GroupCode between ? and ? `
-      params.push(GroupCode_Start, GroupCode_End)
-    }
+
+    const branch = rangeFilter('st.Branch', Branch_Start, Branch_End)
+    sql += branch.sql
+    params.push(...branch.params)
+    const group = rangeFilter('g.GroupCode', GroupCode_Start, GroupCode_End)
+    sql += group.sql
+    params.push(...group.params)
     if (BPCode) {
       sql += `and st.BPCode like ? `
       params.push(`%${BPCode}%`)

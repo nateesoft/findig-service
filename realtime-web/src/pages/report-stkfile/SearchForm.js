@@ -110,7 +110,7 @@ const SearchForm = ({
             currentTheme
           )} mb-2`}
         >
-          สาขาสิ้นสุด
+          สาขาเริ่มต้น
         </label>
         <Select
           options={[
@@ -157,7 +157,7 @@ const SearchForm = ({
             currentTheme
           )} mb-2`}
         >
-          สาขาเริ่มต้น
+          สาขาสิ้นสุด
         </label>
         <Select
           options={[
@@ -216,14 +216,14 @@ const SearchForm = ({
             })) : [])
           ]}
           value={(() => {
-            if (searchCriteria.GroupCode1 === "") return { value: "", label: "ทุกกลุ่มสินค้า" };
-            const found = groupFile?.find(item => item.GroupCode === searchCriteria.GroupCode1);
+            if (searchCriteria.GroupCode_Start === "") return { value: "", label: "ทุกกลุ่มสินค้า" };
+            const found = groupFile?.find(item => item.GroupCode === searchCriteria.GroupCode_Start);
             return found ? { value: found.GroupCode, label: `${found.GroupCode}-${found.GroupName}` } : null;
           })()}
           onChange={option =>
             setSearchCriteria({
               ...searchCriteria,
-              GroupCode1: option ? option.value : ""
+              GroupCode_Start: option ? option.value : ""
             })
           }
           isClearable
@@ -263,14 +263,14 @@ const SearchForm = ({
             })) : [])
           ]}
           value={(() => {
-            if (searchCriteria.GroupCode2 === "") return { value: "", label: "ทุกกลุ่มสินค้า" };
-            const found = groupFile?.find(item => item.GroupCode === searchCriteria.GroupCode2);
+            if (searchCriteria.GroupCode_End === "") return { value: "", label: "ทุกกลุ่มสินค้า" };
+            const found = groupFile?.find(item => item.GroupCode === searchCriteria.GroupCode_End);
             return found ? { value: found.GroupCode, label: `${found.GroupCode}-${found.GroupName}` } : null;
           })()}
           onChange={option =>
             setSearchCriteria({
               ...searchCriteria,
-              GroupCode2: option ? option.value : ""
+              GroupCode_End: option ? option.value : ""
             })
           }
           isClearable
@@ -304,14 +304,14 @@ const SearchForm = ({
         <Select
           options={[{ value: "", label: "ทุกคลัง" }, { value: "A1", label: "คลังสินค้าหลัก" }]}
           value={(() => {
-            if (searchCriteria.S_Stk === "") return { value: "", label: "ทุกคลัง" };
-            if (searchCriteria.S_Stk === "A1") return { value: "A1", label: "คลังสินค้าหลัก" };
+            if (searchCriteria.BStk === "") return { value: "", label: "ทุกคลัง" };
+            if (searchCriteria.BStk === "A1") return { value: "A1", label: "คลังสินค้าหลัก" };
             return null;
           })()}
           onChange={option =>
             setSearchCriteria({
               ...searchCriteria,
-              S_Stk: option ? option.value : ""
+              BStk: option ? option.value : ""
             })
           }
           isClearable

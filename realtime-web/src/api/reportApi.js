@@ -1,3 +1,4 @@
+import axios from "axios"
 import apiClient, { handleApiError } from "../httpRequest"
 import { getBranchFromToken } from "../utils/auth"
 
@@ -31,12 +32,14 @@ export const loadStcardReport = async (payload) => {
     }
 }
 
-export const loadStkfileReport = async (payload) => {
+export const loadStkfileReport = async (payload, signal) => {
     const branchCode = getBranchFromToken()
     try {
-        const response = await apiClient.post(`/report/stkfile?branchCode=${branchCode}`, payload)
+        const response = await apiClient.post(`/report/stkfile?branchCode=${branchCode}`, payload, { signal })
         return { data: response.data, error: null }
     } catch (error) {
+        // ให้ผู้เรียกจัดการการยกเลิกเอง ไม่แสดงเป็น network error
+        if (axios.isCancel(error)) throw error
         return handleApiError(error)
     }
 }
