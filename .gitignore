@@ -1,0 +1,5 @@
+# MySQL data directory mounted by the local Docker container (mysql8)
+docker-images/**/data/
+
+# Local environment files (contain DB credentials)
+.env.local

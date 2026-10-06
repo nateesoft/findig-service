@@ -23,6 +23,7 @@ const SaleTable = ({
     currentTheme,
     filteredSales,
     searchCriteria,
+    searchedCriteria,
     resetSearch,
     isLoading
 }) => {
@@ -32,6 +33,12 @@ const SaleTable = ({
   const [expandedBranches, setExpandedBranches] = useState(new Set());
   const [expandedGroups, setExpandedGroups] = useState(new Set());
   const itemsPerPage = 10;
+
+  // ค้นหาแบบระบุวันที่ -> backend ส่ง ยกมา/รับ/จ่าย มาด้วย และคงเหลือเป็นยอด ณ วันที่สิ้นสุด
+  const hasMovement = filteredSales.some(item => item.InQty !== undefined);
+  const periodText = hasMovement
+    ? `ช่วงวันที่ ${searchedCriteria?.Date_Start || 'เริ่มต้น'} ถึง ${searchedCriteria?.Date_End || 'ปัจจุบัน'}`
+    : '';
   
   // ฟังก์ชันจัดกลุ่มข้อมูลตามสาขา
   const groupByBranch = (sales) => {
@@ -47,7 +54,7 @@ const SaleTable = ({
       }
       acc[branchCode].items.push(item);
       acc[branchCode].totalItems += 1;
-      acc[branchCode].totalQty += Number(item.BQty24 || 0);
+      acc[branchCode].totalQty += Number(item.BalanceQty || 0);
       return acc;
     }, {});
     
@@ -68,11 +75,37 @@ const SaleTable = ({
       }
       acc[groupName].items.push(item);
       acc[groupName].totalItems += 1;
-      acc[groupName].totalQty += Number(item.BQty24 || 0);
+      acc[groupName].totalQty += Number(item.BalanceQty || 0);
       return acc;
     }, {});
     
     return Object.values(grouped).sort((a, b) => a.groupName.localeCompare(b.groupName));
+  };
+
+  // สรุปยอดคงเหลือรวมทุกสาขา แยกตามรหัสสินค้า และรวมตามรหัสหลัก (ตัดส่วนหลัง "-" ตัวสุดท้าย เช่น TC170-01 -> TC170, TC-170-01 -> TC-170)
+  const summarizeByProductCode = (items) => {
+    const round = (n) => Math.round(n * 1000) / 1000;
+    const byBase = {};
+    items.forEach(item => {
+      const code = item.BPCode || '';
+      const dashIndex = code.lastIndexOf('-');
+      const baseCode = dashIndex > 0 ? code.slice(0, dashIndex) : code;
+      if (!byBase[baseCode]) {
+        byBase[baseCode] = { baseCode, total: 0, codes: {} };
+      }
+      const qty = Number(item.BalanceQty || 0);
+      byBase[baseCode].total += qty;
+      byBase[baseCode].codes[code] = (byBase[baseCode].codes[code] || 0) + qty;
+    });
+    return Object.values(byBase)
+      .sort((a, b) => a.baseCode.localeCompare(b.baseCode))
+      .map(base => ({
+        baseCode: base.baseCode,
+        total: round(base.total),
+        codes: Object.entries(base.codes)
+          .sort(([a], [b]) => a.localeCompare(b))
+          .map(([code, qty]) => ({ code, qty: round(qty) }))
+      }));
   };
 
   // ฟังก์ชันสำหรับ toggle การแสดงรายละเอียดของสาขา
@@ -182,6 +215,13 @@ const SaleTable = ({
           th { background-color: #f5f5f5; font-weight: bold; }
           .text-center { text-align: center; }
           .print-date { text-align: right; margin-bottom: 10px; font-size: 12px; }
+          .summary-title { margin-top: 30px; margin-bottom: 8px; font-size: 14px; font-weight: bold; }
+          .summary-table { width: auto; min-width: 50%; }
+          .summary-table td { border: none; padding: 2px 16px 2px 0; }
+          .summary-total td { font-weight: bold; border-top: 1px solid #999; padding-bottom: 10px; }
+          .text-right { text-align: right; }
+          /* ระยะขอบกระดาษตอนพิมพ์ */
+          @page { margin: 15mm 12mm; }
           @media print {
             body { margin: 0; }
             .no-print { display: none; }
@@ -191,6 +231,7 @@ const SaleTable = ({
       <body>
         <div class="print-date">วันที่พิมพ์: ${new Date().toLocaleDateString('th-TH')}</div>
         <h1>รายงาน สินค้าคงเหลือ</h1>
+        ${periodText ? `<div class="text-center" style="margin-bottom: 10px; font-size: 12px;">${periodText}</div>` : ''}
         <table>
           <thead>
             <tr>
@@ -199,6 +240,10 @@ const SaleTable = ({
               <th>รหัสสินค้า</th>
               <th>ชื่อสินค้า</th>
               <th class="text-center">หมวดสินค้า</th>
+              ${hasMovement ? `
+              <th class="text-center">ยกมา</th>
+              <th class="text-center">รับ</th>
+              <th class="text-center">จ่าย</th>` : ''}
               <th class="text-center">คงเหลือ</th>
               <th class="text-center">คลัง</th>
             </tr>
@@ -206,13 +251,13 @@ const SaleTable = ({
           <tbody>
             ${sortedGroups.map(group => `
               <tr style="background-color: #f8fafc; font-weight: bold;">
-                <td colspan="7" style="padding: 12px;">
+                <td colspan="${hasMovement ? 10 : 7}" style="padding: 12px;">
                   สาขา: ${group.branchCode} (${group.totalItems} รายการ, รวม ${group.totalQty} ชิ้น)
                 </td>
               </tr>
               ${groupByProductGroup(group.items).map(productGroup => `
                 <tr style="background-color: #f1f5f9; font-weight: bold;">
-                  <td colspan="7" style="padding-left: 20px;">
+                  <td colspan="${hasMovement ? 10 : 7}" style="padding-left: 20px;">
                     กลุ่ม: ${productGroup.groupName} (${productGroup.totalItems} รายการ, รวม ${productGroup.totalQty} ชิ้น)
                   </td>
                 </tr>
@@ -223,7 +268,11 @@ const SaleTable = ({
                     <td>${item.BPCode || ''}</td>
                     <td>${item.PDesc || ''}</td>
                     <td class="text-center">${item.PGroup || ''}</td>
-                    <td class="text-center">${item.BQty24 || ''}</td>
+                    ${hasMovement ? `
+                    <td class="text-center">${item.OpeningQty ?? ''}</td>
+                    <td class="text-center">${item.InQty ?? ''}</td>
+                    <td class="text-center">${item.OutQty ?? ''}</td>` : ''}
+                    <td class="text-center">${item.BalanceQty ?? ''}</td>
                     <td class="text-center">${item.BStk || ''}</td>
                   </tr>
                 `).join('')}
@@ -234,6 +283,25 @@ const SaleTable = ({
         <div style="margin-top: 20px; text-align: center; font-size: 12px;">
           จำนวนสาขาทั้งหมด: ${sortedGroups.length} สาขา, จำนวนรายการทั้งหมด: ${filteredSales.length} รายการ
         </div>
+        <div class="summary-title">รวมทุกสาขาแยกตามรหัสสินค้า</div>
+        <table class="summary-table">
+          <tbody>
+            ${summarizeByProductCode(filteredSales).map(base => `
+              ${base.codes.map((c, i) => `
+                <tr>
+                  <td>${i === 0 ? 'รวม' : ''}</td>
+                  <td>${c.code}</td>
+                  <td class="text-right">${c.qty.toLocaleString()}</td>
+                </tr>
+              `).join('')}
+              <tr class="summary-total">
+                <td>รวมทั้งหมด</td>
+                <td>${base.baseCode}</td>
+                <td class="text-right">${base.total.toLocaleString()}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
       </body>
       </html>
     `;
@@ -251,8 +319,13 @@ const SaleTable = ({
     const worksheetData = [];
     
     // เพิ่ม headers
+    if (periodText) {
+      worksheetData.push([periodText]);
+    }
     worksheetData.push([
-      'สาขา', 'กลุ่มสินค้า', 'รหัสสินค้า', 'ชื่อสินค้า', 'หมวดสินค้า', 'คงเหลือ', 'คลัง'
+      'สาขา', 'กลุ่มสินค้า', 'รหัสสินค้า', 'ชื่อสินค้า', 'หมวดสินค้า',
+      ...(hasMovement ? ['ยกมา', 'รับ', 'จ่าย'] : []),
+      'คงเหลือ', 'คลัง'
     ]);
     
     // เพิ่มข้อมูล
@@ -277,11 +350,26 @@ const SaleTable = ({
             item.BPCode || '',
             item.PDesc || '',
             item.PGroup || '',
-            item.BQty24 || '',
+            ...(hasMovement ? [item.OpeningQty ?? '', item.InQty ?? '', item.OutQty ?? ''] : []),
+            item.BalanceQty ?? '',
             item.BStk || ''
           ]);
         });
       });
+    });
+
+    // สรุปรวมทุกสาขาแยกตามรหัสสินค้า
+    worksheetData.push([]);
+    worksheetData.push([
+      `จำนวนสาขาทั้งหมด: ${sortedGroups.length} สาขา, จำนวนรายการทั้งหมด: ${filteredSales.length} รายการ`
+    ]);
+    worksheetData.push([]);
+    worksheetData.push(['รวมทุกสาขาแยกตามรหัสสินค้า']);
+    summarizeByProductCode(filteredSales).forEach(base => {
+      base.codes.forEach((c, i) => {
+        worksheetData.push([i === 0 ? 'รวม' : '', c.code, c.qty]);
+      });
+      worksheetData.push(['รวมทั้งหมด', base.baseCode, base.total]);
     });
 
     // สร้าง worksheet
@@ -629,10 +717,17 @@ const SaleTable = ({
                                     currentTheme
                                   )} uppercase tracking-wider pl-16`}
                                 >
-                                  <div className="grid grid-cols-5 gap-4">
+                                  <div className={`grid ${hasMovement ? 'grid-cols-8' : 'grid-cols-5'} gap-4`}>
                                     <span>รหัสสินค้า</span>
                                     <span>ชื่อสินค้า</span>
                                     <span>หมวดสินค้า</span>
+                                    {hasMovement && (
+                                      <>
+                                        <span>ยกมา</span>
+                                        <span>รับ</span>
+                                        <span>จ่าย</span>
+                                      </>
+                                    )}
                                     <span>คงเหลือ</span>
                                     <span>คลัง</span>
                                   </div>
@@ -652,11 +747,18 @@ const SaleTable = ({
                                       currentTheme
                                     )} pl-16`}
                                   >
-                                    <div className="grid grid-cols-5 gap-4">
+                                    <div className={`grid ${hasMovement ? 'grid-cols-8' : 'grid-cols-5'} gap-4`}>
                                       <span>{item.BPCode}</span>
                                       <span className="truncate" title={item.PDesc}>{item.PDesc}</span>
                                       <span>{item.PGroup}</span>
-                                      <span>{item.BQty24}</span>
+                                      {hasMovement && (
+                                        <>
+                                          <span>{item.OpeningQty}</span>
+                                          <span>{item.InQty}</span>
+                                          <span>{item.OutQty}</span>
+                                        </>
+                                      )}
+                                      <span>{item.BalanceQty}</span>
                                       <span>{item.BStk}</span>
                                     </div>
                                   </td>

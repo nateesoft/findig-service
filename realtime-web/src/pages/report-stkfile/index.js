@@ -19,6 +19,7 @@ const Sales = () => {
   const { currentTheme, branchCode } = appData
 
   const [filteredSales, setFilteredSales] = useState([])
+  const [searchedCriteria, setSearchedCriteria] = useState(null)
   const [showSaleModal, setShowSaleModal] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [showSearchForm, setShowSearchForm] = useState(true);
@@ -28,6 +29,8 @@ const Sales = () => {
   
   // Search criteria state
   const [searchCriteria, setSearchCriteria] = useState({
+    Date_Start: '',
+    Date_End: '',
     Branch_Start: branchCode || '',
     Branch_End: branchCode || '',
     GroupCode_Start: '',
@@ -36,18 +39,38 @@ const Sales = () => {
     BStk: '',
   });
 
+  const toComparableDate = (str) => str.split('/').reverse().join('');
+
   const handleSearch = async () => {
+    const { Date_Start, Date_End } = searchCriteria;
+    if (Date_Start && Date_End && toComparableDate(Date_Start) > toComparableDate(Date_End)) {
+      setActiveModal({
+        type: 'error',
+        title: 'วันที่ไม่ถูกต้อง',
+        message: 'วันที่เริ่มต้นต้องไม่มากกว่าวันที่สิ้นสุด',
+        actions: [
+          {
+            label: 'ตกลง',
+            onClick: () => setActiveModal(null)
+          }
+        ]
+      });
+      return;
+    }
+
+    // สร้าง AbortController ใหม่และยกเลิก request เดิม (ถ้ามี)
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     try {
-      // สร้าง AbortController ใหม่และยกเลิก request เดิม (ถ้ามี)
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-      abortControllerRef.current = new AbortController();
-      
       setIsLoading(true)
-      const { data, error } = await loadStkfileReport(searchCriteria, abortControllerRef.current.signal)
+      const { data, error } = await loadStkfileReport(searchCriteria, controller.signal)
       if(data){
         setFilteredSales(data);
+        setSearchedCriteria(searchCriteria);
       }
       if(error){
         setActiveModal({
@@ -63,7 +86,7 @@ const Sales = () => {
         });
       }
     } catch (err) {
-      if (err.name !== 'AbortError') {
+      if (err.name !== 'AbortError' && err.name !== 'CanceledError') {
         setActiveModal({
           type: 'error',
           title: 'ไม่สามารถแสดงข้อมูลได้',
@@ -77,8 +100,11 @@ const Sales = () => {
         });
       }
     } finally {
-      setIsLoading(false)
-      abortControllerRef.current = null;
+      // ถ้ามีการค้นหาใหม่มาแทนแล้ว ไม่ต้องไปรีเซ็ตสถานะของการค้นหาใหม่
+      if (abortControllerRef.current === controller) {
+        setIsLoading(false)
+        abortControllerRef.current = null;
+      }
     }
   };
 
@@ -92,6 +118,8 @@ const Sales = () => {
 
   const resetSearch = () => {
     setSearchCriteria({
+      Date_Start: '',
+      Date_End: '',
       Branch_Start: branchCode || '',
       Branch_End: branchCode || '',
       GroupCode_Start: '',
@@ -100,6 +128,7 @@ const Sales = () => {
       BStk: '',
     });
     setFilteredSales([]);
+    setSearchedCriteria(null);
   };
 
   useEffect(() => {
@@ -196,6 +225,7 @@ const Sales = () => {
         currentTheme={currentTheme}
         filteredSales={filteredSales}
         searchCriteria={searchCriteria}
+        searchedCriteria={searchedCriteria}
         resetSearch={resetSearch}
         isLoading={isLoading}
       />
